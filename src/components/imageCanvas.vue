@@ -22,6 +22,10 @@ watch(
     deep: true,
  })
 
+function getSelectionNorm() {
+    return [0, 1].map(x => (selection_start.value[x]-selection_end.value[x])**2).reduce((a, b) => a+b)
+}
+
 function showImage(url) {
     var image = new Image()
 
@@ -37,42 +41,51 @@ function showImage(url) {
     };
 }
 
-
 function add_color_element(event) {
     // If currently not using a selection tool
     if (!selection_tool_active.value) {
         // Read color of pixel
-        var pixelData = canvasElement.value.getContext('2d', { willReadFrequently: true }).getImageData(event.offsetX, event.offsetY, 1, 1).data;
+        var xy = calculate_XY_position(event)
+        var pixelData = canvasElement.value.getContext('2d', { willReadFrequently: true }).getImageData(xy[0], xy[1], 1, 1).data;
 
         // Create entry in colors array
-        props.colors[props.colors.length] = {color: pixelData, xPos: event.offsetX, yPos: event.offsetY, rgba: arrayToRgbStr(pixelData), hovered: false}
+        props.colors[props.colors.length] = {color: pixelData, xPos: xy[0], yPos: xy[1], rgba: arrayToRgbStr(pixelData), hovered: false, selected: false}
     } else {
         selection_tool_active.value = false
     }
 }
 
+function calculate_XY_position(event) {
+    var canvasRect = canvasElement.value.getBoundingClientRect()
+    var targetRect = event.target.getBoundingClientRect()
+    
+    return [targetRect.x - canvasRect.x + event.offsetX, targetRect.y - canvasRect.y + event.offsetY]
+}
+
 function mouse_down(event){
-    selection_start.value = [event.offsetX, event.offsetY]
+    selection_start.value = calculate_XY_position(event)
+    selection_end.value = selection_start.value
 }
 
 function mouse_move(event){
-    selection_tool_active.value = true
+
     if (event.buttons === 1) {
-        if (event.target !== canvasElement.value) {
-            var offset = [0,0]
-            if (window.getComputedStyle(event.target).getPropertyValue('transform') !== 'none') {
-                const res = window.getComputedStyle(event.target).getPropertyValue('transform')
-                offset = res.slice(0,-1).split(',').slice(4).map(x => Number(x))
-            }
-            selection_end.value = [event.offsetX + event.target.offsetLeft + offset[0], event.offsetY + event.target.offsetTop + offset[1]]
-        }
-        else {
-            selection_end.value = [event.offsetX, event.offsetY]
+        
+        selection_end.value = calculate_XY_position(event)
+        if (!selection_tool_active.value && (getSelectionNorm() > 50)) {
+            selection_tool_active.value = true
         }
     }
 }
 
-function mouse_up(event){
+function mouse_up(_){
+        selection_start.value = [0, 0]
+        selection_end.value = [0, 0]
+}
+
+function mouse_leave(event){
+    mouse_up(event)
+    selection_tool_active.value = false
 }
 
 function arrayToRgbStr(arr) {
@@ -86,14 +99,15 @@ function arrayToRgbStr(arr) {
             @mousedown="mouse_down"
             @click="add_color_element"
             @mouseup="mouse_up"
-            @mousemove="mouse_move">
+            @mousemove="mouse_move"
+            @mouseleave="mouse_leave">
         <canvas id="canvas" ref="canvasElement">
         </canvas>
         <div>
         <colorCircleElement v-for="(color, index) in colors" :key="index" :color="color" :colors="colors">
         </colorCircleElement>
         </div>
-        <RectAngularSelectionElement :startSelection="selection_start" :endSelection="selection_end"></RectAngularSelectionElement>
+        <RectAngularSelectionElement :startSelection="selection_start" :endSelection="selection_end" :active="selection_tool_active" :colors="colors"></RectAngularSelectionElement>
     </div>
 </template>
 

@@ -11,9 +11,9 @@ onMounted(() => {
 
 <template>
     <div ref="colorCircleRef"
-    :class="{hovered: props.color.hovered}"
+    :class="{hovered: props.color.hovered, selected: props.color.selected}"
     :style="{ left: props.color.xPos + 'px', top: props.color.yPos + 'px', backgroundColor: props.color.rgba}"
-    @click="deleteSelf(props)"
+    @click.stop="deleteSelf(props)"
     @mouseover="onHover(props)"
     @mouseleave="unHoverAll(props)"
     class="colorCirlce"></div>
@@ -29,9 +29,5 @@ onMounted(() => {
     border-color: rgba(0,0,0,.3);
     border-width: 2px;
     border-style: solid;
-}
-
-.hovered {
-    border-color: rgba(0,0,0,.5) !important ;
 }
 </style>

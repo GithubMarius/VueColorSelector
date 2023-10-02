@@ -9,7 +9,7 @@ const imageCanvasInstance = ref(null)
 const imageElement = ref(null)
 const colorContainerElement = ref(null)
 const imgUrl = ref('src/assets/Fritz.jpg')
-const colors= ref([{color: [0.5,1,1,1], xPos: 0, yPos: 0, rgba: 'rgba(200,20,1,1)', hovered: false}])
+const colors= ref([{color: [0.5,1,1,1], xPos: 0, yPos: 0, rgba: 'rgba(200,20,1,1)', hovered: false, selected: false}])
 
 // functions that mutate state and trigger updates
 

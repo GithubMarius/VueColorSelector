@@ -1,10 +1,10 @@
 <script setup>
-import { ref, watch, defineProps, onMounted } from 'vue'
+import { ref, defineProps, onMounted } from 'vue'
 import {deleteSelf, onHover, unHoverAll} from './colorUtils'
 
 const props = defineProps(['color', 'colors'])
 const colorBlockRef = ref(0)
-const key=ref(0)
+const key=ref(null)
 
 onMounted(() => {
   })
@@ -12,7 +12,7 @@ onMounted(() => {
 
 <template>
 <div ref="colorBlockRef" class="color_block"
-:class="{hovered: props.color.hovered}"
+:class="{hovered: props.color.hovered, selected: props.color.selected}"
 :style="{backgroundColor: props.color.rgba}"
 @click="deleteSelf(props)"
 @mouseover="onHover(props)"
@@ -30,5 +30,9 @@ onMounted(() => {
 
 .hovered {
   border-color: rgba(0,0,0,0.2) !important;
+}
+
+.selected {
+  border-color:  rgb(14, 137, 231) !important; 
 }
 </style>
