@@ -1,10 +1,18 @@
 <script setup>
-import { ref, defineProps, onMounted } from 'vue'
+import { ref, defineProps, onMounted, computed } from 'vue'
 import {deleteSelf, onHover, unHoverAll} from './colorUtils'
 
-const props = defineProps(['color', 'colors'])
+const props = defineProps(['color', 'colors', 'group_name', 'show_all'])
 const colorBlockRef = ref(0)
 const key=ref(null)
+
+const check_group = computed(() => {
+  console.log(props.color.group)
+  console.log(props.group_name)
+  return props.show_all || ((props.color.group.length === 0) && !props.group_name) || (props.color.group === props.group_name)
+  // return props.show_all || ((props.color.group.length === 0) && !props.group_name) || (props.color.group === props.group_name)
+  // return ((props.color.group.length === 0) && !props.group_name) || props.color.group.includes(props.group_name)
+})
 
 onMounted(() => {
   })
@@ -12,6 +20,8 @@ onMounted(() => {
 
 <template>
 <div ref="colorBlockRef" class="color_block"
+v-if="check_group"
+
 :class="{hovered: props.color.hovered, selected: props.color.selected}"
 :style="{backgroundColor: props.color.rgba}"
 @click="deleteSelf(props)"

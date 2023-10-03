@@ -35,10 +35,16 @@ function showImage(url) {
 
     //Validate the File Height and Width.
     image.onload = function () {
-    canvasElement.value.width = this.width
-    canvasElement.value.height = this.height
-    canvasElement.value.getContext('2d').drawImage(this, 0, 0);
-    return true;
+        canvasElement.value.width = this.width
+        canvasElement.value.height = this.height
+
+        // Set container width
+        canvasContainerRef.value.style.width = this.width + 'px'
+        canvasContainerRef.value.style.height = this.height + 'px'
+
+
+        canvasElement.value.getContext('2d').drawImage(this, 0, 0);
+        return true;
     };
 }
 
@@ -50,7 +56,7 @@ function add_color_element(event) {
         var pixelData = canvasElement.value.getContext('2d', { willReadFrequently: true }).getImageData(xy[0], xy[1], 1, 1).data;
 
         // Create entry in colors array
-        props.colors[props.colors.length] = {color: pixelData, xPos: xy[0], yPos: xy[1], rgba: arrayToRgbStr(pixelData), hovered: false, selected: false}
+        props.colors[props.colors.length] = {color: pixelData, xPos: xy[0], yPos: xy[1], rgba: arrayToRgbStr(pixelData), hovered: false, selected: false, group: ''}
     } else {
         selection_tool_active.value = false
     }
@@ -106,14 +112,15 @@ function arrayToRgbStr(arr) {
 </script>
 
 <template>
-    <div ref="canvasContainerRef"
+    <div ref="canvasContainerRef" class="container position-relative"
             @mousedown.left="mouse_down"
             @mousedown.right="drop_selection"
             @contextmenu.prevent
             @click="add_color_element"
             @mouseup="mouse_up"
             @mousemove="mouse_move"
-            @mouseleave="mouse_leave">
+            @mouseleave="mouse_leave"
+        >
         <canvas id="canvas" ref="canvasElement">
         </canvas>
         <div>
@@ -129,4 +136,5 @@ function arrayToRgbStr(arr) {
     position: absolute;
     left: 0px;
 }
+
 </style>
