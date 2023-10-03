@@ -25,11 +25,11 @@ onMounted(() => {
   display: inline-block;
   width: 50px;
   height: 50px;
-  border: 5px solid rgba(0,0,0,0);
+  border: 2px solid rgba(0,0,0,0);
 }
 
 .hovered {
-  border-color: rgba(0,0,0,0.2) !important;
+  border-color: rgba(0,0,0,0.7) !important;
 }
 
 .selected {

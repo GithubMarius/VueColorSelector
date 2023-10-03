@@ -7,6 +7,7 @@ const props = defineProps(['url', 'colorContainerElement', 'colors'])
 
 const canvasElement = ref(null)
 const canvasContainerRef = ref(null)
+const rectangularSelectionRef = ref(null)
 
 const selection_start = ref([0,0])
 const selection_end = ref([0,0])
@@ -15,7 +16,6 @@ const selection_tool_active = ref(false)
 watch(
     () => props.url,
       (newUrl, _) => {
-        console.log(newUrl)
         showImage(newUrl)
      }, {
     immediate: true,
@@ -27,6 +27,7 @@ function getSelectionNorm() {
 }
 
 function showImage(url) {
+    // Open image from url
     var image = new Image()
 
     //Set the Base64 string return from FileReader as source.
@@ -56,13 +57,23 @@ function add_color_element(event) {
 }
 
 function calculate_XY_position(event) {
+    // Calculate xy position relative to canvas
     var canvasRect = canvasElement.value.getBoundingClientRect()
     var targetRect = event.target.getBoundingClientRect()
     
     return [targetRect.x - canvasRect.x + event.offsetX, targetRect.y - canvasRect.y + event.offsetY]
 }
 
+function drop_selection() {
+    props.colors.forEach(color => color.selected = false)
+}
+
 function mouse_down(event){
+    if (!event.shiftKey) {
+        drop_selection()
+    }
+
+
     selection_start.value = calculate_XY_position(event)
     selection_end.value = selection_start.value
 }
@@ -96,7 +107,9 @@ function arrayToRgbStr(arr) {
 
 <template>
     <div ref="canvasContainerRef"
-            @mousedown="mouse_down"
+            @mousedown.left="mouse_down"
+            @mousedown.right="drop_selection"
+            @contextmenu.prevent
             @click="add_color_element"
             @mouseup="mouse_up"
             @mousemove="mouse_move"
@@ -107,7 +120,7 @@ function arrayToRgbStr(arr) {
         <colorCircleElement v-for="(color, index) in colors" :key="index" :color="color" :colors="colors">
         </colorCircleElement>
         </div>
-        <RectAngularSelectionElement :startSelection="selection_start" :endSelection="selection_end" :active="selection_tool_active" :colors="colors"></RectAngularSelectionElement>
+        <RectAngularSelectionElement ref="rectangularSelectionRef" :startSelection="selection_start" :endSelection="selection_end" :active="selection_tool_active" :colors="colors"></RectAngularSelectionElement>
     </div>
 </template>
 

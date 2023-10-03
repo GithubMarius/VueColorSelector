@@ -14,12 +14,12 @@ watch(() => props.endSelection, (newEnd, _) => {
     update_selection()
 })
 
-watch(() => props.active, (value, _) => {
+/* watch(() => props.active, (value, _) => {
     if (!value) {
         // Unselect all colors if tool status changes to inactive
         props.colors.forEach(color => color.selected = false)
     }
-})
+}) */
 
 function calculateLeftandTop(newEnd) {
     // Calculate position of selection rectangle
