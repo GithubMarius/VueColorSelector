@@ -1,5 +1,5 @@
-<script setup>
-import { ref, watch, defineProps } from 'vue'
+<script lang="ts" setup>
+import { ref, watch, defineProps, defineExpose } from 'vue'
 
 const props = defineProps(['startSelection', 'endSelection', 'active', 'colors'])
 
@@ -35,11 +35,20 @@ function calculateWidthandHeight(newEnd) {
 function update_selection() {
     // Highlight points within selection
     props.colors.forEach(color => {
-        if (is_color_in_bounds(color)) {
-            color.selected = true
-        }
+        color.selecting = is_color_in_bounds(color)
     })
 }
+
+function manifest_selection() {
+    props.colors.forEach(color => {
+        if (color.selecting) {
+            color.selected = true
+        }
+        color.selecting = false
+    })
+}
+
+defineExpose({manifest_selection})
 
 function is_color_in_bounds(color) {
     // Check if position of color (point) is within selection bounds

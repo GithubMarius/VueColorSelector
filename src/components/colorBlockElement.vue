@@ -22,7 +22,7 @@ onMounted(() => {
 <div ref="colorBlockRef" class="color_block"
 v-if="check_group"
 
-:class="{hovered: props.color.hovered, selected: props.color.selected}"
+:class="{hovered: props.color.hovered, selected: (props.color.selected || props.color.selecting)}"
 :style="{backgroundColor: props.color.rgba}"
 @click="deleteSelf(props)"
 @mouseover="onHover(props)"

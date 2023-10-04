@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 import { ref, watch, defineProps } from 'vue'
 import RectAngularSelectionElement from './RectAngularSelectionElement.vue';
 import colorCircleElement from './colorCircleElement.vue'
@@ -9,8 +9,8 @@ const canvasElement = ref(null)
 const canvasContainerRef = ref(null)
 const rectangularSelectionRef = ref(null)
 
-const selection_start = ref([0,0])
-const selection_end = ref([0,0])
+const selection_start = ref([-1, -1])
+const selection_end = ref([0, 0])
 const selection_tool_active = ref(false)
 
 watch(
@@ -56,7 +56,15 @@ function add_color_element(event) {
         var pixelData = canvasElement.value.getContext('2d', { willReadFrequently: true }).getImageData(xy[0], xy[1], 1, 1).data;
 
         // Create entry in colors array
-        props.colors[props.colors.length] = {color: pixelData, xPos: xy[0], yPos: xy[1], rgba: arrayToRgbStr(pixelData), hovered: false, selected: false, group: ''}
+        props.colors[props.colors.length] = {
+            color: pixelData,
+            xPos: xy[0],
+            yPos: xy[1],
+            rgba: arrayToRgbStr(pixelData),
+            hovered: false,
+            selected: false,
+            selecting: false,
+            group: ''}
     } else {
         selection_tool_active.value = false
     }
@@ -87,7 +95,10 @@ function mouse_down(event){
 function mouse_move(event){
 
     if (event.buttons === 1) {
-        
+        if (selection_start.value[0] === -1) {
+            selection_start.value = calculate_XY_position(event)
+        }
+
         selection_end.value = calculate_XY_position(event)
         if (!selection_tool_active.value && (getSelectionNorm() > 50)) {
             selection_tool_active.value = true
@@ -96,8 +107,9 @@ function mouse_move(event){
 }
 
 function mouse_up(_){
-        selection_start.value = [0, 0]
-        selection_end.value = [0, 0]
+    rectangularSelectionRef.value.manifest_selection()
+    selection_start.value = [-1,-1]
+    selection_end.value = [0, 0]
 }
 
 function mouse_leave(event){

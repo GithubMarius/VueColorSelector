@@ -1,5 +1,5 @@
 <script setup>
-import {ref, onMounted, watch} from 'vue'
+import {ref, onMounted} from 'vue'
 
 const props = defineProps(['tabs', 'title'])
 const tabContainerRef = ref(null)

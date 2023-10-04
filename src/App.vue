@@ -1,6 +1,5 @@
 <script setup>
-import imageCanvas from './components/imageCanvas.vue';
-import colorBlockElement from './components/colorBlockElement.vue'
+import imageCanvasElement from './components/imageCanvasElement.vue'
 import tabElement from './components/tabElement.vue'
 import colorGroupElement from './components/colorGroupElement.vue'
 
@@ -8,10 +7,9 @@ import colorGroupElement from './components/colorGroupElement.vue'
 import { ref, onMounted, computed } from 'vue'
 // reactive state
 const imageCanvasInstance = ref(null)
-const imageElement = ref(null)
 const colorContainerElement = ref(null)
 const imgUrl = ref('src/assets/Fritz.jpg')
-const colors = ref([{color: [0.5,1,1,1], xPos: 0, yPos: 0, rgba: 'rgba(200,20,1,1)', hovered: false, selected: false, group: ''}])
+const colors = ref([{color: [0.5,1,1,1], xPos: 0, yPos: 0, rgba: 'rgba(200,20,1,1)', hovered: false, selected: false, selecting: false, group: ''}])
 const tabs = ref({
   active_tab: 0,
   list: []
@@ -53,7 +51,7 @@ function update_selection_groups(event) {
 <template>
   <div class="row w-100 vh-100">
     <div class="col-sm-8 justify-content-center">
-      <imageCanvas ref="imageCanvasInstance" :url="imgUrl" :colorContainerElement="colorContainerElement" :colors="colors"></imageCanvas>
+      <imageCanvasElement ref="imageCanvasInstance" :url="imgUrl" :colorContainerElement="colorContainerElement" :colors="colors"></imageCanvasElement>
     </div>
 
 

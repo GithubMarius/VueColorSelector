@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+        "extends": "@vue/tsconfig/tsconfig.json",
+        "isolatedModules": true,
+        "paths": {"*": ["./src/*"]},
+        "vetur.validation.script": false
+    }
+}

@@ -1,9 +1,8 @@
 <script setup>
-import { defineProps, onMounted, ref } from 'vue';
+import { defineProps, onMounted } from 'vue';
 import {deleteSelf, onHover, unHoverAll} from './colorUtils'
 
 const props = defineProps(['color', 'colors'])
-const key=ref(null)
 
 onMounted(() => {
   })
@@ -11,7 +10,7 @@ onMounted(() => {
 
 <template>
     <div ref="colorCircleRef"
-    :class="{hovered: props.color.hovered, selected: props.color.selected}"
+    :class="{hovered: props.color.hovered, selected: (props.color.selected || props.color.selecting)}"
     :style="{ left: props.color.xPos + 'px', top: props.color.yPos + 'px', backgroundColor: props.color.rgba}"
     @click.stop="deleteSelf(props)"
     @mouseover="onHover(props)"
