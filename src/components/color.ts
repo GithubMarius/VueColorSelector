@@ -1,26 +1,11 @@
 
 export default class Color {
-    rgba: ColorArray
-    xPos: Number
-    yPos: Number
-    hovered: Boolean
-    selected: Boolean
-    selecting: Boolean
-    group: string
 
-    constructor(rgba: ColorArray, xPos: Number, yPos: Number,
-        hovered: Boolean = false, selected: Boolean=false,  selecting: Boolean = false,
-        group: string = '') {
-
-        this.rgba = rgba
-        this.xPos = xPos
-        this.yPos = yPos
-        this.hovered = hovered
-        this.selected = selected
-        this.selecting = selecting
-        this.group = group
-
-    }
+    constructor(
+        public rgba: ColorArray, public xPos: Number, public yPos: Number,
+        public hovered: Boolean = false, public selected: Boolean=false,  public selecting: Boolean = false,
+        public group: string = ''
+        ) {}
 
     get css_rgba (): string {
         // CSS rgba color string
@@ -43,5 +28,6 @@ export default class Color {
     }
 
 }
+
 
 export type ColorArray = [Number, Number, Number, Number]
