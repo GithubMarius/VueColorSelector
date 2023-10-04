@@ -22,7 +22,7 @@ function activate() {
     props.tabs.active_tab = get_position()
 }
 
-defineExpose([activate])
+defineExpose({ activate })
 
 </script>
 

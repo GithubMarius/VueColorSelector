@@ -6,11 +6,12 @@ import settingsElement from './components/settingsElement.vue'
 
 
 import { ref, onMounted, computed, Ref } from 'vue'
-import Color from './components/color'
+import { Color } from './components/color'
 
 // reactive state
 const imageCanvasInstance = ref(null)
 const colorContainerElement = ref(null)
+const groupNameInputRef = ref(null)
 const imgUrl = ref('src/assets/Fritz.jpg')
 const colors = ref([new Color([0.5,1,1,1], 0, 0)])
 const tabs = ref({
@@ -46,7 +47,6 @@ function update_selection_groups(event) {
   if (event.target.value.length > 0) {
     selectedEntries.value.forEach(color => color.group = event.target.value)
   }
-  selectedEntries.value.forEach(color => console.log(color.group))
 }
 
 </script>
@@ -59,10 +59,10 @@ function update_selection_groups(event) {
 
 
     <div class="col-sm-4 bg-light">
-      <Transition>
+      <Transition  @after-enter="groupNameInputRef.focus()">
         <div class="row bg-primary p-3 text-light" v-if="numberSelectedEntries > 0">
           <label class="form-label">Group name</label>
-          <input class="form-control" type="text" @keyup.enter="update_selection_groups">
+          <input ref="groupNameInputRef" class="form-control" type="text" @keyup.enter="update_selection_groups">
         </div>
       </Transition>
         <div class="row mt-2">
@@ -71,12 +71,12 @@ function update_selection_groups(event) {
             <button v-for="(tab, index) in tabs.list" :key="index"
             class="nav-link"
             :class="{active: (tabs.active_tab === index)}"
-            @click="tabs.active_tab=index">{{ tab.title }}</button>
+            @click="tab.activate">{{ tab.title }}</button>
           </div>
         </nav>
         </div>
         <div class="tab-content" id="nav-tabContent">
-          <tabElement :tabs="tabs" :title="'File Dialog'"><input type="file" class="btn btn-primary"  @change="onFileChange"></tabElement>
+          <tabElement :tabs="tabs" :title="'File Dialog'"><input type="file" class="form-control"  @change="onFileChange"></tabElement>
           <tabElement :tabs="tabs" :title="'Colors'">
             <colorGroupElement :colors="colors" :group_name="'All'" :show_all="true"></colorGroupElement>
           </tabElement>
@@ -90,6 +90,55 @@ function update_selection_groups(event) {
 </template>
 
 <style>
+:root {
+  --col-pri: #0d6efd;
+  --col-sec: #f8f9fa;
+  --col-text-dark: #212529;
+  --col-text-light: var(--col-sec);
+}
+
+.text-pri {
+  color: var(--col-pri);
+}
+
+.text-light {
+  color: var(--col-sec);
+}
+
+.bg-pri {
+  background-color: var(--col-pri);
+}
+
+.bg-sec {
+  background-color: var(--col-sec);
+}
+
+.border-pri {
+  border-color: var(--col-pri);
+}
+
+.btn-pri {
+  color: var(--col-text-light);
+  background-color: var(--col-pri);
+  border-color: var(--col-pri);
+}
+
+.btn-pri:hover {
+  color: var(--col-sec) !important;
+  border-color: var(--col-pri) !important;
+}
+
+.btn-outline-pri {
+  color: var(--col-pri) !important;
+  background-color: var(--col-sec);
+  border-color: var(--col-pri) !important;
+}
+
+.btn-outline-pri:hover {
+  color: var(--col-text-light) !important;
+  border-color: var(--col-pri) !important;
+  background-color: var(--col-pri) !important;
+}
 
 .content_container {
   max-height: 100%;

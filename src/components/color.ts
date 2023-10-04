@@ -3,7 +3,7 @@ export class Color {
 
     constructor(
         public rgba: ColorArray, public xPos: Number, public yPos: Number,
-        public hovered: Boolean = false, public selected: Boolean=false,  public selecting: Boolean = false,
+        public hovered: Boolean = false, public selected: Boolean=false,  public selecting: Boolean = false, public visible: Boolean = true,
         public group: string = ''
         ) {}
 

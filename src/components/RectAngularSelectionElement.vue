@@ -35,7 +35,7 @@ function calculateWidthandHeight(newEnd) {
 function update_selection() {
     // Highlight points within selection
     props.colors.forEach(color => {
-        color.selecting = is_color_in_bounds(color)
+        color.selecting = color.visible && is_color_in_bounds(color)
     })
 }
 

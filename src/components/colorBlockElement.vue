@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, defineProps, onMounted, computed } from 'vue'
+import { ref, defineProps, onMounted, computed, watch } from 'vue'
 import {deleteSelf, onHover, unHoverAll} from './colorUtils'
 import { Color } from './color';
 
@@ -16,10 +16,16 @@ const props = defineProps({
   show_all: {
     type: Boolean,
     default: false
+  },
+  visible: {
+    type: Boolean,
+    default: true
   }
 })
 
-const colorBlockRef = ref(0)
+watch(() => props.visible, (value, _) => {props.color.visible = value})
+
+const colorBlockRef = ref(null)
 
 const check_group = computed(() => {
   return props.show_all || ((props.color.group.length === 0) && !props.group_name) || (props.color.group === props.group_name)

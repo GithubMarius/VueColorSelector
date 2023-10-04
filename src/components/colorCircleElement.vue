@@ -17,10 +17,11 @@ onMounted(() => {
 </script>
 
 <template>
-    <div ref="colorCircleRef"
+    <div ref="colorCircleRef" v-if="props.color.visible"
     :class="{hovered: props.color.hovered, selected: (props.color.selected || props.color.selecting)}"
     :style="{ left: props.color.css_xPos, top: props.color.css_yPos, backgroundColor: props.color.css_rgb}"
-    @click.stop="deleteSelf(props)"
+    @click.ctrl.stop="deleteSelf(props)"
+    @click.shift.stop="color.selected = !color.selected"
     @mouseover="onHover(props)"
     @mouseleave="unHoverAll(props)"
     class="colorCirlce"></div>
