@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, defineProps, onMounted, computed } from 'vue'
 import {deleteSelf, onHover, unHoverAll} from './colorUtils'
-import Color from './color';
+import { Color } from './color';
 
 const props = defineProps({
   color: {

@@ -2,7 +2,7 @@
 import { ref, watch, defineProps, Ref } from 'vue'
 import RectAngularSelectionElement from './RectAngularSelectionElement.vue';
 import colorCircleElement from './colorCircleElement.vue'
-import Color from './color';
+import { Color } from './color';
 
 const props = defineProps(['url', 'colorContainerElement', 'colors'])
 

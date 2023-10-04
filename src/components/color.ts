@@ -1,5 +1,5 @@
 
-export default class Color {
+export class Color {
 
     constructor(
         public rgba: ColorArray, public xPos: Number, public yPos: Number,

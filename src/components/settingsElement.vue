@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Color, {ColorArray} from './color';
+import {Color, ColorArray} from './color';
 import {onMounted, ref} from 'vue'
 
 const settings = ref({
