@@ -1,17 +1,20 @@
-<script lang="ts" setup>
-import { ref, watch, defineProps } from 'vue'
+<script setup lang="ts">
+import { ref, watch, defineProps, Ref } from 'vue'
 import RectAngularSelectionElement from './RectAngularSelectionElement.vue';
 import colorCircleElement from './colorCircleElement.vue'
+import Color from './color';
 
 const props = defineProps(['url', 'colorContainerElement', 'colors'])
 
 const canvasElement = ref(null)
 const canvasContainerRef = ref(null)
-const rectangularSelectionRef = ref(null)
+const rectangularSelectionRef: Ref<typeof RectAngularSelectionElement> = ref(null)
 
 const selection_start = ref([-1, -1])
 const selection_end = ref([0, 0])
 const selection_tool_active = ref(false)
+
+
 
 watch(
     () => props.url,
@@ -26,22 +29,22 @@ function getSelectionNorm() {
     return [0, 1].map(x => (selection_start.value[x]-selection_end.value[x])**2).reduce((a, b) => a+b)
 }
 
-function showImage(url) {
+function showImage(url: string) {
     // Open image from url
     var image = new Image()
 
     //Set the Base64 string return from FileReader as source.
-    image.src =url
+    image.src = url
 
     //Validate the File Height and Width.
-    image.onload = function () {
+    image.onload = function (this: HTMLImageElement) {
+
         canvasElement.value.width = this.width
         canvasElement.value.height = this.height
 
         // Set container width
         canvasContainerRef.value.style.width = this.width + 'px'
         canvasContainerRef.value.style.height = this.height + 'px'
-
 
         canvasElement.value.getContext('2d').drawImage(this, 0, 0);
         return true;
@@ -56,15 +59,7 @@ function add_color_element(event) {
         var pixelData = canvasElement.value.getContext('2d', { willReadFrequently: true }).getImageData(xy[0], xy[1], 1, 1).data;
 
         // Create entry in colors array
-        props.colors[props.colors.length] = {
-            color: pixelData,
-            xPos: xy[0],
-            yPos: xy[1],
-            rgba: arrayToRgbStr(pixelData),
-            hovered: false,
-            selected: false,
-            selecting: false,
-            group: ''}
+        props.colors[props.colors.length] = new Color(pixelData, xy[0], xy[1])
     } else {
         selection_tool_active.value = false
     }

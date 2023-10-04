@@ -1,14 +1,27 @@
-<script setup>
+<script setup lang="ts">
 import { ref, defineProps, onMounted, computed } from 'vue'
 import {deleteSelf, onHover, unHoverAll} from './colorUtils'
+import Color from './color';
 
-const props = defineProps(['color', 'colors', 'group_name', 'show_all'])
+const props = defineProps({
+  color: {
+    type: Color
+  },
+  colors: {
+    type: Array<Color>
+  },
+  group_name: {
+    type: String
+  },
+  show_all: {
+    type: Boolean,
+    default: false
+  }
+})
+
 const colorBlockRef = ref(0)
-const key=ref(null)
 
 const check_group = computed(() => {
-  console.log(props.color.group)
-  console.log(props.group_name)
   return props.show_all || ((props.color.group.length === 0) && !props.group_name) || (props.color.group === props.group_name)
   // return props.show_all || ((props.color.group.length === 0) && !props.group_name) || (props.color.group === props.group_name)
   // return ((props.color.group.length === 0) && !props.group_name) || props.color.group.includes(props.group_name)
@@ -23,7 +36,7 @@ onMounted(() => {
 v-if="check_group"
 
 :class="{hovered: props.color.hovered, selected: (props.color.selected || props.color.selecting)}"
-:style="{backgroundColor: props.color.rgba}"
+:style="{backgroundColor: props.color.css_rgb}"
 @click="deleteSelf(props)"
 @mouseover="onHover(props)"
 @mouseleave="unHoverAll(props)"

@@ -1,15 +1,18 @@
-<script setup>
+<script setup lang="ts">
 import imageCanvasElement from './components/imageCanvasElement.vue'
 import tabElement from './components/tabElement.vue'
 import colorGroupElement from './components/colorGroupElement.vue'
+import settingsElement from './components/settingsElement.vue'
 
 
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, Ref } from 'vue'
+import Color from './components/color'
+
 // reactive state
 const imageCanvasInstance = ref(null)
 const colorContainerElement = ref(null)
 const imgUrl = ref('src/assets/Fritz.jpg')
-const colors = ref([{color: [0.5,1,1,1], xPos: 0, yPos: 0, rgba: 'rgba(200,20,1,1)', hovered: false, selected: false, selecting: false, group: ''}])
+const colors = ref([new Color([0.5,1,1,1], 0, 0)])
 const tabs = ref({
   active_tab: 0,
   list: []
@@ -18,13 +21,13 @@ const tabs = ref({
 // functions that mutate state and trigger updates
 
 
-function onFileChange(){
+function onFileChange(event){
   var reader = new FileReader();
   reader.readAsDataURL(event.target.files[0]);
   reader.onload = function (e) {
 
     //Set the Base64 string return from FileReader as source.
-    imgUrl.value = e.target.result;
+    (imgUrl as Ref).value = e.target.result;
   }
 }
 
@@ -32,7 +35,7 @@ function onFileChange(){
 onMounted(() => {
 })
 
-const group_names = computed(() => [... new Set(colors.value.map(color => color.group))])
+const group_names = computed(() => Array.from(new Set(colors.value.map(color => color.group))))
 const numberSelectedEntries = computed(() => selectedEntries.value.length)
 
 const selectedEntries = computed(() => {
@@ -80,7 +83,7 @@ function update_selection_groups(event) {
           <tabElement :tabs="tabs" :title="'ColorsTest'">
             <colorGroupElement v-for="(group_name, index) in group_names" :key="index" :group_name="group_name" :colors="colors"></colorGroupElement>
           </tabElement>
-          <tabElement :tabs="tabs" :title="'Settings'">Test asdas adas</tabElement>
+          <tabElement :tabs="tabs" :title="'Settings'"><settingsElement></settingsElement></tabElement>
         </div>
       </div>
   </div>

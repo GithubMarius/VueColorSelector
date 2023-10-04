@@ -1,8 +1,16 @@
-<script setup>
+<script setup lang="ts">
 import { defineProps, onMounted } from 'vue';
 import {deleteSelf, onHover, unHoverAll} from './colorUtils'
+import Color from './color';
 
-const props = defineProps(['color', 'colors'])
+const props = defineProps({
+  color: {
+    type: Color
+  },
+  colors: {
+    type: Array<Color>
+  }
+})
 
 onMounted(() => {
   })
@@ -11,7 +19,7 @@ onMounted(() => {
 <template>
     <div ref="colorCircleRef"
     :class="{hovered: props.color.hovered, selected: (props.color.selected || props.color.selecting)}"
-    :style="{ left: props.color.xPos + 'px', top: props.color.yPos + 'px', backgroundColor: props.color.rgba}"
+    :style="{ left: props.color.css_xPos, top: props.color.css_yPos, backgroundColor: props.color.css_rgb}"
     @click.stop="deleteSelf(props)"
     @mouseover="onHover(props)"
     @mouseleave="unHoverAll(props)"
