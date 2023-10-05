@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, watch, defineProps, Ref } from 'vue'
+import { ref, watch, defineProps, Ref, onMounted } from 'vue'
 import RectAngularSelectionElement from './RectAngularSelectionElement.vue';
 import colorCircleElement from './colorCircleElement.vue'
 import { Color } from './color';
 
-const props = defineProps(['url', 'colorContainerElement', 'colors'])
+const props = defineProps(['url', 'colorContainerElement', 'colors', 'settings'])
 
 const canvasElement = ref(null)
 const canvasContainerRef = ref(null)
@@ -14,7 +14,8 @@ const selection_start = ref([-1, -1])
 const selection_end = ref([0, 0])
 const selection_tool_active = ref(false)
 
-
+const image = ref(null)
+const ctx = ref(null)
 
 watch(
     () => props.url,
@@ -25,44 +26,77 @@ watch(
     deep: true,
  })
 
+watch(
+    () => props.settings.color_mode,
+      (_value, _) => {
+        drawImage()
+     }
+)
+
 function getSelectionNorm() {
     return [0, 1].map(x => (selection_start.value[x]-selection_end.value[x])**2).reduce((a, b) => a+b)
 }
 
 function showImage(url: string) {
     // Open image from url
-    var image = new Image()
+    image.value = new Image()
 
     //Set the Base64 string return from FileReader as source.
-    image.src = url
+    image.value.src = url
 
     //Validate the File Height and Width.
-    image.onload = function (this: HTMLImageElement) {
-
-        canvasElement.value.width = this.width
-        canvasElement.value.height = this.height
-
-        // Set container width
-        canvasContainerRef.value.style.width = this.width + 'px'
-        canvasContainerRef.value.style.height = this.height + 'px'
-
-        canvasElement.value.getContext('2d').drawImage(this, 0, 0);
-        return true;
-    };
+    image.value.onload = drawImage
 }
+function set_canvas_dimensions() {
+    canvasElement.value.width = image.value.width
+    canvasElement.value.height = image.value.height
+
+    // Set container width
+    canvasContainerRef.value.style.width = image.value.width + 'px'
+    canvasContainerRef.value.style.height = image.value.height + 'px'
+}
+
+function drawImage() {
+    set_canvas_dimensions()
+    if (props.settings.color_mode) {
+        drawImageInColor()
+    } else {
+        drawImageInBw()
+    }
+    return true
+}
+
+function drawImageInColor() {
+    ctx.value.drawImage(image.value, 0, 0);    
+}
+
+function drawImageInBw() {
+    // Draw b/w image
+    ctx.value.drawImage(image.value, 0, 0);
+    ctx.value.fillStyle = '#FFF';
+    ctx.value.fillRect(0, 0, image.value.width, image.value.height);
+    ctx.value.globalCompositeOperation = 'luminosity';
+    ctx.value.drawImage(image.value, 0, 0);
+}
+
 
 function add_color_element(event) {
     // If currently not using a selection tool
     if (!selection_tool_active.value) {
         // Read color of pixel
         var xy = calculate_XY_position(event)
-        var pixelData = canvasElement.value.getContext('2d', { willReadFrequently: true }).getImageData(xy[0], xy[1], 1, 1).data;
+        var pixelData = get_pixel_color(xy[0], xy[1])
 
         // Create entry in colors array
-        props.colors[props.colors.length] = new Color(pixelData, xy[0], xy[1])
+        new Color(pixelData, xy[0], xy[1])
     } else {
         selection_tool_active.value = false
     }
+}
+
+function get_pixel_color(x, y) {
+    // Get color at position (x, y)
+    return ctx.value.getImageData(x, y, 1, 1).data;
 }
 
 function calculate_XY_position(event) {
@@ -116,6 +150,8 @@ function arrayToRgbStr(arr) {
     // Converts array into rgba string
     return `rgba(${arr})`
 }
+
+onMounted(() => ctx.value = canvasElement.value.getContext('2d', { willReadFrequently: true }))
 </script>
 
 <template>

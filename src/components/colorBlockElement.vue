@@ -7,39 +7,29 @@ const props = defineProps({
   color: {
     type: Color
   },
-  colors: {
-    type: Array<Color>
-  },
-  group_name: {
-    type: String
-  },
-  show_all: {
-    type: Boolean,
-    default: false
-  },
   visible: {
     type: Boolean,
-    default: true
+    default: false
   }
 })
 
 watch(() => props.visible, (value, _) => {props.color.visible = value})
 
 const colorBlockRef = ref(null)
-
+/*
 const check_group = computed(() => {
   return props.show_all || ((props.color.group.length === 0) && !props.group_name) || (props.color.group === props.group_name)
   // return props.show_all || ((props.color.group.length === 0) && !props.group_name) || (props.color.group === props.group_name)
   // return ((props.color.group.length === 0) && !props.group_name) || props.color.group.includes(props.group_name)
 })
-
+*/
 onMounted(() => {
   })
 </script>
 
 <template>
+  <slot></slot>
 <div ref="colorBlockRef" class="color_block"
-v-if="check_group"
 
 :class="{hovered: props.color.hovered, selected: (props.color.selected || props.color.selecting)}"
 :style="{backgroundColor: props.color.css_rgb}"

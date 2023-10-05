@@ -2,22 +2,33 @@
 import imageCanvasElement from './components/imageCanvasElement.vue'
 import tabElement from './components/tabElement.vue'
 import colorGroupElement from './components/colorGroupElement.vue'
+import colorBlockElement from './components/colorBlockElement.vue'
 import settingsElement from './components/settingsElement.vue'
 
 
-import { ref, onMounted, computed, Ref } from 'vue'
-import { Color } from './components/color'
+import { ref, onMounted, computed, Ref, watch } from 'vue'
+import { Color, ColorArray, ColorGroup } from './components/color'
 
 // reactive state
 const imageCanvasInstance = ref(null)
 const colorContainerElement = ref(null)
 const groupNameInputRef = ref(null)
 const imgUrl = ref('src/assets/Fritz.jpg')
-const colors = ref([new Color([0.5,1,1,1], 0, 0)])
+const colors = Color.colors
 const tabs = ref({
-  active_tab: 0,
+  active_tab: 2,
   list: []
 })
+
+const settings = ref({
+    background_color: <ColorArray>[0, 1, 2, 1],
+    background_color_light: <ColorArray>[0, 1, 2, 1],
+    color_mode: false
+})
+
+watch(() => colors.value, (value,_) => console.log(555),
+  { deep: true,
+  immediate: true })
 
 // functions that mutate state and trigger updates
 
@@ -34,9 +45,10 @@ function onFileChange(event){
 
 // lifecycle hooks
 onMounted(() => {
+  new Color([0.5, 1, 1, 1], 0, 0)
 })
 
-const group_names = computed(() => Array.from(new Set(colors.value.map(color => color.group))))
+const groups = ref(ColorGroup.groups)
 const numberSelectedEntries = computed(() => selectedEntries.value.length)
 
 const selectedEntries = computed(() => {
@@ -45,16 +57,24 @@ const selectedEntries = computed(() => {
 
 function update_selection_groups(event) {
   if (event.target.value.length > 0) {
-    selectedEntries.value.forEach(color => color.group = event.target.value)
+    selectedEntries.value.forEach(color => {
+      color.group_name = event.target.value
+      color.selected = false
+    })
   }
 }
 
 </script>
 
 <template>
+  <button @click="settings.color_mode = !settings.color_mode"></button>
   <div class="row w-100 vh-100">
-    <div class="col-sm-8 justify-content-center">
-      <imageCanvasElement ref="imageCanvasInstance" :url="imgUrl" :colorContainerElement="colorContainerElement" :colors="colors"></imageCanvasElement>
+    <div id="canvas_column" class="col-sm-8 justify-content-center">
+      <imageCanvasElement ref="imageCanvasInstance"
+      :url="imgUrl"
+      :colorContainerElement="colorContainerElement"
+      :colors="colors"
+      :settings="settings"></imageCanvasElement>
     </div>
 
 
@@ -78,10 +98,10 @@ function update_selection_groups(event) {
         <div class="tab-content" id="nav-tabContent">
           <tabElement :tabs="tabs" :title="'File Dialog'"><input type="file" class="form-control"  @change="onFileChange"></tabElement>
           <tabElement :tabs="tabs" :title="'Colors'">
-            <colorGroupElement :colors="colors" :group_name="'All'" :show_all="true"></colorGroupElement>
+            <colorBlockElement v-for="(color, index) in colors" :key="index" :color="color"></colorBlockElement>
           </tabElement>
           <tabElement :tabs="tabs" :title="'ColorsTest'">
-            <colorGroupElement v-for="(group_name, index) in group_names" :key="index" :group_name="group_name" :colors="colors"></colorGroupElement>
+            <colorGroupElement v-for="(group, index) in groups" :key="index" :group="group"></colorGroupElement>
           </tabElement>
           <tabElement :tabs="tabs" :title="'Settings'"><settingsElement></settingsElement></tabElement>
         </div>
