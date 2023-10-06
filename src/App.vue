@@ -4,6 +4,7 @@ import tabElement from './components/tabElement.vue'
 import colorGroupElement from './components/colorGroupElement.vue'
 import colorBlockElement from './components/colorBlockElement.vue'
 import settingsElement from './components/settingsElement.vue'
+import Settings from './components/settings'
 
 
 import { ref, onMounted, computed, Ref, watch } from 'vue'
@@ -20,11 +21,7 @@ const tabs = ref({
   list: []
 })
 
-const settings = ref({
-    background_color: <ColorArray>[0, 1, 2, 1],
-    background_color_light: <ColorArray>[0, 1, 2, 1],
-    color_mode: false
-})
+const settingsRef = ref(new Settings())
 
 watch(() => colors.value, (value,_) => console.log(555),
   { deep: true,
@@ -67,20 +64,20 @@ function update_selection_groups(event) {
 </script>
 
 <template>
-  <button @click="settings.color_mode = !settings.color_mode"></button>
+  <button @click="settingsRef.color_mode = !settingsRef.color_mode"></button>
   <div class="row w-100 vh-100">
-    <div id="canvas_column" class="col-sm-8 justify-content-center">
+    <div id="canvas_column" class="col-sm-8 justify-content-center bg-pri">
       <imageCanvasElement ref="imageCanvasInstance"
       :url="imgUrl"
       :colorContainerElement="colorContainerElement"
       :colors="colors"
-      :settings="settings"></imageCanvasElement>
+      :settings="settingsRef"></imageCanvasElement>
     </div>
 
 
-    <div class="col-sm-4 bg-light">
+    <div class="col-sm-4 bg-sec">
       <Transition  @after-enter="groupNameInputRef.focus()">
-        <div class="row bg-primary p-3 text-light" v-if="numberSelectedEntries > 0">
+        <div class="row bg-attention p-3 text-light" v-if="numberSelectedEntries > 0">
           <label class="form-label">Group name</label>
           <input ref="groupNameInputRef" class="form-control" type="text" @keyup.enter="update_selection_groups">
         </div>
@@ -103,7 +100,7 @@ function update_selection_groups(event) {
           <tabElement :tabs="tabs" :title="'ColorsTest'">
             <colorGroupElement v-for="(group, index) in groups" :key="index" :group="group"></colorGroupElement>
           </tabElement>
-          <tabElement :tabs="tabs" :title="'Settings'"><settingsElement></settingsElement></tabElement>
+          <tabElement :tabs="tabs" :title="'Settings'"><settingsElement :settings="settingsRef"></settingsElement></tabElement>
         </div>
       </div>
   </div>
@@ -115,6 +112,14 @@ function update_selection_groups(event) {
   --col-sec: #f8f9fa;
   --col-text-dark: #212529;
   --col-text-light: var(--col-sec);
+  --bg-default: #FFFFFF;
+  --bg-secondary: var(--col-sec);
+  --bg-attention: var(--col-pri);
+  --text-default: #212529;
+}
+
+body {
+  color: var(--text-default);
 }
 
 .text-pri {
@@ -125,12 +130,12 @@ function update_selection_groups(event) {
   color: var(--col-sec);
 }
 
-.bg-pri {
-  background-color: var(--col-pri);
+.bg-pri{
+  background-color: var(--bg-default);
 }
 
 .bg-sec {
-  background-color: var(--col-sec);
+  background-color: var(--bg-secondary);
 }
 
 .border-pri {
@@ -158,6 +163,11 @@ function update_selection_groups(event) {
   color: var(--col-text-light) !important;
   border-color: var(--col-pri) !important;
   background-color: var(--col-pri) !important;
+}
+
+.bg-attention {
+  color: var(--col-text-light);
+  background-color: var(--bg-attention);
 }
 
 .content_container {

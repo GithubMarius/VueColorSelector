@@ -167,7 +167,7 @@ onMounted(() => ctx.value = canvasElement.value.getContext('2d', { willReadFrequ
         <canvas id="canvas" ref="canvasElement">
         </canvas>
         <div>
-        <colorCircleElement v-for="(color, index) in colors" :key="index" :color="color" :colors="colors">
+        <colorCircleElement v-for="(color, index) in colors" :key="index" :color="color" :colors="colors" :settings="settings">
         </colorCircleElement>
         </div>
         <RectAngularSelectionElement ref="rectangularSelectionRef" :startSelection="selection_start" :endSelection="selection_end" :active="selection_tool_active" :colors="colors"></RectAngularSelectionElement>

@@ -2,21 +2,30 @@
 import {Color, ColorArray} from './color';
 import {onMounted, ref} from 'vue'
 import "bootstrap-icons/font/bootstrap-icons.css";
+import Settings from './settings';
 
-const settings = ref({
-    background_color: <ColorArray>[0, 1, 2, 1],
-    background_color_light: <ColorArray>[0, 1, 2, 1]
+const props = defineProps({
+  settings: {
+    type: Settings
+  }
 })
 
+const rangeColorCircleRadiusRef = ref(null)
 onMounted(() => {
-    console.log(Color)
+    rangeColorCircleRadiusRef.value.value = props.settings.color_circle_radius
 })
+
+function toggle_theme(event) {
+  props.settings.bright = event.target.checked
+}
+
+function update_circle_radius(event) {
+  props.settings.color_circle_radius = event.target.value
+}
 
 </script>
 
 <template>
-    
-
 <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
   <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off">
   <label class="btn btn-outline-primary" for="btncheck1">V</label>
@@ -24,9 +33,20 @@ onMounted(() => {
   <input type="checkbox" class="btn-check" id="btncheck2" autocomplete="off">
   <label class="btn btn-outline-primary" for="btncheck2">M</label>
 </div>
-
-<div class="form-check form-switch">
-  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-  <label class="form-check-label" for="flexSwitchCheckDefault">Default switch checkbox input</label>
-</div><i class="bi bi-caret-down display-6"></i>
+<form>
+  <div class="form-group row">
+    <label for="switchTheme" class="col-sm-4 col-form-label">Dark/Light mode</label>
+    <div class="col-sm-8 m-auto">
+      <span class="form-switch">
+          <input class="form-check-input" type="checkbox" @input="toggle_theme" role="switch" id="switchTheme" checked>
+      </span>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="rangeColorCircleSize" class="col-sm-4 col-form-label">Circle radius</label>
+    <div class="col-sm-8 m-auto">
+      <input ref="rangeColorCircleRadiusRef" type="range" class="form-range" id="rangeColorCircleSize" @input="update_circle_radius" min="4" max="50">
+    </div>
+  </div>
+</form>
 </template>

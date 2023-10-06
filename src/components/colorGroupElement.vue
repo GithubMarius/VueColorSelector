@@ -32,17 +32,20 @@ function submit_name() {
     editing_name.value = false
 }
 
+const displayed_group_name = computed(() => props.group.group_name !== '' ? props.group.group_name : 'Groupless Colors')
+
 </script>
 
 <template>
     <div class="container">
-        <div class="bg-light p-2 row">
-            <div class="col-9">
+        <div class="row">
+            <div class="col-9 p-0 fs-6">
                 <div class="input-group">
-                <input ref="group_name_input_ref" type="text" class="form-control" :value="group.group_name" :disabled="!editing_name"
-                @keydown.enter="submit_name"
-                @focusout="editing_name = false">
-                <div class="input-group-text"  @click="activate_name_editing()" ><i class="bi bi-pen"></i></div>
+                    <div class="input-group-text" :class="{'rounded': !editing_name}"  v-if="group.group_name !== ''" @click="activate_name_editing()" ><i class="bi bi-pen"></i></div>
+                    <input ref="group_name_input_ref" type="text" class="form-control" :value="displayed_group_name" :disabled="!editing_name"
+                    :class="{'disabled-name-input p-0 fs-5': !editing_name}"
+                    @keydown.enter="submit_name"
+                    @focusout="editing_name = false">
                 </div>
             </div>
             <div v-if="!show_all" class="col-3" role="group" aria-label="Basic checkbox toggle button group">
@@ -58,7 +61,7 @@ function submit_name() {
                 </div>
             </div>
         </div>
-        <div v-if="group.visibility_group">
+        <div class="p-3" v-if="group.visibility_group">
             <colorBlockElement v-for="(color, index) in group.colors" :key="index" :color="color"></colorBlockElement>
         </div>
     </div>
@@ -67,5 +70,10 @@ function submit_name() {
 <style>
 .group-menu {
     float: right;
+}
+.disabled-name-input {
+    padding-left: 15px !important;
+    background-color: transparent !important;
+    border-color: transparent;
 }
 </style>
