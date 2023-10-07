@@ -26,13 +26,6 @@ function update_circle_radius(event) {
 </script>
 
 <template>
-<div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
-  <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off">
-  <label class="btn btn-outline-primary" for="btncheck1">V</label>
-
-  <input type="checkbox" class="btn-check" id="btncheck2" autocomplete="off">
-  <label class="btn btn-outline-primary" for="btncheck2">M</label>
-</div>
 <form>
   <div class="form-group row">
     <label for="switchTheme" class="col-sm-4 col-form-label">Dark/Light mode</label>

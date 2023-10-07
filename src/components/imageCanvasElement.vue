@@ -8,7 +8,7 @@ const props = defineProps(['url', 'colorContainerElement', 'colors', 'settings']
 
 const canvasElement = ref(null)
 const canvasContainerRef = ref(null)
-const rectangularSelectionRef: Ref<typeof RectAngularSelectionElement> = ref(null)
+// const rectangularSelectionRef: Ref<typeof RectAngularSelectionElement> = ref(null)
 
 const selection_start = ref([-1, -1])
 const selection_end = ref([0, 0])
@@ -135,6 +135,8 @@ function mouse_move(event){
     }
 }
 
+/*
+
 function mouse_up(_){
     rectangularSelectionRef.value.manifest_selection()
     selection_start.value = [-1,-1]
@@ -145,6 +147,7 @@ function mouse_leave(event){
     mouse_up(event)
     selection_tool_active.value = false
 }
+*/
 
 function arrayToRgbStr(arr) {
     // Converts array into rgba string
@@ -170,7 +173,6 @@ onMounted(() => ctx.value = canvasElement.value.getContext('2d', { willReadFrequ
         <colorCircleElement v-for="(color, index) in colors" :key="index" :color="color" :colors="colors" :settings="settings">
         </colorCircleElement>
         </div>
-        <RectAngularSelectionElement ref="rectangularSelectionRef" :startSelection="selection_start" :endSelection="selection_end" :active="selection_tool_active" :colors="colors"></RectAngularSelectionElement>
     </div>
 </template>
 

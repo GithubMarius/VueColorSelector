@@ -5,12 +5,12 @@ export default class Settings {
     
     constructor(
         public bright_theme: Theme = new Theme(),
-        public dark_theme: Theme = new Theme('#222222' ,'#111111'),
+        public dark_theme: Theme = new Theme('#222222' ,'#111111', 'red', '#FFFFFF', '#222222'),
         public color_mode: Boolean = true,
         public color_circle_radius = 15,
-        is_bright = true
+        private _bright: Boolean = true
     ) {
-        this.bright = is_bright
+        this.bright = _bright
     }
 
     get theme() {
@@ -22,13 +22,18 @@ export default class Settings {
         this.theme.activate()
     }
 
-    set bright(value) {
+    set bright(value: Boolean) {
+        this._bright = value
         if (value) {
             this.bright_theme.activate()
         }
         else {
             this.dark_theme.activate()
         }
+    }
+
+    get bright(): Boolean {
+        return this._bright
     }
 
     get css_circle_diameter() {
@@ -41,15 +46,31 @@ export class Theme {
     document_colors = {}
 
     constructor(
-        public bg_default = Theme.getProperty('--bg-default'),
-        public bg_secondary = Theme.getProperty('--bg-secondary'),
-        public bg_attention = Theme.getProperty('--bg-attention')
+        public color_bg_default = Theme.getProperty('--bg-default'),
+        public color_bg_secondary = Theme.getProperty('--bg-secondary'),
+        public color_bg_attention = Theme.getProperty('--bg-attention'),
+        public color_text_default = Theme.getProperty('--text-default'),
+        public color_text_contrast = Theme.getProperty('--text-contrast')
     ){
-        this.document_colors = {
-            '--bg-default': this.bg_default,
-            '--bg-secondary': this.bg_secondary,
-            '--bg-attention': this.bg_attention
-        }
+        // Add public color properties to document_colors object
+        const colors = Object.keys(this).filter(this.is_color)
+        colors.forEach(color => this.add_to_colors(color))
+    }
+
+    is_color(key): Boolean {
+        // Check if property is color (color properties start with 'color_')
+        return key.startsWith('color_')
+    }
+
+    get_color_name(color): string {
+        // Convert property name to corresponding css color name
+        return color.replace('color_', '--').replace('_', '-')
+    }
+
+    add_to_colors(color) {
+        // Add to document colors
+        const name = this.get_color_name(color)
+        this.document_colors[name] = this[color]
     }
 
     activate(): void {

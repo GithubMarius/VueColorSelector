@@ -18,6 +18,7 @@ const props = defineProps({
 
 
 onMounted(() => {
+  console.log(123123)
   })
 </script>
 
@@ -32,11 +33,11 @@ onMounted(() => {
     @click.shift.stop="color.selected = !color.selected"
     @mouseover="onHover(props)"
     @mouseleave="unHoverAll(props)"
-    class="colorCirlce"></div>
+    class="color_circle" :data-color-id="color.index"></div>
 </template>
 
 <style>
- .colorCirlce {
+ .color_circle {
     position: absolute;
     border-radius: 50%;
     transform: translate(-50%, -50%);

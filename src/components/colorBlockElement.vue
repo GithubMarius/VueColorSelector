@@ -36,6 +36,7 @@ onMounted(() => {
 @click="deleteSelf(props)"
 @mouseover="onHover(props)"
 @mouseleave="unHoverAll(props)"
+:data-color-id="color.index"
 ></div>
 </template>
 

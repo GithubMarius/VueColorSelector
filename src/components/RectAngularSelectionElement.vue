@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, watch, defineProps, defineExpose } from 'vue'
+import { ref, watch, defineProps, defineExpose, onMounted, nextTick } from 'vue'
 
 const props = defineProps(['startSelection', 'endSelection', 'active', 'colors'])
 
@@ -40,6 +40,7 @@ function update_selection() {
 }
 
 function manifest_selection() {
+    // Add temporally selected colors to selection
     props.colors.forEach(color => {
         if (color.selecting) {
             color.selected = true

@@ -9,6 +9,7 @@ import Settings from './components/settings'
 
 import { ref, onMounted, computed, Ref, watch } from 'vue'
 import { Color, ColorArray, ColorGroup } from './components/color'
+import WholePageSelector from './components/wholePageSelector.vue'
 
 // reactive state
 const imageCanvasInstance = ref(null)
@@ -23,7 +24,7 @@ const tabs = ref({
 
 const settingsRef = ref(new Settings())
 
-watch(() => colors.value, (value,_) => console.log(555),
+watch(() => colors.value, (value,_) => true,
   { deep: true,
   immediate: true })
 
@@ -42,7 +43,7 @@ function onFileChange(event){
 
 // lifecycle hooks
 onMounted(() => {
-  new Color([0.5, 1, 1, 1], 0, 0)
+  new Color([0.5, 1, 1, 1],  80, 80)
 })
 
 const groups = ref(ColorGroup.groups)
@@ -60,13 +61,20 @@ function update_selection_groups(event) {
     })
   }
 }
+/*
+onMounted(() => {
+  window.addEventListener('keyup', function(event) {
+    console.log(event.key)
+  })
+})
+*/
 
 </script>
 
 <template>
-  <button @click="settingsRef.color_mode = !settingsRef.color_mode"></button>
-  <div class="row w-100 vh-100">
-    <div id="canvas_column" class="col-sm-8 justify-content-center bg-pri">
+  <WholePageSelector>
+  <div class="row w-100 vh-100 m-0">
+    <div id="canvas_column" class="col-sm-8 justify-content-center bg-pri p-0">
       <imageCanvasElement ref="imageCanvasInstance"
       :url="imgUrl"
       :colorContainerElement="colorContainerElement"
@@ -76,7 +84,7 @@ function update_selection_groups(event) {
 
 
     <div class="col-sm-4 bg-sec">
-      <Transition  @after-enter="groupNameInputRef.focus()">
+      <Transition @after-enter="groupNameInputRef.focus()">
         <div class="row bg-attention p-3 text-light" v-if="numberSelectedEntries > 0">
           <label class="form-label">Group name</label>
           <input ref="groupNameInputRef" class="form-control" type="text" @keyup.enter="update_selection_groups">
@@ -104,6 +112,7 @@ function update_selection_groups(event) {
         </div>
       </div>
   </div>
+  </WholePageSelector>
 </template>
 
 <style>
@@ -116,6 +125,8 @@ function update_selection_groups(event) {
   --bg-secondary: var(--col-sec);
   --bg-attention: var(--col-pri);
   --text-default: #212529;
+  --text-contrast: var(var(--col-text-light));
+  --bs-body-color: var(--text-default);
 }
 
 body {
@@ -126,8 +137,8 @@ body {
   color: var(--col-pri);
 }
 
-.text-light {
-  color: var(--col-sec);
+.text-default {
+  color: var(--text-default);
 }
 
 .bg-pri{
@@ -186,6 +197,15 @@ body {
   height: 50px;
 }
 
+.nav-link {
+  color: var(--col-pri) !important;
+}
+
+.nav-link.active {
+  color: var(--text-default) !important;
+  border-bottom-color: transparent !important;
+  background-color: var(--bg-secondary) !important;
+}
 
 /* from https://vuejs.org/guide/built-ins/transition.html#the-transition-component */
 .v-enter-active,
