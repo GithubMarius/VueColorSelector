@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, defineProps, Ref, onMounted } from 'vue'
-import RectAngularSelectionElement from './RectAngularSelectionElement.vue';
+import { ref, watch, defineProps, Ref, onMounted, inject } from 'vue'
 import colorCircleElement from './colorCircleElement.vue'
 import { Color } from './color';
 
@@ -8,14 +7,13 @@ const props = defineProps(['url', 'colorContainerElement', 'colors', 'settings']
 
 const canvasElement = ref(null)
 const canvasContainerRef = ref(null)
-// const rectangularSelectionRef: Ref<typeof RectAngularSelectionElement> = ref(null)
 
-const selection_start = ref([-1, -1])
-const selection_end = ref([0, 0])
 const selection_tool_active = ref(false)
 
 const image = ref(null)
 const ctx = ref(null)
+
+const tools: any = inject('tools')
 
 watch(
     () => props.url,
@@ -32,10 +30,6 @@ watch(
         drawImage()
      }
 )
-
-function getSelectionNorm() {
-    return [0, 1].map(x => (selection_start.value[x]-selection_end.value[x])**2).reduce((a, b) => a+b)
-}
 
 function showImage(url: string) {
     // Open image from url
@@ -81,8 +75,9 @@ function drawImageInBw() {
 
 
 function add_color_element(event) {
+    console.log(event.time)
     // If currently not using a selection tool
-    if (!selection_tool_active.value) {
+    if (!tools.active) {
         // Read color of pixel
         var xy = calculate_XY_position(event)
         var pixelData = get_pixel_color(xy[0], xy[1])
@@ -107,47 +102,6 @@ function calculate_XY_position(event) {
     return [targetRect.x - canvasRect.x + event.offsetX, targetRect.y - canvasRect.y + event.offsetY]
 }
 
-function drop_selection() {
-    props.colors.forEach(color => color.selected = false)
-}
-
-function mouse_down(event){
-    if (!event.shiftKey) {
-        drop_selection()
-    }
-
-
-    selection_start.value = calculate_XY_position(event)
-    selection_end.value = selection_start.value
-}
-
-function mouse_move(event){
-
-    if (event.buttons === 1) {
-        if (selection_start.value[0] === -1) {
-            selection_start.value = calculate_XY_position(event)
-        }
-
-        selection_end.value = calculate_XY_position(event)
-        if (!selection_tool_active.value && (getSelectionNorm() > 50)) {
-            selection_tool_active.value = true
-        }
-    }
-}
-
-/*
-
-function mouse_up(_){
-    rectangularSelectionRef.value.manifest_selection()
-    selection_start.value = [-1,-1]
-    selection_end.value = [0, 0]
-}
-
-function mouse_leave(event){
-    mouse_up(event)
-    selection_tool_active.value = false
-}
-*/
 
 function arrayToRgbStr(arr) {
     // Converts array into rgba string
@@ -159,13 +113,8 @@ onMounted(() => ctx.value = canvasElement.value.getContext('2d', { willReadFrequ
 
 <template>
     <div ref="canvasContainerRef" class="container position-relative"
-            @mousedown.left="mouse_down"
-            @mousedown.right="drop_selection"
             @contextmenu.prevent
-            @click="add_color_element"
-            @mouseup="mouse_up"
-            @mousemove="mouse_move"
-            @mouseleave="mouse_leave"
+            @click.left.exact="add_color_element"
         >
         <canvas id="canvas" ref="canvasElement">
         </canvas>

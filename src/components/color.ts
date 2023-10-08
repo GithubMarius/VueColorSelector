@@ -1,4 +1,4 @@
-import { ShallowRef, shallowRef, Ref, ref } from "vue"
+import { ShallowRef, shallowRef, Ref, ref, withKeys } from "vue"
 
 export class Color {
 
@@ -15,7 +15,6 @@ export class Color {
         }
 
     set group_name(value: string) {
-        console.log(ColorGroup.groups)
         ColorGroup.add_to_group(this, value)
     }
 
@@ -64,6 +63,14 @@ export class ColorGroup {
         return this.group_names.includes(group_name)
     }
 
+    static drop_empty_groups(): void {
+        ColorGroup.groups.value.forEach((group, index, object) => {
+            if (group.group_name !== '' && group.colors.length === 0) {
+                object.splice(index, 1)
+            }
+        })
+    }
+
     static get group_names() {
         // Return names of groups
         return this.groups.value.map(group => group.group_name)
@@ -75,9 +82,10 @@ export class ColorGroup {
     }
 
     static add_to_group(color: Color, group_name: string) {
-        // Set group of color to existing group/new group (if not one with same name exists)
+        // Set group of color to existing group/new group (if not one with same name exists) and drop empty groups
         color.group = this.get_group(group_name)
         color.group.colors.push(color)
+        ColorGroup.drop_empty_groups()
     }
 
     static get_group(group_name: string) {

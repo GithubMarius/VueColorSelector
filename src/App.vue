@@ -6,23 +6,33 @@ import colorBlockElement from './components/colorBlockElement.vue'
 import settingsElement from './components/settingsElement.vue'
 import Settings from './components/settings'
 
+import { ref, onMounted, computed, Ref, watch, provide } from 'vue'
+import { Color, ColorGroup } from './components/color'
+import rectangularSelectionToolElement from './components/rectangularSelectionToolElement.vue'
 
-import { ref, onMounted, computed, Ref, watch } from 'vue'
-import { Color, ColorArray, ColorGroup } from './components/color'
-import WholePageSelector from './components/wholePageSelector.vue'
 
-// reactive state
+// Refs state
 const imageCanvasInstance = ref(null)
 const colorContainerElement = ref(null)
-const groupNameInputRef = ref(null)
+const rectSelectionRef = ref(null)
 const imgUrl = ref('src/assets/Fritz.jpg')
 const colors = Color.colors
 const tabs = ref({
   active_tab: 2,
   list: []
 })
+const tools = ref({
+  existing: [],
+  get active() {
+    return this.existing.reduce((accumulator, tool) => tool.active || accumulator, false)
+  }
+})
 
-const settingsRef = ref(new Settings())
+// Provides
+
+provide('tools', tools)
+
+const settingsRef: Ref | Settings = ref(new Settings())
 
 watch(() => colors.value, (value,_) => true,
   { deep: true,
@@ -46,21 +56,7 @@ onMounted(() => {
   new Color([0.5, 1, 1, 1],  80, 80)
 })
 
-const groups = ref(ColorGroup.groups)
-const numberSelectedEntries = computed(() => selectedEntries.value.length)
-
-const selectedEntries = computed(() => {
-  return colors.value.filter(color => color.selected)
-})
-
-function update_selection_groups(event) {
-  if (event.target.value.length > 0) {
-    selectedEntries.value.forEach(color => {
-      color.group_name = event.target.value
-      color.selected = false
-    })
-  }
-}
+const groups = ColorGroup.groups
 /*
 onMounted(() => {
   window.addEventListener('keyup', function(event) {
@@ -72,7 +68,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <WholePageSelector>
+  <rectangularSelectionToolElement ref="rectSelectionRef">
   <div class="row w-100 vh-100 m-0">
     <div id="canvas_column" class="col-sm-8 justify-content-center bg-pri p-0">
       <imageCanvasElement ref="imageCanvasInstance"
@@ -81,16 +77,11 @@ onMounted(() => {
       :colors="colors"
       :settings="settingsRef"></imageCanvasElement>
     </div>
-
-
     <div class="col-sm-4 bg-sec">
-      <Transition @after-enter="groupNameInputRef.focus()">
-        <div class="row bg-attention p-3 text-light" v-if="numberSelectedEntries > 0">
-          <label class="form-label">Group name</label>
-          <input ref="groupNameInputRef" class="form-control" type="text" @keyup.enter="update_selection_groups">
-        </div>
-      </Transition>
         <div class="row mt-2">
+          
+
+    {{  tools.active }}
         <nav>
           <div class="nav nav-tabs" id="nav-tab" role="tablist">
             <button v-for="(tab, index) in tabs.list" :key="index"
@@ -102,17 +93,17 @@ onMounted(() => {
         </div>
         <div class="tab-content" id="nav-tabContent">
           <tabElement :tabs="tabs" :title="'File Dialog'"><input type="file" class="form-control"  @change="onFileChange"></tabElement>
-          <tabElement :tabs="tabs" :title="'Colors'">
+          <tabElement :tabs="tabs" :title="'All colors'">
             <colorBlockElement v-for="(color, index) in colors" :key="index" :color="color"></colorBlockElement>
           </tabElement>
-          <tabElement :tabs="tabs" :title="'ColorsTest'">
+          <tabElement :tabs="tabs" :title="'Colors in groups'">
             <colorGroupElement v-for="(group, index) in groups" :key="index" :group="group"></colorGroupElement>
           </tabElement>
           <tabElement :tabs="tabs" :title="'Settings'"><settingsElement :settings="settingsRef"></settingsElement></tabElement>
         </div>
       </div>
   </div>
-  </WholePageSelector>
+  </rectangularSelectionToolElement>
 </template>
 
 <style>

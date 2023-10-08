@@ -18,7 +18,6 @@ const props = defineProps({
 
 
 onMounted(() => {
-  console.log(123123)
   })
 </script>
 

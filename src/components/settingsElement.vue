@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import {Color, ColorArray} from './color';
-import {onMounted, ref} from 'vue'
+import {onMounted, PropType, ref, Ref} from 'vue'
 import "bootstrap-icons/font/bootstrap-icons.css";
 import Settings from './settings';
 
 const props = defineProps({
   settings: {
-    type: Settings
+    type: Object as PropType<Settings & Ref>
   }
 })
 
