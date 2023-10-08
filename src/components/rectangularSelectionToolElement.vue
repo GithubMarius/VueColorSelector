@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { computed, inject, ref, nextTick } from 'vue';
 import { Color } from './color';
+import { ToolInterface } from './Tool';
 
 const selectionToolElementRef = ref(null)
 const appContainerRef = ref(null)
 const groupNameInputRef = ref(null)
 
-const tools = inject('tools')
 
-const selectionToolObjectRef = ref({
+
+const tools: any = inject('tools')
+
+const selectionTool: Tool = {
     automatic_active: false,
     monitor: false,
     min_diagonal: 50**2,
@@ -188,8 +191,22 @@ const selectionToolObjectRef = ref({
     reset_automatic_active_and_monitor() {
         this.automatic_active = false
         this.monitor = false
+    },
+    mouseDownLeft(event: MouseEvent) {
+        if (!target_is_input(event)) {
+            mouseDownRight(event)
+            mouseDownLeftShift(event)
+        }
+    },
+    mouseMove(event: MouseEvent) {
+    if (event.buttons === 1 && this.monitor) {
+            this.end_selection = [event.clientX, event.clientY]
+            event.preventDefault()
+        }
     }
-})
+}
+
+const selectionToolObjectRef = ref(selectionTool)
 
 function mouseDownLeft(event: MouseEvent) {
     if (!target_is_input(event)) {
@@ -216,19 +233,15 @@ function mouseDownRight(_: MouseEvent) {
     selectionToolObjectRef.value.drop_selection()
 }
 
-function mouseMove(event: MouseEvent) {
-    if (event.buttons === 1 && selectionToolObjectRef.value.monitor) {
-        selectionToolObjectRef.value.end_selection = [event.clientX, event.clientY]
-        event.preventDefault()
+function mouseUp(event: MouseEvent) {
+    if (selectionToolObjectRef.value?.active) {
+        tools.value.last_ts = event.timeStamp
     }
-}
-
-function mouseUp(event: any) {
     selectionToolObjectRef.value.manifest_selection()
 }
 
 function mouseLeave(_: MouseEvent) {
-    groupNameInputRef.value?.focus()
+    groupNameInputRef.value?.focus()    
 }
 
 const numberSelectedEntries = computed(() => selectedEntries.value.length)
@@ -247,19 +260,22 @@ function update_selection_groups(event) {
     }
 }
 
-(<any>tools).value.existing.push(selectionToolObjectRef.value)
+tools.value.existing.push(selectionToolObjectRef.value)
 
 </script>
 
 
 <template>
     <div ref="appContainerRef" class="position-relative"
-    @mousemove = "mouseMove"
+    @mouseenter="tools.mouseEnter"
+    @mousemove = "tools.mouseMove"
     @mousedown.left.exact="mouseDownLeft"
     @mousedown.left.shift.exact="mouseDownLeftShift"
     @mousedown.right="mouseDownRight"
     @mouseup="mouseUp"
     @mouseleave="mouseLeave"
+    @click.left.exact="tools.clickLeft"
+    @click.right.exact="tools.clickRight"
     >
         <div>
             <Transition @after-enter="groupNameInputRef.focus()">

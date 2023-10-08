@@ -2,6 +2,7 @@
 import { ref, watch, defineProps, Ref, onMounted, inject } from 'vue'
 import colorCircleElement from './colorCircleElement.vue'
 import { Color } from './color';
+import { referenceTool } from './Tool'
 
 const props = defineProps(['url', 'colorContainerElement', 'colors', 'settings'])
 
@@ -14,6 +15,7 @@ const image = ref(null)
 const ctx = ref(null)
 
 const tools: any = inject('tools')
+tools.value.existing.push(referenceTool)
 
 watch(
     () => props.url,
@@ -75,9 +77,8 @@ function drawImageInBw() {
 
 
 function add_color_element(event) {
-    console.log(event.time)
     // If currently not using a selection tool
-    if (!tools.active) {
+    if (!tools.value.active && (tools.value.last_ts !== event.timeStamp)) {
         // Read color of pixel
         var xy = calculate_XY_position(event)
         var pixelData = get_pixel_color(xy[0], xy[1])

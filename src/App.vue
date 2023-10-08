@@ -8,6 +8,7 @@ import Settings from './components/settings'
 
 import { ref, onMounted, computed, Ref, watch, provide } from 'vue'
 import { Color, ColorGroup } from './components/color'
+import { tools } from './components/Tool'
 import rectangularSelectionToolElement from './components/rectangularSelectionToolElement.vue'
 
 
@@ -21,12 +22,7 @@ const tabs = ref({
   active_tab: 2,
   list: []
 })
-const tools = ref({
-  existing: [],
-  get active() {
-    return this.existing.reduce((accumulator, tool) => tool.active || accumulator, false)
-  }
-})
+
 
 // Provides
 
@@ -79,9 +75,6 @@ onMounted(() => {
     </div>
     <div class="col-sm-4 bg-sec">
         <div class="row mt-2">
-          
-
-    {{  tools.active }}
         <nav>
           <div class="nav nav-tabs" id="nav-tab" role="tablist">
             <button v-for="(tab, index) in tabs.list" :key="index"
