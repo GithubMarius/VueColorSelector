@@ -45,14 +45,20 @@ function dragReal(event) {
     console.log(props.referencePair.digital.scale_from_event(event))
 }
 
+function dragStart(event) {
+}
+
+function change_cursor(_, value: Boolean) {
+}
+
 </script>
 
 <template>
 <div>
-    <div ref="start" class="reference_point rounded" data-isstart="true" @click.prevent @drag.prevent="dragDigital" @dragend="dragDigital" draggable="true" :style="styleStart"></div>
-    <hr class="reference_line" :style="{left: referencePair.digital.cssCenterX, top: referencePair.digital.cssCenterY,  transform: referencePair.digital.cssTransform, width: referencePair.digital.cssLength}">
-    <div ref="end" class="reference_point rounded" data-isstart="false" @click.prevent @drag.prevent="dragDigital" @dragend="dragDigital" draggable="true" :style="styleEnd"></div>
-    <div ref="real" class="reference_point rounded" @click.prevent @drag.prevent="dragReal" @dragend="dragReal" draggable="true" :style="styleReal"></div>
+    <div ref="start" class="reference_point rounded" data-isstart="true" @click.prevent @drag.prevent="dragDigital" @dragend="dragDigital" draggable="true" :style="styleStart" @dragover.prevent></div>
+    <hr  class="reference_line" :style="{left: referencePair.digital.cssCenterX, top: referencePair.digital.cssCenterY,  transform: referencePair.digital.cssTransform, width: referencePair.digital.cssLength}">
+    <div ref="end" class="reference_point rounded" data-isstart="false" @click.prevent @drag.prevent="dragDigital" @dragend="dragDigital" draggable="true" :style="styleEnd" @dragover.prevent></div>
+    <div ref="real" class="reference_point rounded" @click.prevent @drag.prevent="dragReal" @dragend="dragReal" draggable="true" :style="styleReal" @dragover.prevent></div>
 </div>
 
 
@@ -67,6 +73,7 @@ function dragReal(event) {
 }
 
 .reference_line {
+    pointer-events: none;
     position: absolute;
     margin: 0px;
     height: 2px;
