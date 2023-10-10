@@ -62,12 +62,6 @@ onMounted(() => {
 })
 */
 
-function test() {
-  toolManagementRef.value.toggle_tool(0)
-}
-
-const too = computed(() => toolManagementRef.value.activatable_tools)
-
 </script>
 
 <template>

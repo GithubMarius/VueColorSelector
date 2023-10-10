@@ -9,6 +9,7 @@ export default class Settings {
         public color_mode: Boolean = true,
         public color_circle_radius = 15,
         public reference_circle_radius = 8,
+        public scale = 0.5,
         private _bright: Boolean = true
     ) {
         this.bright = _bright

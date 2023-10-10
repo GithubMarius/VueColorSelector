@@ -27,24 +27,32 @@ const styleEnd = computed(function(){return Object.assign({
     top: props.referencePair.digital.cssEndY
 }, size_circle.value)})
 
-function drag(event) {
-    const isoriginal = Boolean(event.target.dataset.isoriginal)
-    const isstart = Boolean(event.target.dataset.isstart)
-    if (isoriginal && isstart) {
-        console.log(event)
-        console.log([event.clientX, event.clientY])
-        props.referencePair.digital.start = [event.clientX, event.clientY]
+const styleReal = computed(function(){return Object.assign({
+    left: props.referencePair.digital.cssRealX,
+    top: props.referencePair.digital.cssRealY
+}, size_circle.value)})
+
+function dragDigital(event) {
+    if (event.target.dataset.isstart === 'true') {
+        props.referencePair.digital.start_from_event(event, true)
+    } else {
+        props.referencePair.digital.end_from_event(event, true)
     }
+}
+
+function dragReal(event) {
+    settings.value.scale = props.referencePair.digital.scale_from_event(event)
+    console.log(props.referencePair.digital.scale_from_event(event))
 }
 
 </script>
 
 <template>
 <div>
-    <div ref="start" class="reference_point rounded" data-isoriginal="true" data-isstart="true" :style="styleStart" @drag="drag"></div>
+    <div ref="start" class="reference_point rounded" data-isstart="true" @click.prevent @drag.prevent="dragDigital" @dragend="dragDigital" draggable="true" :style="styleStart"></div>
     <hr class="reference_line" :style="{left: referencePair.digital.cssCenterX, top: referencePair.digital.cssCenterY,  transform: referencePair.digital.cssTransform, width: referencePair.digital.cssLength}">
-    <div ref="end" class="reference_point rounded" :style="styleEnd">
-</div>
+    <div ref="end" class="reference_point rounded" data-isstart="false" @click.prevent @drag.prevent="dragDigital" @dragend="dragDigital" draggable="true" :style="styleEnd"></div>
+    <div ref="real" class="reference_point rounded" @click.prevent @drag.prevent="dragReal" @dragend="dragReal" draggable="true" :style="styleReal"></div>
 </div>
 
 

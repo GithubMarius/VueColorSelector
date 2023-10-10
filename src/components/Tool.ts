@@ -21,7 +21,7 @@ export const Tool: ToolInterface = {
 }
 
 export class Reference {
-    constructor(public start: [Number|any, Number|any], public end: [Number|any, Number|any], public isset=true, public visible=true){}
+    constructor(public start: [Number|any, Number|any], public end: [Number|any, Number|any], public visible=true, public scale_real=0.5){}
 
     get cssStartX() {
       return (this.start) ? this.start[0] + 'px' : 'none'
@@ -48,11 +48,11 @@ export class Reference {
     }
 
     get cssCenterX() {
-      return (this.start && this.end) ? this.centerX + 'px' : 'none'
+      return this.isset ? this.centerX + 'px' : 'none'
     }
 
     get cssCenterY() {
-      return (this.start && this.end) ? this.centerY + 'px' : 'none'
+      return this.isset ? this.centerY + 'px' : 'none'
     }
 
     get length() {
@@ -60,7 +60,7 @@ export class Reference {
     }
 
     get cssLength() {
-      return (this.start && this.end) ? this.length + 'px' : 'none'
+      return this.isset ? this.length + 'px' : 'none'
     }
 
     get angle() {
@@ -68,30 +68,59 @@ export class Reference {
     }
 
     get cssTransform() {
-      return (this.start && this.end) ? 'translate(-50%, -50%) rotate(' + this.angle + 'rad)' : 'none'
+      return this.isset ? 'translate(-50%, -50%) rotate(' + this.angle + 'rad)' : 'none'
     }
 
-    start_from_event(event) {
-      const target = <HTMLElement>event.target 
-      if (target.id === 'canvas') {
-        const rect = target.getBoundingClientRect()
-        this.start = [event.clientX - rect.x, event.clientY - rect.y]
+    start_from_event(event, ignore_target=false) {
+      const canvas = document.getElementById('canvas')
+      if (ignore_target || ((<HTMLElement>event.target ) === canvas)) {
+        this.start = this.get_coordinate_from_event(event, canvas)
       }
     }
 
-    end_from_event(event) {
-      const target = <HTMLElement>event.target 
-      if (target.id === 'canvas') {
-        const rect = target.getBoundingClientRect()
-        this.end = [event.clientX - rect.x, event.clientY - rect.y]
+    end_from_event(event, ignore_target=false) {
+      const canvas = document.getElementById('canvas')
+      if (ignore_target || ((<HTMLElement>event.target ) === canvas)) {
+        this.end = this.get_coordinate_from_event(event, canvas)
       }
+    }
+
+    get isset() {
+      return this.start && this.end
+    }
+
+    get realX() {
+      return this.scale_real*this.end[0] + (1-this.scale_real)*this.start[0]
+    }
+
+    get realY() {
+      return this.scale_real*this.end[1] + (1-this.scale_real)*this.start[1]
+    }
+
+    get cssRealX() {
+      return (this.isset) ? this.scale_real*this.end[0] + (1-this.scale_real)*this.start[0] + 'px' : 'none'
+    }
+
+    get cssRealY() {
+      return (this.isset) ? this.scale_real*this.end[1] + (1-this.scale_real)*this.start[1] + 'px' : 'none'
+    }
+
+    scale_from_event(event) {
+      const point = this.get_coordinate_from_event(event)
+      this.scale_real = ((point[0]-this.start[0])*(this.end[0]-this.start[0]) + (point[1]-this.start[1])*(this.end[1]-this.start[1]))/(this.length**2)
+      return this.scale_real
+    }
+
+    get_coordinate_from_event(event, canvas=document.getElementById('canvas')): [Number|any, Number|any] {
+      const rect = canvas.getBoundingClientRect()
+      return [event.clientX - rect.x, event.clientY - rect.y]
     }
 }
 
 class referencePair {
   constructor(public destructable: Boolean = true,
-    public digital = new Reference(null, null, false, true),
-    public real = new Reference(null, null, false, true)) {}
+    public digital = new Reference(null, null, true),
+    public real = new Reference(null, null, true)) {}
 }
 
 console.log('Warning, reference tool set inactive currently.')

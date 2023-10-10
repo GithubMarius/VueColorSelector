@@ -121,7 +121,7 @@ onMounted(() => ctx.value = canvasElement.value.getContext('2d', { willReadFrequ
             @contextmenu.prevent
             @click.left.exact="add_color_element"
         >
-        <canvas id="canvas" ref="canvasElement">
+        <canvas id="canvas" ref="canvasElement" @dragover.prevent @drop.prevent>
         </canvas>
         <div>
         <colorCircleElement v-for="(color, index) in colors" :key="index" :color="color" :colors="colors" :settings="settings">
