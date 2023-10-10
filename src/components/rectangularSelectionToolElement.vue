@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, ref, nextTick } from 'vue';
+import { computed, inject, ref } from 'vue';
 import { Color } from './color';
 import { ToolInterface } from './Tool';
 
@@ -11,40 +11,25 @@ const groupNameInputRef = ref(null)
 
 const tools: any = inject('tools')
 
-const selectionTool: Tool = {
-    automatic_active: false,
-    monitor: false,
-    min_diagonal: 50**2,
-    _active: false,
+const selectionTool: ToolInterface = {
+    key: 's',
+    active: false,
+    passive: false,
+    icon: 'bi-square',
     _start_selection: [0, 0],
     _end_selection: [0, 0],
-
-    get active(): Boolean {
-        return this._active || this.automatic_active
-    },
-
-    set active(value: Boolean) {
-        this._active = value
-    },
 
     set start_selection(value) {
         // Set start selection value (end selection value is be set to same value as well)
         this._start_selection = value
         this.end_selection = value
-        this.monitor = true
     },
 
     set end_selection(value) {
-        // Set end selection value and check if selection tool should be set to automatic_active
+        // Set end selection value
         this._end_selection = value
-        if (!this.automatic_active) {
-            this.check_diameter()
-        }
-        
-        if (this.automatic_active) {
-            const selected_colors = this.selected_colors
-            Color.colors.value.forEach(color => color.selecting = selected_colors.includes(color))
-        }
+        const selected_colors = this.selected_colors
+        Color.colors.value.forEach(color => color.selecting = selected_colors.includes(color))
 
     },
 
@@ -113,13 +98,6 @@ const selectionTool: Tool = {
         return this.width**2 + this.height**2
     },
 
-    check_diameter() {
-        // Change automatic_active state if rectangle diagonal length exceeds min value
-        if (this.diagonal > this.min_diagonal) {
-            this.automatic_active = true
-        }
-    },
-
     get selected_colors() {
         // Get colors which color circle or block is within selection rectangle
         return this.selected_element_ids.map(index => Color.colors.value[index])
@@ -130,6 +108,10 @@ const selectionTool: Tool = {
         const circle_ids = this.get_ids_for_elements_within_selection_of_class('color_circle')
         const block_ids = this.get_ids_for_elements_within_selection_of_class('color_block')
         return [...new Set((circle_ids.concat(block_ids)))]
+    },
+
+    toggle() {
+        this.active = !this.active
     },
 
     get_visible_elements_of_class(css_class: string): Array<Element> {
@@ -177,71 +159,49 @@ const selectionTool: Tool = {
             color.selected = true
             color.selecting = false
         })
-        this.reset_automatic_active_and_monitor()
         groupNameInputRef.value?.focus()
-
-    },
+        this.start_selection = [0,0]
+    }
+    ,
 
     drop_selection() {
         // Drop selection (set not selected to all colors)
         Color.colors.value.forEach(color => color.selected = false)
-        this.reset_automatic_active_and_monitor()
     },
-
-    reset_automatic_active_and_monitor() {
-        this.automatic_active = false
-        this.monitor = false
-    },
-    mouseDownLeft(event: MouseEvent) {
+    mousedownleft(event: MouseEvent) {
         if (!target_is_input(event)) {
-            mouseDownRight(event)
-            mouseDownLeftShift(event)
+            this.mousedownright(event)
+            this.mousedownleftshift(event)
         }
     },
-    mouseMove(event: MouseEvent) {
-    if (event.buttons === 1 && this.monitor) {
-            this.end_selection = [event.clientX, event.clientY]
+    mousedownright(_: MouseEvent) {
+        this.drop_selection()
+    },
+    mousedownleftshift(event: MouseEvent) {    
+        if (!target_is_input(event)) {
+            selectionToolObjectRef.value.start_selection = [event.clientX, event.clientY];
+        }
+    }
+    ,
+    mousemove(event: MouseEvent) {
+    if (event.buttons === 1) {
+            selectionToolObjectRef.value.end_selection = [event.clientX, event.clientY]
             event.preventDefault()
         }
+    },
+    mouseup(event: MouseEvent) {
+        tools.value.last_ts = event.timeStamp
+        this.manifest_selection()
+    },
+    mouseleave(_) {
+        groupNameInputRef.value?.focus()
     }
 }
 
 const selectionToolObjectRef = ref(selectionTool)
 
-function mouseDownLeft(event: MouseEvent) {
-    if (!target_is_input(event)) {
-        mouseDownRight(event)
-        mouseDownLeftShift(event)
-    }
-}
-
-function mouseDownLeftShift(event: MouseEvent) {
-    if (!target_is_input(event)) {
-        selectionToolObjectRef.value.start_selection = [event.clientX, event.clientY];
-    }
-}
-
 function target_is_input(event: MouseEvent): Boolean {
     return (<HTMLElement>event.target).tagName === 'INPUT'
-}
-
-function target_has_class_form_range(event: MouseEvent): Boolean {
-    return (<HTMLElement>event.target).classList.contains('form-range')
-}
-
-function mouseDownRight(_: MouseEvent) {
-    selectionToolObjectRef.value.drop_selection()
-}
-
-function mouseUp(event: MouseEvent) {
-    if (selectionToolObjectRef.value?.active) {
-        tools.value.last_ts = event.timeStamp
-    }
-    selectionToolObjectRef.value.manifest_selection()
-}
-
-function mouseLeave(_: MouseEvent) {
-    groupNameInputRef.value?.focus()    
 }
 
 const numberSelectedEntries = computed(() => selectedEntries.value.length)
@@ -260,28 +220,20 @@ function update_selection_groups(event) {
     }
 }
 
-tools.value.existing.push(selectionToolObjectRef.value)
+tools.value.tools.push(selectionTool)
 
 </script>
 
 
 <template>
-    <div ref="appContainerRef" class="position-relative"
-    @mouseenter="tools.mouseEnter"
-    @mousemove = "tools.mouseMove"
-    @mousedown.left.exact="mouseDownLeft"
-    @mousedown.left.shift.exact="mouseDownLeftShift"
-    @mousedown.right="mouseDownRight"
-    @mouseup="mouseUp"
-    @mouseleave="mouseLeave"
-    @click.left.exact="tools.clickLeft"
-    @click.right.exact="tools.clickRight"
-    >
+    <div ref="appContainerRef" class="position-relative">
         <div>
             <Transition @after-enter="groupNameInputRef.focus()">
                 <div class="position-absolute z-1 rounded group-name-input-div" v-if="numberSelectedEntries > 0">
                     <input ref="groupNameInputRef" id="groupName" class="form-control" type="text" placeholder="GROUP NAME"
                     @click.prevent
+                    @keydown.stop
+                    @keypress.stop
                     @keyup.enter="update_selection_groups">
                 </div>
             </Transition>

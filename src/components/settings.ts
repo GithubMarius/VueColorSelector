@@ -8,6 +8,7 @@ export default class Settings {
         public dark_theme: Theme = new Theme('#222222' ,'#111111', 'red', '#FFFFFF', '#222222'),
         public color_mode: Boolean = true,
         public color_circle_radius = 15,
+        public reference_circle_radius = 8,
         private _bright: Boolean = true
     ) {
         this.bright = _bright

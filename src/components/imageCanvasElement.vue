@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, defineProps, Ref, onMounted, inject } from 'vue'
 import colorCircleElement from './colorCircleElement.vue'
+import referenceElement from './referenceElement.vue';
 import { Color } from './color';
 import { referenceTool } from './Tool'
 
@@ -14,8 +15,10 @@ const selection_tool_active = ref(false)
 const image = ref(null)
 const ctx = ref(null)
 
-const tools: any = inject('tools')
-tools.value.existing.push(referenceTool)
+const tools: any =  inject('tools')
+tools.value.tools.push(referenceTool)
+
+const referenceToolRef = ref(referenceTool)
 
 watch(
     () => props.url,
@@ -78,7 +81,8 @@ function drawImageInBw() {
 
 function add_color_element(event) {
     // If currently not using a selection tool
-    if (!tools.value.active && (tools.value.last_ts !== event.timeStamp)) {
+    // TODO: Check if timestamp could be removed
+    if (!tools.value.active_tool && (tools.value.last_ts !== event.timeStamp)) {
         // Read color of pixel
         var xy = calculate_XY_position(event)
         var pixelData = get_pixel_color(xy[0], xy[1])
@@ -123,6 +127,8 @@ onMounted(() => ctx.value = canvasElement.value.getContext('2d', { willReadFrequ
         <colorCircleElement v-for="(color, index) in colors" :key="index" :color="color" :colors="colors" :settings="settings">
         </colorCircleElement>
         </div>
+        <referenceElement :referencePair="referenceToolRef.references[0]">
+        </referenceElement>
     </div>
 </template>
 

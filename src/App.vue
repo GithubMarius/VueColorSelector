@@ -6,9 +6,9 @@ import colorBlockElement from './components/colorBlockElement.vue'
 import settingsElement from './components/settingsElement.vue'
 import Settings from './components/settings'
 
-import { ref, onMounted, computed, Ref, watch, provide } from 'vue'
+import { ref, onMounted, Ref, watch, provide, computed } from 'vue'
 import { Color, ColorGroup } from './components/color'
-import { tools } from './components/Tool'
+import { toolManagementRef } from './components/Tool'
 import rectangularSelectionToolElement from './components/rectangularSelectionToolElement.vue'
 
 
@@ -22,13 +22,14 @@ const tabs = ref({
   active_tab: 2,
   list: []
 })
+const settingsRef: Ref | Settings = ref(new Settings())
 
 
 // Provides
 
-provide('tools', tools)
+provide('tools', toolManagementRef)
+provide('settings', settingsRef)
 
-const settingsRef: Ref | Settings = ref(new Settings())
 
 watch(() => colors.value, (value,_) => true,
   { deep: true,
@@ -61,6 +62,12 @@ onMounted(() => {
 })
 */
 
+function test() {
+  toolManagementRef.value.toggle_tool(0)
+}
+
+const too = computed(() => toolManagementRef.value.activatable_tools)
+
 </script>
 
 <template>
@@ -74,6 +81,14 @@ onMounted(() => {
       :settings="settingsRef"></imageCanvasElement>
     </div>
     <div class="col-sm-4 bg-sec">
+        <div class="mt-2">
+          <div class="btn-group" role="group" aria-label="Basic example">
+             <button v-for="(tool, index) in toolManagementRef.activatable_tools" :key="index" class="btn bi"
+             :class="[tool.icon, tool.active ? 'btn-primary': 'btn-outline-primary']"
+             @click="toolManagementRef.toggle_tool(index)"
+             ></button>
+          </div>
+        </div>
         <div class="row mt-2">
         <nav>
           <div class="nav nav-tabs" id="nav-tab" role="tablist">

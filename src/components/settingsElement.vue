@@ -19,8 +19,12 @@ function toggle_theme(event) {
   props.settings.bright = event.target.checked
 }
 
-function update_circle_radius(event) {
+function update_color_circle_radius(event) {
   props.settings.color_circle_radius = event.target.value
+}
+
+function update_reference_circle_radius(event) {
+  props.settings.reference_circle_radius = event.target.value
 }
 
 </script>
@@ -38,7 +42,13 @@ function update_circle_radius(event) {
   <div class="form-group row">
     <label for="rangeColorCircleSize" class="col-sm-4 col-form-label">Circle radius</label>
     <div class="col-sm-8 m-auto">
-      <input ref="rangeColorCircleRadiusRef" type="range" class="form-range" id="rangeColorCircleSize" @input="update_circle_radius" min="4" max="50">
+      <input ref="rangeColorCircleRadiusRef" type="range" class="form-range" id="rangeColorCircleSize" @input="update_color_circle_radius" min="4" max="50">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="rangeReferenceCircleSize" class="col-sm-4 col-form-label">Reference radius</label>
+    <div class="col-sm-8 m-auto">
+      <input ref="rangeReferenceCircleSize" type="range" class="form-range" id="rangeReferenceCircleSize" @input="update_reference_circle_radius" min="4" max="50">
     </div>
   </div>
 </form>
