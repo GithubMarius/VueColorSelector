@@ -1,5 +1,6 @@
 import { eventNames } from 'node:process';
-import { ref } from 'vue'
+import { isNumberObject } from 'node:util/types';
+import { ref, computed } from 'vue'
 
 export interface ToolInterface {
 active: Boolean
@@ -20,108 +21,109 @@ export const Tool: ToolInterface = {
   toggle() {}
 }
 
-export class Reference {
-    constructor(public start: [Number|any, Number|any], public end: [Number|any, Number|any], public visible=true, public scale_real=0.5){}
 
-    get cssStartX() {
-      return (this.start) ? this.start[0] + 'px' : 'none'
-    }
+export class Point {
+  constructor(public x: number, public y: number) {}
+  dot(arr1: [number, number], arr2: [number, number] = this.asarray): number {
+    return arr1[0] * arr2[0] + arr1[1] * arr2[1]
+  }
 
-    get cssStartY() {
-      return (this.start) ? this.start[1] + 'px' : 'none'
-    }
+  dot_squared(arr: [number, number]): number {
+    return this.dot(arr, arr)
+  }
 
-    get cssEndX() {
-      return (this.end) ? this.end[0] + 'px' : 'none'
-    }
+  add(arr1: [number, number], arr2: [number, number] = this.asarray): [number, number] {
+    return [arr2[0] + arr1[0], arr2[1] + arr1[1]]
+  }
 
-    get cssEndY() {
-      return (this.end) ? this.end[1] + 'px' : 'none'
-    }
+  sub(arr1: [number, number], arr2: [number, number] = this.asarray): [number, number] {
+    return [arr2[0] - arr1[0], arr2[1] - arr1[1]]
+  }
 
-    get centerX() {
-      return (this.start[0] + this.end[0])/2
-    }
+  get asarray(): [number, number] {
+    return [this.x, this.y]
+  }
 
-    get centerY() {
-      return (this.start[1] + this.end[1])/2
-    }
+  distance(arr: [number, number]) {
+    const sub = this.sub(arr)
+    return Math.sqrt(this.dot_squared(sub))
+  }
 
-    get cssCenterX() {
-      return this.isset ? this.centerX + 'px' : 'none'
-    }
+  center(arr1: [number, number], arr2: [number, number] = this.asarray): [number, number] {
+    return [0.5 * (arr1[0] +arr2[0]), 0.5 * (arr1[1] + arr2[1])]
+  }
 
-    get cssCenterY() {
-      return this.isset ? this.centerY + 'px' : 'none'
-    }
+  scale(s: number): [number, number] {
+    return [s * this.x, s * this.y]
+  }
 
-    get length() {
-      return Math.sqrt((this.end[0]-this.start[0])**2 + (this.end[1]-this.start[1])**2)
-    }
+  get_org(): [number, number] {
+    return [this.x, this.y]
+  }
 
-    get cssLength() {
-      return this.isset ? this.length + 'px' : 'none'
-    }
+  get_scaled() {
+    const s = referenceTool.scale.value
+    return this.add(this.scale(s), referenceTool.refPoint.value.scale(1-s))
+  }
 
-    get angle() {
-      return Math.atan((this.end[1]-this.start[1])/(this.end[0]-this.start[0]))
-    }
 
-    get cssTransform() {
-      return this.isset ? 'translate(-50%, -50%) rotate(' + this.angle + 'rad)' : 'none'
-    }
+  static get_coordinates_from_event(event, canvas=document.getElementById('canvas')): [number, number] {
+    const rect = canvas.getBoundingClientRect()
+    return [event.clientX - rect.x, event.clientY - rect.y]
+  }
 
-    start_from_event(event, ignore_target=false) {
-      const canvas = document.getElementById('canvas')
-      if (ignore_target || ((<HTMLElement>event.target ) === canvas)) {
-        this.start = this.get_coordinate_from_event(event, canvas)
-      }
-    }
+  static point_from_event(event) {
+    const [x, y] = this.get_coordinates_from_event(event)
+    return new Point(x, y)
+  }
 
-    end_from_event(event, ignore_target=false) {
-      const canvas = document.getElementById('canvas')
-      if (ignore_target || ((<HTMLElement>event.target ) === canvas)) {
-        this.end = this.get_coordinate_from_event(event, canvas)
-      }
+  update_from_event(event) {
+    [this.x, this.y] = Point.get_coordinates_from_event(event)
+  }
+  
+  scale_from_event(event: MouseEvent) {
+    const xy = Point.get_coordinates_from_event(event)
+    const arr_ref = referenceTool.refPoint.value.asarray
+    const subevent = this.sub(arr_ref, xy)
+    const subpoints = this.sub(arr_ref)
+    const scale = this.dot(subevent, subpoints)/this.distance(arr_ref)**2
+    if (scale > 0) {
+      referenceTool.scale.value = scale
     }
+  }
 
-    get isset() {
-      return this.start && this.end
-    }
-
-    get realX() {
-      return this.scale_real*this.end[0] + (1-this.scale_real)*this.start[0]
-    }
-
-    get realY() {
-      return this.scale_real*this.end[1] + (1-this.scale_real)*this.start[1]
-    }
-
-    get cssRealX() {
-      return (this.isset) ? this.scale_real*this.end[0] + (1-this.scale_real)*this.start[0] + 'px' : 'none'
-    }
-
-    get cssRealY() {
-      return (this.isset) ? this.scale_real*this.end[1] + (1-this.scale_real)*this.start[1] + 'px' : 'none'
-    }
-
-    scale_from_event(event) {
-      const point = this.get_coordinate_from_event(event)
-      this.scale_real = ((point[0]-this.start[0])*(this.end[0]-this.start[0]) + (point[1]-this.start[1])*(this.end[1]-this.start[1]))/(this.length**2)
-      return this.scale_real
-    }
-
-    get_coordinate_from_event(event, canvas=document.getElementById('canvas')): [Number|any, Number|any] {
-      const rect = canvas.getBoundingClientRect()
-      return [event.clientX - rect.x, event.clientY - rect.y]
-    }
+  angle(point: Point) {
+    const sub = this.sub(point.asarray)
+    return Math.atan(sub[1]/sub[0])
+  }
 }
 
-class referencePair {
-  constructor(public destructable: Boolean = true,
-    public digital = new Reference(null, null, true),
-    public real = new Reference(null, null, true)) {}
+export class NWPair {
+  constructor(public start: Point, public end: Point) {}
+
+  get length_org() {
+    return this.start.distance(this.end.asarray)
+  }
+
+  get length_scaled() {
+    return this.start.distance(this.end.asarray) * referenceTool.scale.value
+  }
+
+  get angle() {
+    return this.start.angle(this.end)
+  }
+
+  get center_org() {
+    return this.start.center(this.end.asarray)
+  }
+
+  get center_scaled() {
+    return this.start.center(this.end.get_scaled(), this.start.get_scaled())
+  }
+  
 }
+
+
 
 console.log('Warning, reference tool set inactive currently.')
 export const referenceTool: ToolInterface = {
@@ -129,17 +131,68 @@ export const referenceTool: ToolInterface = {
     passive: false,
     icon: 'bi-arrows-vertical',
     key: 'r',
+    scale: ref(0.5),
+    points: <Array<Point>> new Array(0),
+    pairs: <Array<NWPair>>[],
+    update_call: null,
+    test: new Array(0),
+    _last_active: <NWPair|null>null,
+    refPoint: ref(0),
+
+    get last_active(): Point {
+      return (this._last_active) ? this._last_active : this.points[this.points.length-1]
+    },
+
+    set last_active(value) {
+      this._last_active = value
+    },
+
     toggle() {
       this.active = !this.active
     },
-    references: [new referencePair(false)],
+
+    new_pair(point1: Point, point2: Point) {
+      this.pairs.push(new NWPair(point1, point2))
+    },
     
     mousedownleft(event: MouseEvent) {
-      this.references[0].digital.start_from_event(event)
+      const point = Point.point_from_event(event)
+      if (this.points.length === 0) {
+        this.refPoint = point
+      }
+      this.points.push(point)
+    },
+
+    mousedownleftshift(event: MouseEvent) {
+      const point = Point.point_from_event(event)
+      if (this.points.length > 0) {
+        this.new_pair(this.last_active, point)
+      }
+      this.points.push(point)
+    },
+
+    add_new_point(point: Point) {
+      this.last_active = point
+      this.points.push(point)
+    },
+
+    point_from_event(event: MouseEvent) {
+      return Point.point_from_event(event)
     },
 
     mousedownright(event: MouseEvent) {
-      this.references[0].digital.end_from_event(event)
+      this.references[0].end_from_event(event)
+    },
+
+    mousemove(event: MouseEvent) {
+      if (this.update_call) {
+        if (event.buttons === 1) {
+          this.update_call(event)
+        }
+        else {
+          this.update_call = null
+        }
+      }
     },
 
     get reference_real_set() {
@@ -193,6 +246,9 @@ export const toolManagementRef = ref({
       } else if (event.shiftKey && !event.ctrlKey) {
         // + Shift + NoCtrl
         this.forward_event(event, 'mousedownleftshift')
+      } else if (!event.shiftKey && event.ctrlKey) {
+        // + NoShift + Ctrl
+        this.forward_event(event, 'mousedownleftctrl')
       }
     }
     else if (event.buttons === 2) {

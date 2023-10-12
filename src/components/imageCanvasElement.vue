@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref, watch, defineProps, Ref, onMounted, inject } from 'vue'
 import colorCircleElement from './colorCircleElement.vue'
-import referenceElement from './referenceElement.vue';
+import referencePoint from './referencePoint.vue';
+import referencePair from './referencePair.vue';
+import referenceNWPoint from './referenceNWPoint.vue';
 import { Color } from './color';
 import { referenceTool } from './Tool'
 
@@ -118,17 +120,20 @@ onMounted(() => ctx.value = canvasElement.value.getContext('2d', { willReadFrequ
 
 <template>
     <div ref="canvasContainerRef" class="container position-relative"
+            :class="{dragging: referenceToolRef.update_call}"
             @contextmenu.prevent
             @click.left.exact="add_color_element"
         >
-        <canvas id="canvas" ref="canvasElement" @dragover.prevent @drop.prevent>
+        <canvas id="canvas" ref="canvasElement">
         </canvas>
         <div>
         <colorCircleElement v-for="(color, index) in colors" :key="index" :color="color" :colors="colors" :settings="settings">
         </colorCircleElement>
         </div>
-        <referenceElement :referencePair="referenceToolRef.references[0]">
-        </referenceElement>
+        <referencePair v-for="(pair, index) in referenceToolRef.pairs" :key="index" :pair="pair">
+        </referencePair>
+        <referenceNWPoint v-for="(point, index) in referenceToolRef.points" :key="index" :point="point" :tool="referenceToolRef">
+        </referenceNWPoint>
     </div>
 </template>
 
@@ -136,6 +141,13 @@ onMounted(() => ctx.value = canvasElement.value.getContext('2d', { willReadFrequ
 #canvas {
     position: absolute;
     left: 0px;
+}
+
+
+.dragging {
+    cursor: grabbing;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
 }
 
 </style>
