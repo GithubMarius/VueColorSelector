@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, defineProps, onMounted, computed, watch } from 'vue'
-import {deleteSelf, onHover, unHoverAll} from './colorUtils'
-import { Color } from './color';
+import {onHover, unHoverAll} from '../colorUtils'
+import { Color } from '../color';
+import selectableElement from '../elements/selectableElement.vue'
 
 const props = defineProps({
   color: {
@@ -28,16 +29,17 @@ onMounted(() => {
 </script>
 
 <template>
-  <slot></slot>
+<selectableElement>
 <div ref="colorBlockRef" class="color_block"
 
 :class="{hovered: props.color.hovered, selected: (props.color.selected || props.color.selecting)}"
 :style="{backgroundColor: props.color.css_rgb}"
-@click="deleteSelf(props)"
+@click.ctrl="color.delete()"
 @mouseover="onHover(props)"
 @mouseleave="unHoverAll(props)"
 :data-color-id="color.index"
 ></div>
+</selectableElement>
 </template>
 
 <style>

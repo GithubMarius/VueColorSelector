@@ -1,21 +1,22 @@
 <script setup lang="ts">
-import { ref, watch, defineProps, Ref, onMounted, inject } from 'vue'
-import colorCircleElement from './colorCircleElement.vue'
+import { ref, watch, defineProps, onMounted, inject } from 'vue'
+import colorCircleElement from './elements/colorCircleElement.vue'
 import referencePoint from './referencePoint.vue';
 import referencePair from './referencePair.vue';
-import referenceNWPoint from './referenceNWPoint.vue';
 import { Color } from './color';
 import { referenceTool } from './Tool'
 
-const props = defineProps(['url', 'colorContainerElement', 'colors', 'settings'])
+const props = defineProps(['url', 'colors', 'settings'])
 
 const canvasElement = ref(null)
+const canvasElementBW = ref(null)
 const canvasContainerRef = ref(null)
 
 const selection_tool_active = ref(false)
 
 const image = ref(null)
 const ctx = ref(null)
+const ctxBW = ref(null)
 
 const tools: any =  inject('tools')
 tools.value.tools.push(referenceTool)
@@ -52,6 +53,9 @@ function set_canvas_dimensions() {
     canvasElement.value.width = image.value.width
     canvasElement.value.height = image.value.height
 
+    canvasElementBW.value.width = image.value.width
+    canvasElementBW.value.height = image.value.height
+
     // Set container width
     canvasContainerRef.value.style.width = image.value.width + 'px'
     canvasContainerRef.value.style.height = image.value.height + 'px'
@@ -59,11 +63,8 @@ function set_canvas_dimensions() {
 
 function drawImage() {
     set_canvas_dimensions()
-    if (props.settings.color_mode) {
-        drawImageInColor()
-    } else {
-        drawImageInBw()
-    }
+    drawImageInColor()
+    drawImageInBw()
     return true
 }
 
@@ -73,11 +74,11 @@ function drawImageInColor() {
 
 function drawImageInBw() {
     // Draw b/w image
-    ctx.value.drawImage(image.value, 0, 0);
-    ctx.value.fillStyle = '#FFF';
-    ctx.value.fillRect(0, 0, image.value.width, image.value.height);
-    ctx.value.globalCompositeOperation = 'luminosity';
-    ctx.value.drawImage(image.value, 0, 0);
+    ctxBW.value.drawImage(image.value, 0, 0);
+    ctxBW.value.fillStyle = '#FFF';
+    ctxBW.value.fillRect(0, 0, image.value.width, image.value.height);
+    ctxBW.value.globalCompositeOperation = 'luminosity';
+    ctxBW.value.drawImage(image.value, 0, 0);
 }
 
 
@@ -109,13 +110,10 @@ function calculate_XY_position(event) {
     return [targetRect.x - canvasRect.x + event.offsetX, targetRect.y - canvasRect.y + event.offsetY]
 }
 
-
-function arrayToRgbStr(arr) {
-    // Converts array into rgba string
-    return `rgba(${arr})`
-}
-
-onMounted(() => ctx.value = canvasElement.value.getContext('2d', { willReadFrequently: true }))
+onMounted(() => {
+    ctx.value = canvasElement.value.getContext('2d', { willReadFrequently: true })
+    ctxBW.value = canvasElementBW.value.getContext('2d')
+    })
 </script>
 
 <template>
@@ -124,30 +122,35 @@ onMounted(() => ctx.value = canvasElement.value.getContext('2d', { willReadFrequ
             @contextmenu.prevent
             @click.left.exact="add_color_element"
         >
-        <canvas id="canvas" ref="canvasElement">
-        </canvas>
+        <canvas id="canvas" class="canvas" ref="canvasElement"></canvas>
+        <canvas id="canvasBW" class="canvas canvasBW" :class="{'d-none': settings.color_mode}" ref="canvasElementBW"></canvas>
         <div>
-        <colorCircleElement v-for="(color, index) in colors" :key="index" :color="color" :colors="colors" :settings="settings">
-        </colorCircleElement>
+            <referencePair v-for="(pair, index) in referenceToolRef.pairs" :key="index" :pair="pair">
+            </referencePair>
+            <colorCircleElement v-for="(color, index) in colors" :key="index" :color="color" :colors="colors" :settings="settings">
+            </colorCircleElement>
         </div>
-        <referencePair v-for="(pair, index) in referenceToolRef.pairs" :key="index" :pair="pair">
-        </referencePair>
-        <referenceNWPoint v-for="(point, index) in referenceToolRef.points" :key="index" :point="point" :tool="referenceToolRef">
-        </referenceNWPoint>
+        <referencePoint v-for="(point, index) in referenceToolRef.points" :key="index" :point="point" :tool="referenceToolRef">
+        </referencePoint>
     </div>
 </template>
 
 <style>
-#canvas {
-    position: absolute;
-    left: 0px;
-}
 
 
 .dragging {
     cursor: grabbing;
     cursor: -moz-grabbing;
     cursor: -webkit-grabbing;
+}
+
+.canvas {
+    position: absolute;
+    left: 0px;
+}
+
+.canvasBW {
+    pointer-events: none;
 }
 
 </style>

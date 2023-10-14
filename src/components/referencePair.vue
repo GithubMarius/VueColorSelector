@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { StyleValue, computed } from 'vue';
-import { NWPair } from './Tool'
+import { Pair } from './Tool'
 
 const props = defineProps({
   pair: {
-    type: NWPair
+    type: Pair
   }
 })
-
-
 
 const styleDigital = computed(function(): StyleValue {
     const xy = props.pair.center_org
@@ -32,25 +30,23 @@ const styleReal = computed(function(): StyleValue {
 </script>
 
 <template>
-        <hr class="pairline pairline_digital" :style="styleDigital">
-        <hr class="pairline pairline_real" :style="styleReal">
+        <hr class="pairline pairline_digital" :style="styleDigital" v-if="pair.visible">
+        <hr class="pairline pairline_real" :style="styleReal" v-if="pair.visible">
 </template>
 
 <style>
 .pairline {
     position: absolute;
     margin: 0px;
-    height: 2px;
+    border-top: 2px dashed ;
     opacity: 1;
 }
 
 .pairline_digital {
-    color: var(--col-pri);
-    background-color: var(--col-pri);
+    border-color: var(--col-pri);
 }
 
 .pairline_real {
-    color: yellow;
-    background-color: green;
+    border-color: var(--col-reference-scaled);
 }
 </style>

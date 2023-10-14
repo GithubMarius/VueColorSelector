@@ -1,15 +1,19 @@
 <script setup lang="ts">
+import "bootstrap-icons/font/bootstrap-icons.css";
+
 import imageCanvasElement from './components/imageCanvasElement.vue'
-import tabElement from './components/tabElement.vue'
-import colorGroupElement from './components/colorGroupElement.vue'
-import colorBlockElement from './components/colorBlockElement.vue'
-import settingsElement from './components/settingsElement.vue'
+import settingsTab from './components/tabs/settingsTab.vue'
 import Settings from './components/settings'
+
+import allColorsTab from './components/tabs/allColorsTab.vue'
+import groupedColorsTab from './components/tabs/groupedColorsTab.vue'
 
 import { ref, onMounted, Ref, watch, provide, computed } from 'vue'
 import { Color, ColorGroup } from './components/color'
 import { toolManagementRef } from './components/Tool'
 import rectangularSelectionToolElement from './components/rectangularSelectionToolElement.vue'
+
+import referenceTab from './components/tabs/referencesTab.vue'
 
 
 // Refs state
@@ -62,6 +66,17 @@ onMounted(() => {
 })
 */
 
+const all_tabs = {
+  active_tab: ref(0),
+  list:
+  {
+    'All Colors': allColorsTab,
+    'Colors by Group': groupedColorsTab,
+    'References': referenceTab,
+    'Settings': settingsTab
+}
+}
+
 </script>
 
 <template>
@@ -74,45 +89,43 @@ onMounted(() => {
       :colors="colors"
       :settings="settingsRef"></imageCanvasElement>
     </div>
-    <div class="col-sm-4 bg-sec">
-        <div class="mt-2">
-          <div class="btn-group" role="group" aria-label="Basic example">
+    <div class="col-sm-4 p-0 bg-sec">
+      <div class="row m-2">
+          <input type="file" class="form-control" data-bs-theme="light"  @change="onFileChange">
+        </div>
+        <div class="row m-2">
+          <div class="btn-group" role="group" aria-label="ToolToogles">
              <button v-for="(tool, index) in toolManagementRef.activatable_tools" :key="index" class="btn bi"
              :class="[tool.icon, tool.active ? 'btn-primary': 'btn-outline-primary']"
              @click="toolManagementRef.toggle_tool(index)"
              ></button>
           </div>
         </div>
-        <div class="row mt-2">
-        <nav>
-          <div class="nav nav-tabs" id="nav-tab" role="tablist">
-            <button v-for="(tab, index) in tabs.list" :key="index"
-            class="nav-link"
-            :class="{active: (tabs.active_tab === index)}"
-            @click="tab.activate">{{ tab.title }}</button>
-          </div>
-        </nav>
+        <div class="row">
+          <nav>
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+              <button v-for="(tab, index) in Object.keys(all_tabs.list)" :key="index"
+              class="nav-link"
+              :class="{active: all_tabs.active_tab.value === index}"
+              @click="all_tabs.active_tab.value = index">{{ tab }}</button>
+            </div>
+          </nav>
         </div>
-        <div class="tab-content" id="nav-tabContent">
-          <tabElement :tabs="tabs" :title="'File Dialog'"><input type="file" class="form-control"  @change="onFileChange"></tabElement>
-          <tabElement :tabs="tabs" :title="'All colors'">
-            <colorBlockElement v-for="(color, index) in colors" :key="index" :color="color"></colorBlockElement>
-          </tabElement>
-          <tabElement :tabs="tabs" :title="'Colors in groups'">
-            <colorGroupElement v-for="(group, index) in groups" :key="index" :group="group"></colorGroupElement>
-          </tabElement>
-          <tabElement :tabs="tabs" :title="'Settings'"><settingsElement :settings="settingsRef"></settingsElement></tabElement>
+        <div class="row m-2 p-2 tab-content" id="nav-tabContent">
+          <component :is="Object.values(all_tabs.list)[all_tabs.active_tab.value]" :colors="colors" :groups="groups" :settings="settingsRef"></component>
         </div>
+
       </div>
-  </div>
+    </div>
   </rectangularSelectionToolElement>
 </template>
 
 <style>
+
 :root {
   --col-pri: #0d6efd;
   --col-sec: #f8f9fa;
-  --col-text-dark: #212529;
+  --col-text-dark: #818a8f;
   --col-text-light: var(--col-sec);
   --bg-default: #FFFFFF;
   --bg-secondary: var(--col-sec);
@@ -120,10 +133,22 @@ onMounted(() => {
   --text-default: #212529;
   --text-contrast: var(var(--col-text-light));
   --bs-body-color: var(--text-default);
+  --col-reference-org: var(--col-pri);
+  --col-reference-scaled: #ff392b;
+  --col-border-light:  #dee2e6;
+  --REMOVEAGAIN:  #dee2e6;
 }
 
 body {
   color: var(--text-default);
+}
+
+.deleteCursor {
+    cursor: url("src/assets/icons/dash-circle.svg") 12 12 , not-allowed !important;
+}
+
+.deleteCursor .deletable {
+    cursor: url("src/assets/icons/dash-circle-fill.svg") 12 12 , not-allowed !important;
 }
 
 .text-pri {
@@ -146,6 +171,10 @@ body {
   border-color: var(--col-pri);
 }
 
+.border-light {
+  border-color: var(--col-border-light) !important;
+}
+
 .btn-pri {
   color: var(--col-text-light);
   background-color: var(--col-pri);
@@ -159,7 +188,7 @@ body {
 
 .btn-outline-pri {
   color: var(--col-pri) !important;
-  background-color: var(--col-sec);
+  background-color: transparent;
   border-color: var(--col-pri) !important;
 }
 
@@ -190,14 +219,25 @@ body {
   height: 50px;
 }
 
+
 .nav-link {
   color: var(--col-pri) !important;
 }
 
+.nav-tabs {
+  border-color : var(--col-border-light);
+}
+
 .nav-link.active {
   color: var(--text-default) !important;
+  border-color: var(--col-border-light) !important;
   border-bottom-color: transparent !important;
   background-color: var(--bg-secondary) !important;
+}
+
+.nav-link:hover {
+  border-color: var(--col-border-light) !important;
+  border-bottom-color: transparent !important;
 }
 
 /* from https://vuejs.org/guide/built-ins/transition.html#the-transition-component */

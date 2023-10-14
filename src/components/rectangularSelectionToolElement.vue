@@ -2,6 +2,7 @@
 import { computed, inject, ref } from 'vue';
 import { Color } from './color';
 import { ToolInterface } from './Tool';
+import { target_is_input } from './target_is_input';
 
 const selectionToolElementRef = ref(null)
 const appContainerRef = ref(null)
@@ -200,10 +201,6 @@ const selectionTool: ToolInterface = {
 
 const selectionToolObjectRef = ref(selectionTool)
 
-function target_is_input(event: MouseEvent): Boolean {
-    return (<HTMLElement>event.target).tagName === 'INPUT'
-}
-
 const numberSelectedEntries = computed(() => selectedEntries.value.length)
 
 const selectedEntries = computed(() => {
@@ -226,7 +223,7 @@ tools.value.tools.push(selectionTool)
 
 
 <template>
-    <div ref="appContainerRef" class="position-relative">
+    <div ref="appContainerRef" class="row w-100 vh-100 m-0 position-relative">
         <div>
             <Transition @after-enter="groupNameInputRef.focus()">
                 <div class="position-absolute z-1 rounded group-name-input-div" v-if="numberSelectedEntries > 0">

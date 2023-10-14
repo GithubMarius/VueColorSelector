@@ -1,10 +1,5 @@
 import { Color } from "./color"
 
-export function deleteSelf(props) {
-    // Delete self
-    props.colors.splice(get_index_of_color(props), 1)
-}
-
 export function onHover(props) {
     // Set hover status
     unHoverAll(props)    

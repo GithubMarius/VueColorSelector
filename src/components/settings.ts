@@ -1,14 +1,36 @@
 import { Ref, ref } from "vue"
 import { Color, ColorArray } from "./color"
 
+export class Radius {
+    constructor(public label, public value: number, public min: number = 0, public max: number = 50) {}
+
+    get css_diameter() {
+        // Return css diameter
+        return this.value * 2 + 'px'
+    }
+
+    get css_size() {
+        // Return width & height properties
+        return {
+            width: this.css_diameter,
+            height: this.css_diameter
+        }
+    }
+
+    update_from_event(event) {
+        // Input event handler
+        this.value = event.target.value
+    }
+}
+
 export default class Settings {
     
     constructor(
         public bright_theme: Theme = new Theme(),
-        public dark_theme: Theme = new Theme('#222222' ,'#111111', 'red', '#FFFFFF', '#222222'),
+        public dark_theme: Theme = new Theme('#444444' ,'#333333', 'red', '#EEEEEE', '#555555', '#ec684b'),
         public color_mode: Boolean = true,
         public color_circle_radius = 15,
-        public reference_circle_radius = 8,
+        public reference_circle_radius = new Radius('Reference circle radius', 8),
         public scale = 0.5,
         private _bright: Boolean = true
     ) {
@@ -41,7 +63,6 @@ export default class Settings {
     get css_circle_diameter() {
         return this.color_circle_radius * 2 + 'px'
     }
-
 }
 
 export class Theme {
@@ -52,7 +73,8 @@ export class Theme {
         public color_bg_secondary = Theme.getProperty('--bg-secondary'),
         public color_bg_attention = Theme.getProperty('--bg-attention'),
         public color_text_default = Theme.getProperty('--text-default'),
-        public color_text_contrast = Theme.getProperty('--text-contrast')
+        public color_text_contrast = Theme.getProperty('--text-contrast'),
+        public color_col_pri = Theme.getProperty('--col-pri')
     ){
         // Add public color properties to document_colors object
         const colors = Object.keys(this).filter(this.is_color)

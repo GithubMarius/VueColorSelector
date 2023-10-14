@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Color, ColorGroup } from './color';
+import { Color, ColorGroup } from '../color';
 import colorBlockElement from './colorBlockElement.vue'
 
 import { ref, nextTick, computed, onMounted, triggerRef } from 'vue'
@@ -37,8 +37,8 @@ const displayed_group_name = computed(() => props.group.group_name !== '' ? prop
 </script>
 
 <template>
-            <div class="card container mb-2">
-                <div class="card-header row"
+            <div class="card container mb-2 bg-pri border-light">
+                <div class="card-header row bg-sec"
                     :class="{rounded: !group.visibility_group}">
                     <div class="col-9 p-0 fs-6">
                         <div class="input-group">
@@ -52,7 +52,7 @@ const displayed_group_name = computed(() => props.group.group_name !== '' ? prop
                     <div v-if="!show_all" class="col-3" role="group" aria-label="Basic checkbox toggle button group">
                         <div class="btn-group group-menu">
                             <input type="checkbox" class="btn-check" autocomplete="off">
-                            <label class="btn btn-outline-primary"
+                            <label class="btn btn-outline-pri"
                             @click="group.toggle_group_visibility()"><i class="bi" :class="[group.visibility_group ? 'bi-caret-up' : 'bi-caret-down']"></i>
                             </label>
                             <input type="checkbox" class="btn-check" autocomplete="off">
