@@ -1,42 +1,28 @@
 import { defineStore } from "pinia";
+import { Color, ColorGroup } from '../utils/colors/ColorManagement'
+import { canvas_position_from_event, get_pixel_color } from '../utils/general'
+
 
 export const useColorStore = defineStore("color", {
   state: () => {
-    return { 
+    return {
       colors: [],
-      groups: []
+      groups: ColorGroup.groups,
+      history: []
     }
   },
   actions: {
-    increment(value = 1) {
-      this.colors.push(value)
-    },
+    color_from_event(event: MouseEvent) {
+      const [x, y] = canvas_position_from_event(event)
+      const pixelData = get_pixel_color(x, y)
+      const color = new Color(pixelData, x, y)
+      this.colors.push(color)
+    }
+
   },
   getters: {
+    'test': function() {
+      return this.colors
+    },
   },
 });
-
-/*
-
-
-const colorModule = {
-    state: () => ({
-      colors: [],
-      groups: []
-    }),
-    mutations: {
-      increment (state) {
-        // `state` is the local module state
-        state.colors.push(1)
-      }
-    },
-    getters: {
-      test(state) {
-        return state.colors
-      }
-    }
-  }
-
-
-
-*/
