@@ -3,6 +3,7 @@ import { computed, inject, ref } from 'vue';
 import { Color } from './color';
 import { ToolInterface } from './Tool';
 import { target_is_input } from './target_is_input';
+import { nextTick } from 'vue';
 
 const selectionToolElementRef = ref(null)
 const appContainerRef = ref(null)
@@ -18,7 +19,11 @@ const selectionTool: ToolInterface = {
     passive: false,
     icon: 'bi-square',
     _start_selection: [0, 0],
-    _end_selection: [0, 0],
+    end_selection: [0, 0],
+
+    get has_size() {
+        return (this.width + this.height) !== 0
+    },
 
     set start_selection(value) {
         // Set start selection value (end selection value is be set to same value as well)
@@ -26,22 +31,9 @@ const selectionTool: ToolInterface = {
         this.end_selection = value
     },
 
-    set end_selection(value) {
-        // Set end selection value
-        this._end_selection = value
-        const selected_colors = this.selected_colors
-        Color.colors.value.forEach(color => color.selecting = selected_colors.includes(color))
-
-    },
-
     get start_selection() {
         // Return start selection value
         return this._start_selection
-    },
-
-    get end_selection() {
-        // Return end selection value
-        return this._end_selection
     },
 
     get leftRight() {
@@ -74,24 +66,13 @@ const selectionTool: ToolInterface = {
         return Math.abs(this.end_selection[1] - this.start_selection[1])
     },
 
-    get css_left() {
-        // Return css left string value
-        return this.x + 'px'
-    },
-
-    get css_top() {
-        // Return css top string value
-        return this.y + 'px'
-    },
-
-    get css_width() {
-        // Return css width string value
-        return this.width + 'px'
-    },
-
-    get css_height() {
-        // Return css height string value
-        return this.height + 'px'
+    get style() {
+        return {
+            left: this.x + 'px',
+            top: this.y + 'px',
+            width: this.width + 'px',
+            height: this.height + 'px'
+        }
     },
 
     get diagonal() {
@@ -99,16 +80,8 @@ const selectionTool: ToolInterface = {
         return this.width**2 + this.height**2
     },
 
-    get selected_colors() {
-        // Get colors which color circle or block is within selection rectangle
-        return this.selected_element_ids.map(index => Color.colors.value[index])
-    },
-
-    get selected_element_ids() {
-        // Find all circle and block ids and return array of unique values
-        const circle_ids = this.get_ids_for_elements_within_selection_of_class('color_circle')
-        const block_ids = this.get_ids_for_elements_within_selection_of_class('color_block')
-        return [...new Set((circle_ids.concat(block_ids)))]
+    get selectables() {
+        return this.get_visible_elements_of_class('selectable')
     },
 
     toggle() {
@@ -119,23 +92,6 @@ const selectionTool: ToolInterface = {
         // Find all html elements with css_class that are currently visible
         const collection = document.getElementsByClassName(css_class)
         return [...Object.values(collection)].filter(element => element.checkVisibility())
-    },
-
-    filter_for_elements_within_bounds(elements: Array<Element>) {
-        // Return all elements within elements, that are currently fully inside the rectangular selection
-        return elements.filter(element => this.check_bounds(element))
-    },
-
-    get_ids_from_elements(elements) {
-        // Return data-id attribute of elements
-        return elements.map(element  => Number(element.dataset.colorId))
-    },
-
-    get_ids_for_elements_within_selection_of_class(css_class) {
-        // Return ids of all visible elements of css_class that are within selection
-        var elements = this.get_visible_elements_of_class(css_class)
-        elements = this.filter_for_elements_within_bounds(elements)
-        return this.get_ids_from_elements(elements)
     },
 
     check_bounds(element: HTMLElement) {
@@ -156,15 +112,25 @@ const selectionTool: ToolInterface = {
 
     manifest_selection() {
         // Permanently select colors within selection
-        this.selected_colors.forEach(color => {
+        /* this.selected_colors.forEach(color => {
             color.selected = true
             color.selecting = false
         })
+        */
+        this.selectables.forEach(this.dispatchToSelectionEvent)
         groupNameInputRef.value?.focus()
         this.start_selection = [0,0]
-    }
-    ,
-
+        this.selectables.forEach(this.dispatchDropSelecting)
+    },
+    dispatchDropSelecting(element) {
+        element.dispatchEvent(new CustomEvent("selecting", { detail: false}))
+    },
+    dispatchSelectingEvent(element) {
+        element.dispatchEvent(new CustomEvent("selecting", { detail: this.check_bounds(element.firstElementChild)}))
+    },
+    dispatchToSelectionEvent(element) {
+        element.dispatchEvent(new CustomEvent("toselection"))
+    },
     drop_selection() {
         // Drop selection (set not selected to all colors)
         Color.colors.value.forEach(color => color.selected = false)
@@ -182,10 +148,13 @@ const selectionTool: ToolInterface = {
         if (!target_is_input(event)) {
             selectionToolObjectRef.value.start_selection = [event.clientX, event.clientY];
         }
-    }
-    ,
+    },
     mousemove(event: MouseEvent) {
-    if (event.buttons === 1) {
+    if (event.buttons === 1) {            
+            // Emit selecting event to selectables
+            this.selectables.forEach((element: HTMLElement) => this.dispatchSelectingEvent(element))
+
+            // Update end selection value & prevent default
             selectionToolObjectRef.value.end_selection = [event.clientX, event.clientY]
             event.preventDefault()
         }
@@ -237,9 +206,7 @@ tools.value.tools.push(selectionTool)
         </div>
         <slot>
         </slot>
-        <div ref="selectionToolElementRef" class="rectangular_selection" v-if="selectionToolObjectRef.active" :style="
-        {left: selectionToolObjectRef.css_left, top: selectionToolObjectRef.css_top,
-        width: selectionToolObjectRef.css_width, height: selectionToolObjectRef.css_height}">
+        <div ref="selectionToolElementRef" class="rectangular_selection" v-if="selectionToolObjectRef.active && selectionToolObjectRef.has_size" :style="selectionToolObjectRef.style">
         </div>
     </div>
 </template>
@@ -247,6 +214,8 @@ tools.value.tools.push(selectionTool)
 <style>
 .rectangular_selection {
     position: absolute;
+    padding: 0px;
+    min-width: 0px;
     background-color: None;
     border: 1px dashed black;
 }

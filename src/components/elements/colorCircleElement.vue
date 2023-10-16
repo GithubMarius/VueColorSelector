@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Ref, defineProps, onMounted, ref } from 'vue';
-import { onHover, unHoverAll } from '../colorUtils'
+import { Ref, computed, onMounted, ref } from 'vue';
+import { onHover, unHoverAll } from '../../utils/colorUtils'
 import { Color } from '../color';
-import Settings from '../settings';
+import { useSettingsStore } from '../../stores/settings';
 import selectableElement from '../elements/selectableElement.vue'
 
 const props = defineProps({
@@ -11,25 +11,25 @@ const props = defineProps({
   },
   colors: {
     type: Array<Color>
-  },
-  settings: {
-    type: Settings
   }
 })
 
+const settings = useSettingsStore()
+
+const style = computed(function(){ return {
+        left: props.color.css_xPos, top: props.color.css_yPos, backgroundColor: settings.color_mode ? props.color.css_rgb : props.color.css_bw_hsl,
+        minWidth: settings.color_circle_radius.css_diameter, minHeight: settings.color_circle_radius.css_diameter
+      }})
 
 onMounted(() => {
   })
 </script>
 
 <template>
-    <selectableElement>
+  <selectableElement v-model:selecting="color.selectingCircle" v-model:selected="color.selected">
       <div ref="colorCircleRef" v-if="props.color.visible"
-      :class="{hovered: props.color.hovered, selected: (props.color.selected || props.color.selecting)}"
-      :style="{
-        left: props.color.css_xPos, top: props.color.css_yPos, backgroundColor: props.color.css_rgb,
-        minWidth: props.settings.css_circle_diameter, minHeight: props.settings.css_circle_diameter
-      }"
+      :class="{highlighted: (props.color.hovered || props.color.selected || props.color.selecting)}"
+      :style="style"
       @click.ctrl.stop="color.delete()"
       @click.shift.stop="color.selected = !color.selected"
       @mouseover="onHover(props)"

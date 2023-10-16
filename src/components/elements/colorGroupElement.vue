@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { Color, ColorGroup } from '../color';
+import { ColorGroup } from '../color';
 import colorBlockElement from './colorBlockElement.vue'
+import toggleButton from '../ui/toggleButton.vue'
 
-import { ref, nextTick, computed, onMounted, triggerRef } from 'vue'
+import { ref, nextTick, computed, onMounted, triggerRef, reactive } from 'vue'
 
 
 const props = defineProps({
@@ -15,9 +16,6 @@ const props = defineProps({
 const group_name_input_ref = ref(null)
 
 const editing_name = ref(false)
-
-//editing_name != editing_name
-const show_colors = ref(true)
 
 function activate_name_editing() {
     editing_name.value = true
@@ -34,36 +32,32 @@ function submit_name() {
 
 const displayed_group_name = computed(() => props.group.group_name !== '' ? props.group.group_name : 'Groupless Colors')
 
+console.log(props.group)
+
 </script>
 
 <template>
-            <div class="card container mb-2 bg-pri border-light">
-                <div class="card-header row bg-sec"
+            <div class="card container mb-2">
+                <div class="card-header row"
                     :class="{rounded: !group.visibility_group}">
                     <div class="col-9 p-0 fs-6">
-                        <div class="input-group">
-                            <div class="input-group-text" :class="{'rounded': !editing_name}"  v-if="group.group_name !== ''" @click="activate_name_editing()" ><i class="bi bi-pen"></i></div>
+                        <div class="input-group h-100">
+                            <div class="input-group-text rounded-left" :class="{'rounded': !editing_name}"  v-if="group.group_name !== ''" @click="activate_name_editing()" ><i class="bi bi-pen"></i></div>
                             <input ref="group_name_input_ref" type="text" class="form-control" :value="displayed_group_name" :disabled="!editing_name"
-                            :class="{'disabled-name-input p-0 fs-5': !editing_name}"
+                            :class="{'p-0 disabled-name-input fs-5': !editing_name}"
                             @keydown.enter="submit_name"
                             @focusout="editing_name = false">
                         </div>
                     </div>
                     <div v-if="!show_all" class="col-3" role="group" aria-label="Basic checkbox toggle button group">
                         <div class="btn-group group-menu">
-                            <input type="checkbox" class="btn-check" autocomplete="off">
-                            <label class="btn btn-outline-pri"
-                            @click="group.toggle_group_visibility()"><i class="bi" :class="[group.visibility_group ? 'bi-caret-up' : 'bi-caret-down']"></i>
-                            </label>
-                            <input type="checkbox" class="btn-check" autocomplete="off">
-                            <label class="btn btn-outline-pri"
-                            @click="group.toggle_colors_visibility()"><i class="bi" :class="[show_colors ? 'bi-eye-fill' : 'bi-eye-slash']"></i>
-                            </label>
+                            <toggleButton v-model="group.visibility_group" :icons="['bi-caret-up', 'bi-caret-down']"></toggleButton>
+                            <toggleButton v-model="group.visibility_colors" :icons="['bi-eye-fill', 'bi-eye-slash']"></toggleButton>
                         </div>
                     </div>
                 </div>
                 <div class="p-3" v-if="group.visibility_group">
-                    <colorBlockElement v-for="(color, index) in group.colors" :key="index" :color="color"></colorBlockElement>
+                    <colorBlockElement v-for="(color, index) in group.colors_sorted" :key="index" :color="color"></colorBlockElement>
                 </div>
             </div>
 </template>
@@ -75,6 +69,6 @@ const displayed_group_name = computed(() => props.group.group_name !== '' ? prop
 .disabled-name-input {
     padding-left: 15px !important;
     background-color: transparent !important;
-    border-color: transparent;
+    border-color: transparent !important;
 }
 </style>

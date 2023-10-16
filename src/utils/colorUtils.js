@@ -1,4 +1,4 @@
-import { Color } from "./color"
+import { Color } from "../components/color"
 
 export function onHover(props) {
     // Set hover status

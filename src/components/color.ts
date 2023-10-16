@@ -1,4 +1,53 @@
-import { ShallowRef, shallowRef, Ref, ref, withKeys } from "vue"
+import { Ref, ref } from "vue"
+
+function RGBtoHSL(RGB: [number, number, number]): [number, number, number] {
+    // Convert RGB Color to HSL
+
+    const rgb = <[number, number, number]>RGB.map(color => color/255)
+    const hsl = rgbtohsl(rgb)
+    const mult = [360, 100, 100]
+    return <[number, number, number]>hsl.map((color, index) => color*mult[index])
+    // return [H, S, L]
+}
+
+function rgbtohsl(rgb: [number, number, number]): [number, number, number] {
+    const [r, g, b] = rgb
+    const max = Math.max(...rgb)
+    const index_max = rgb.indexOf(max)
+
+    const min = Math.min(...rgb)
+
+
+    const diff = max-min
+    const sum = max+min
+    const l = sum/2
+
+    if (diff === 0) {
+        // Gray tone
+        var [s, h] = [0, 0]
+    }
+    else {
+        // No gray tone
+        var s = (l > 0.5) ? diff / (2 - sum) : diff / sum
+
+        var h: number
+        switch (index_max) {
+            case 0: {
+                h = (g-b)/diff
+                break;
+            }
+            case 1: {
+                h = 2 + (b-r)/diff
+                break;
+            }
+            case 2: {
+                h = 4 + (r-g)/diff
+                break;
+            }
+        }
+    }
+    return [h, s, l]
+}
 
 export class Color {
 
@@ -6,13 +55,19 @@ export class Color {
     group: ColorGroup
 
     constructor(
-        public rgba: ColorArray, public xPos: Number, public yPos: Number,
-        public hovered: Boolean = false, public selected: Boolean=false,  public selecting: Boolean = false, public visible: Boolean = true,
+        public RGBA: ColorArray, public xPos: Number, public yPos: Number,
+        public hovered: Boolean = false, public selected: Boolean=false,
+        public selectingCircle: Boolean = false,
+        public selectingBlock: Boolean = false, public visible: Boolean = true,
         group_name: string = ''
         ) {
             Color.colors.value.push(this)
             this.group_name = group_name
         }
+    
+    get selecting() {
+        return this.selectingCircle ||this.selectingBlock
+    }
 
     set group_name(value: string) {
         ColorGroup.add_to_group(this, value)
@@ -22,22 +77,45 @@ export class Color {
         return this.group.group_name
     }
 
-    get css_rgba (): string {
+    get RGB(): [number, number, number] {
+        return <[number, number, number]>this.RGBA.slice(0,3)
+    }
+
+
+    get HSL(): [number, number, number] {
+        return RGBtoHSL([...this.RGB])
+    }
+
+    get HSLA(): ColorArray {
+        const HSLA: ColorArray|any = this.HSL
+        HSLA.push(this.RGBA[3])
+        return <ColorArray>HSLA
+    }
+
+    get lightness(): number {
+        return this.HSL[2]
+    }
+
+    get css_bw_hsl(): string {
+        return `hsla(0 0% ${this.lightness}%)`
+    }
+
+    get css_rgba(): string {
         // CSS rgba color string
-        return `rgba(${this.rgba})`
+        return `rgba(${this.RGBA})`
     }
 
-    get css_rgb (): string {
+    get css_rgb(): string {
         // CSS rgb color string
-        return `rgba(${this.rgba.slice(0,3)})`
+        return `rgb(${this.RGBA.slice(0,3)})`
     }
 
-    get css_xPos (): string {
+    get css_xPos(): string {
         // Return xPos as string + 'px'
         return this.xPos + 'px'
     }
 
-    get css_yPos (): string {
+    get css_yPos(): string {
         // Return yPos as string + 'px'
         return this.yPos + 'px'
     }
@@ -55,7 +133,7 @@ export class Color {
 }
 
 export class ColorGroup {
-
+    
     static groups: Ref<Array<ColorGroup>> = ref([])
 
     static exists(group_name: string): Boolean {
@@ -100,7 +178,7 @@ export class ColorGroup {
         }
     }
 
-    constructor(public group_name: string, public visibility_group: Boolean = true, public visibility_colors: Boolean = true) {
+    constructor(public group_name: string, public visibility_group: Boolean = true, private _visibility_colors: Boolean = true) {
         ColorGroup.groups.value.push(this)
     }
 
@@ -114,15 +192,26 @@ export class ColorGroup {
         return Color.colors.value.filter(color => color.group_name === this.group_name)
     }
 
-    toggle_group_visibility(): void {
-        // Toggle visibility of group container
-        this.visibility_group = !this.visibility_group
+    get colors_sorted(): Array<Color> {
+        const colors = this.colors
+        return this.sort_colors(colors)
     }
 
-    toggle_colors_visibility(): void {
-        // Toggle visibility of colors in group
-        this.visibility_colors != this.visibility_colors
-        this.colors.forEach(color => color.visible = !color.visible)
+    sort_colors(colors: Array<Color>): Array<Color> {
+        // Sort colors by lightness
+        const indices = [...colors.keys()]
+        const lightness = colors.map(color => color.lightness)
+        indices.sort((a,b) => lightness[a]-lightness[b])
+        return indices.map(index => colors[index])
+    }
+
+    set visibility_colors(value) {
+        this._visibility_colors = value
+        this.colors.forEach(color => color.visible = value)
+    }
+
+    get visibility_colors() {
+        return this._visibility_colors
     }
 
     delete(): void{
@@ -140,4 +229,4 @@ export class ColorGroup {
     }
 }
 
-export type ColorArray = [Number, Number, Number, Number]
+export type ColorArray = [number, number, number, number]

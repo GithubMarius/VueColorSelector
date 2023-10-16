@@ -2,7 +2,7 @@
 
 import colorBlockElement from '../elements/colorBlockElement.vue'
 import selectableElement from '../elements/selectableElement.vue'
-const props = defineProps(['colors'])
+defineProps(['colors'])
 
 
 

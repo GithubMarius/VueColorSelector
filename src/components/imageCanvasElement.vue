@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { ref, watch, defineProps, onMounted, inject } from 'vue'
+import { ref, watch, defineProps, onMounted, inject, computed } from 'vue'
 import colorCircleElement from './elements/colorCircleElement.vue'
-import referencePoint from './referencePoint.vue';
-import referencePair from './referencePair.vue';
+import referencePoint from './elements/referencePointElement.vue';
+import referencePair from './elements/referencePairElement.vue';
 import { Color } from './color';
 import { referenceTool } from './Tool'
+import { useSettingsStore } from '../stores/settings';
 
-const props = defineProps(['url', 'colors', 'settings'])
+const props = defineProps(['url', 'colors'])
 
 const canvasElement = ref(null)
 const canvasElementBW = ref(null)
@@ -23,8 +24,10 @@ tools.value.tools.push(referenceTool)
 
 const referenceToolRef = ref(referenceTool)
 
+const settings = useSettingsStore()
+
 watch(
-    () => props.url,
+    () => settings.url,
       (newUrl, _) => {
         showImage(newUrl)
      }, {
@@ -33,7 +36,7 @@ watch(
  })
 
 watch(
-    () => props.settings.color_mode,
+    () => settings.color_mode,
       (_value, _) => {
         drawImage()
      }
@@ -111,6 +114,7 @@ function calculate_XY_position(event) {
 }
 
 onMounted(() => {
+    showImage(props.url)
     ctx.value = canvasElement.value.getContext('2d', { willReadFrequently: true })
     ctxBW.value = canvasElementBW.value.getContext('2d')
     })
@@ -122,12 +126,12 @@ onMounted(() => {
             @contextmenu.prevent
             @click.left.exact="add_color_element"
         >
-        <canvas id="canvas" class="canvas" ref="canvasElement"></canvas>
-        <canvas id="canvasBW" class="canvas canvasBW" :class="{'d-none': settings.color_mode}" ref="canvasElementBW"></canvas>
+        <canvas id="canvas" ref="canvasElement" class="canvas" :style="{opacity: settings.opacity}" :class="{'opacity-0': !settings.color_mode}" ></canvas>
+        <canvas id="canvasBW" ref="canvasElementBW" class="canvas canvasBW" :style="{opacity: settings.opacity}" :class="{'d-none': settings.color_mode}"></canvas>
         <div>
-            <referencePair v-for="(pair, index) in referenceToolRef.pairs" :key="index" :pair="pair">
+            <referencePair v-for="(pair, index) in referenceToolRef.pairs" :key="index" :pair="pair" :tool="referenceToolRef">
             </referencePair>
-            <colorCircleElement v-for="(color, index) in colors" :key="index" :color="color" :colors="colors" :settings="settings">
+            <colorCircleElement v-for="(color, index) in colors" :key="index" :color="color" :colors="colors">
             </colorCircleElement>
         </div>
         <referencePoint v-for="(point, index) in referenceToolRef.points" :key="index" :point="point" :tool="referenceToolRef">

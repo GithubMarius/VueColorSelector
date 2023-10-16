@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { StyleValue, computed } from 'vue';
-import { Pair } from './Tool'
+import { StyleValue, computed, ref } from 'vue';
+import { Pair } from '../Tool'
+import SelectableElement from './selectableElement.vue';
 
 const props = defineProps({
   pair: {
     type: Pair
+  },
+  tool: {
+    type: Object
   }
 })
 
@@ -27,26 +31,35 @@ const styleReal = computed(function(): StyleValue {
         transform: 'translate(-50%, -50%) rotate(' + props.pair.angle + 'rad)'
     }
 })
+
+const selecting = ref(false)
+const selected = ref(false)
+
 </script>
 
 <template>
-        <hr class="pairline pairline_digital" :style="styleDigital" v-if="pair.visible">
-        <hr class="pairline pairline_real" :style="styleReal" v-if="pair.visible">
+    <selectableElement v-model:selecting="selecting" v-model:selected="selected">
+        <hr class="pairline pairline_digital" :class="{'pairline_select': selecting}" :style="styleDigital" v-if="pair.visible && tool.show_digital">
+    </selectableElement>
+    <hr class="pairline pairline_real" :style="styleReal" v-if="pair.visible && tool.show_real">
 </template>
 
-<style>
+<style lang="scss">
 .pairline {
     position: absolute;
     margin: 0px;
-    border-top: 2px dashed ;
+    border-top: 3px solid ;
     opacity: 1;
+}
+.pairline_select {
+    border-top: 4px solid;
 }
 
 .pairline_digital {
-    border-color: var(--col-pri);
+    border-color: $primary;
 }
 
 .pairline_real {
-    border-color: var(--col-reference-scaled);
+    border-color: $secondary;
 }
 </style>

@@ -1,0 +1,22 @@
+$primary: #6fcc8e;
+$secondary: #264760;
+
+$component-active-bg: $primary !default;
+
+$link-color:                 rgba($primary, .8);
+$link-hover-color:           rgba($primary, .9);
+$link-active-color:          rgba($primary, .9);
+
+@import "../../../node_modules/bootstrap/scss/functions"; 
+@import "../../../node_modules/bootstrap/scss/variables";
+
+
+
+// ...
+
+$theme-colors: map-merge($theme-colors, (
+  "primary": $primary,
+  "secondary": $secondary
+));
+
+@import "../../../node_modules/bootstrap/scss/bootstrap";

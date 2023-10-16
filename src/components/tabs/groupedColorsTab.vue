@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import colorGroupElement from '../elements/colorGroupElement.vue'
-const props = defineProps(['groups'])
+defineProps(['groups'])
 </script>
 
 

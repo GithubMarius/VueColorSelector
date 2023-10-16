@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, defineProps, onMounted, computed, watch } from 'vue'
-import {onHover, unHoverAll} from '../colorUtils'
+import { ref, defineProps, onMounted, computed, watch, Ref, inject, StyleValue } from 'vue'
+import {onHover, unHoverAll} from '../../utils/colorUtils'
 import { Color } from '../color';
 import selectableElement from '../elements/selectableElement.vue'
+import { useSettingsStore } from '../../stores/settings';
 
 const props = defineProps({
   color: {
@@ -13,6 +14,8 @@ const props = defineProps({
     default: false
   }
 })
+
+const settings = useSettingsStore()
 
 watch(() => props.visible, (value, _) => {props.color.visible = value})
 
@@ -29,11 +32,12 @@ onMounted(() => {
 </script>
 
 <template>
-<selectableElement>
+<selectableElement v-model:selecting="color.selectingBlock" v-model:selected="color.selected">
 <div ref="colorBlockRef" class="color_block"
 
-:class="{hovered: props.color.hovered, selected: (props.color.selected || props.color.selecting)}"
-:style="{backgroundColor: props.color.css_rgb}"
+
+:class="{highlighted: ($props.color.hovered || props.color.selected || props.color.selecting)}"
+:style="<StyleValue>{backgroundColor: <StyleValue>[settings.color_mode ? props.color.css_rgb : props.color.css_bw_hsl]}"
 @click.ctrl="color.delete()"
 @mouseover="onHover(props)"
 @mouseleave="unHoverAll(props)"
@@ -48,13 +52,5 @@ onMounted(() => {
   width: 50px;
   height: 50px;
   border: 2px solid rgba(0,0,0,0);
-}
-
-.hovered {
-  border-color: rgba(0,0,0,0.7) !important;
-}
-
-.selected {
-  border-color:  rgb(14, 137, 231) !important; 
 }
 </style>

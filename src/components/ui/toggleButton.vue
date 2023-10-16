@@ -1,7 +1,11 @@
 <script setup>
+/* Example usage:
+<toggleButton v-model="pair.visible" :icons="['bi-eye-fill', 'bi-eye-slash']"></toggleButton>
+*/
+
 defineProps(['modelValue', 'icons'])
 defineEmits(['update:modelValue'])
-const icons = ["bi-eye-fill", "bi-eye-slash"]
+
 </script>
 
 <template>

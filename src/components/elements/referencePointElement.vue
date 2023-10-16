@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { Ref, StyleValue, computed, inject, ref } from 'vue';
-import { referenceTool, Point } from './Tool'
-import Settings from './settings';
-import { combine } from './utils';
+import { referenceTool, Point } from '../Tool'
+import SelectableElement from './selectableElement.vue';
+import { useSettingsStore } from '../../stores/settings';
+import { combine } from '../utils';
+
+const settings = useSettingsStore()
 
 const props = defineProps({
   point: {
@@ -13,14 +16,17 @@ const props = defineProps({
   }
 })
 
-const settings: Ref<Settings> = inject('settings')
 
 const styleDigital = computed(function(): StyleValue {
+    const styleSize = {
+        width: settings.reference_circle_radius.value * 2 + Number(selecting.value || selected.value) * 5 + 'px',
+        height: settings.reference_circle_radius.value * 2 + Number(selecting.value || selected.value) * 5 + 'px'
+    }
     const xy = props.point.get_org()
     return <StyleValue>combine({
         left: xy[0] + 'px',
         top: xy[1] + 'px'
-    }, settings.value.reference_circle_radius.css_size)
+    }, styleSize)
 })
 
 const styleReal = computed(function(): StyleValue {
@@ -28,12 +34,15 @@ const styleReal = computed(function(): StyleValue {
     return <StyleValue>combine({
         left: xy[0] + 'px',
         top: xy[1] + 'px'
-    }, settings.value.reference_circle_radius.css_size)
+    }, settings.reference_circle_radius.css_size)
 })
 
+const selecting = ref(false)
+const selected = ref(false)
 </script>
 
 <template>
+    <selectableElement v-model:selecting="selecting" v-model:selected="selected">
     <div class="user-select-none referencePoint referencePointDigital"
     :class="{
         active_point: point===tool.last_active,
@@ -60,18 +69,19 @@ const styleReal = computed(function(): StyleValue {
     }"
     @mousedown.stop
     @dragstart.prevent
+    v-if="tool.show_digital"
     ></div>
+    </selectableElement>
     <div class="user-select-none referencePoint referencePointReal" :style="styleReal"
     @mousedown.left="tool.update_call = ($event) => point.scale_from_event($event)"
     @mousedown.stop
     @dragstart.prevent
     :class="{ 'grabbable': tool.active }"
-    v-if="tool.refPoint !== point"
+    v-if="(tool.refPoint !== point) && tool.show_real"
     ></div>
-
 </template>
 
-<style>
+<style lang="scss">
 :root {
     --url-org: url(src/assets/icons/x.svg);
     --url-scaled: url(src/assets/icons/x.svg);
@@ -95,7 +105,7 @@ const styleReal = computed(function(): StyleValue {
 }
 
 .referencePointReal {
-    background-color: var(--col-reference-scaled);
+    background-color: $secondary;
     -webkit-mask: var(--url-scaled) no-repeat center;
     mask: var(--url-scaled) no-repeat center;
     -webkit-mask-size: cover;
@@ -110,7 +120,7 @@ const styleReal = computed(function(): StyleValue {
 }
 
 .active_point {
-    background-color: var(--col-pri) !important;
+    background-color: $primary !important;
     -webkit-mask: var(--url-active) no-repeat center;
     mask: var(--url-active) no-repeat center;
     opacity: 1;

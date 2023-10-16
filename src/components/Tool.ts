@@ -169,7 +169,8 @@ export const referenceTool: ToolInterface = {
     points: <Array<Point>> new Array(0),
     pairs: <Array<Pair>>[],
     update_call: null,
-    test: new Array(0),
+    show_digital: true,
+    show_real: true,
     _last_active: <Pair|null>null,
     refPoint: ref(0),
 
