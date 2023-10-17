@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { Ref, computed, onMounted, ref } from 'vue';
-import { onHover, unHoverAll } from '../../utils/colorUtils'
-import { Color } from '../color';
-import { useSettingsStore } from '../../stores/settings';
-import selectableElement from '../elements/selectableElement.vue'
+import { computed, onMounted } from 'vue';
+import { Color } from '@/utils/colors/ColorManagement';
+import { useSettingsStore } from '@/stores/settings';
+import { useColorStore } from '@/stores/color';
+import selectableElement from '@/components/elements/selectableElement.vue'
+
+const colorStore = useColorStore()
 
 const props = defineProps({
   color: {
     type: Color
-  },
-  colors: {
-    type: Array<Color>
   }
 })
 
@@ -30,11 +29,11 @@ onMounted(() => {
       <div ref="colorCircleRef" v-if="props.color.visible"
       :class="{highlighted: (props.color.hovered || props.color.selected || props.color.selecting)}"
       :style="style"
-      @click.ctrl.stop="color.delete()"
+      @click.ctrl.stop="colorStore.color_delete(color)"
       @click.shift.stop="color.selected = !color.selected"
-      @mouseover="onHover(props)"
-      @mouseleave="unHoverAll(props)"
-      class="color_circle" :data-color-id="color.index"></div>
+      @mouseover="colorStore.color_hover(color)"
+      @mouseleave="colorStore.color_unhover_all()"
+      class="color_circle" :data-color-id="colorStore.color_index(color)"></div>
   </selectableElement>
 </template>
 

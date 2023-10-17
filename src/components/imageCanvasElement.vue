@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, watch, defineProps, onMounted, inject, computed } from 'vue'
-import colorCircleElement from './elements/colorCircleElement.vue'
-import referencePoint from './elements/referencePointElement.vue';
-import referencePair from './elements/referencePairElement.vue';
-import { Color } from './color';
-import { referenceTool } from './Tool'
-import { useSettingsStore } from '../stores/settings';
-import { useColorStore } from '../stores/color';
+import { defineProps, inject, onMounted, ref, watch } from 'vue';
+
+import { useColorStore } from '@/stores/color';
+import { useSettingsStore } from '@/stores/settings';
+import { referenceTool } from '@/components/Tool';
+import colorCircleElement from '@/components/elements/colorCircleElement.vue';
+import referencePair from '@/components/elements/referencePairElement.vue';
+import referencePoint from '@/components/elements/referencePointElement.vue';
 
 const props = defineProps(['url', 'colors'])
 
@@ -92,23 +92,9 @@ function add_color_element(event) {
     // TODO: Check if timestamp could be removed
     if (!tools.value.active_tool && (tools.value.last_ts !== event.timeStamp)) {
         colors_.color_from_event(event)
-        console.log(colors_.test)
     } else {
         selection_tool_active.value = false
     }
-}
-
-function get_pixel_color(x, y) {
-    // Get color at position (x, y)
-    return ctx.value.getImageData(x, y, 1, 1).data;
-}
-
-function calculate_XY_position(event) {
-    // Calculate xy position relative to canvas
-    var canvasRect = canvasElement.value.getBoundingClientRect()
-    var targetRect = event.target.getBoundingClientRect()
-    
-    return [targetRect.x - canvasRect.x + event.offsetX, targetRect.y - canvasRect.y + event.offsetY]
 }
 
 onMounted(() => {
@@ -129,7 +115,7 @@ onMounted(() => {
         <div>
             <referencePair v-for="(pair, index) in referenceToolRef.pairs" :key="index" :pair="pair" :tool="referenceToolRef">
             </referencePair>
-            <colorCircleElement v-for="(color, index) in colors_.colors" :key="index" :color="color" :colors="colors">
+            <colorCircleElement v-for="(color, index) in colors_.colors" :key="index" :color="color">
             </colorCircleElement>
         </div>
         <referencePoint v-for="(point, index) in referenceToolRef.points" :key="index" :point="point" :tool="referenceToolRef">

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, defineProps, onMounted, computed, watch, Ref, inject, StyleValue } from 'vue'
-import {onHover, unHoverAll} from '../../utils/colorUtils'
-import { Color } from '../color';
-import selectableElement from '../elements/selectableElement.vue'
-import { useSettingsStore } from '../../stores/settings';
+import { Color } from '@/utils/colors/ColorManagement';
+import selectableElement from '@/components/elements/selectableElement.vue'
+import { useSettingsStore } from '@/stores/settings';
+import { useColorStore } from '@/stores/color';
+
 
 const props = defineProps({
   color: {
@@ -15,9 +16,9 @@ const props = defineProps({
   }
 })
 
+const colorStore = useColorStore()
 const settings = useSettingsStore()
 
-watch(() => props.visible, (value, _) => {props.color.visible = value})
 
 const colorBlockRef = ref(null)
 /*
@@ -38,10 +39,10 @@ onMounted(() => {
 
 :class="{highlighted: ($props.color.hovered || props.color.selected || props.color.selecting)}"
 :style="<StyleValue>{backgroundColor: <StyleValue>[settings.color_mode ? props.color.css_rgb : props.color.css_bw_hsl]}"
-@click.ctrl="color.delete()"
-@mouseover="onHover(props)"
-@mouseleave="unHoverAll(props)"
-:data-color-id="color.index"
+@click.ctrl="colorStore.color_delete(color)"
+@mouseover="colorStore.color_hover(color)"
+@mouseleave="colorStore.color_unhover_all()"
+:data-color-id="colorStore.color_index(color)"
 ></div>
 </selectableElement>
 </template>

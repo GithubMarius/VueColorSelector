@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { computed, inject, ref } from 'vue';
-import { Color } from './color';
 import { ToolInterface } from './Tool';
 import { target_is_input } from './target_is_input';
-import { nextTick } from 'vue';
+import { useColorStore } from '../stores/color';
 
 const selectionToolElementRef = ref(null)
 const appContainerRef = ref(null)
 const groupNameInputRef = ref(null)
 
 
-
+const colorStore = useColorStore()
 const tools: any = inject('tools')
 
 const selectionTool: ToolInterface = {
@@ -91,7 +90,7 @@ const selectionTool: ToolInterface = {
     get_visible_elements_of_class(css_class: string): Array<Element> {
         // Find all html elements with css_class that are currently visible
         const collection = document.getElementsByClassName(css_class)
-        return [...Object.values(collection)].filter(element => element.checkVisibility())
+        return [...Object.values(collection)].filter(element => element.childElementCount > 0 && element.checkVisibility())
     },
 
     check_bounds(element: HTMLElement) {
@@ -133,7 +132,7 @@ const selectionTool: ToolInterface = {
     },
     drop_selection() {
         // Drop selection (set not selected to all colors)
-        Color.colors.value.forEach(color => color.selected = false)
+        colorStore.colors.forEach(color => color.selected = false)
     },
     mousedownleft(event: MouseEvent) {
         if (!target_is_input(event)) {
@@ -173,16 +172,14 @@ const selectionToolObjectRef = ref(selectionTool)
 const numberSelectedEntries = computed(() => selectedEntries.value.length)
 
 const selectedEntries = computed(() => {
-  return Color.colors.value.filter(color => color.selected)
+  return colorStore.colors.filter(color => color.selected)
 })
 
 function update_selection_groups(event) {
     // Add enter group name to selected entries
     if (event.target.value.length > 0) {
-        selectedEntries.value.forEach(color => {
-        color.group_name = event.target.value
-        color.selected = false
-        })
+        colorStore.move_selected_colors_to_group(event.target.value)
+        colorStore.drop_selection()
     }
 }
 

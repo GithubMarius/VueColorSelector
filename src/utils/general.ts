@@ -18,3 +18,7 @@ export function get_pixel_color(x, y) {
     const ctx = canvas.getContext('2d', { willReadFrequently: true })
     return ctx.getImageData(x, y, 1, 1).data;
 }
+
+export function combine(obj1: Object, obj2: Object): Object {
+    return Object.assign({}, obj1, obj2)
+}

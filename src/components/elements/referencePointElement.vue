@@ -3,7 +3,7 @@ import { Ref, StyleValue, computed, inject, ref } from 'vue';
 import { referenceTool, Point } from '../Tool'
 import SelectableElement from './selectableElement.vue';
 import { useSettingsStore } from '../../stores/settings';
-import { combine } from '../utils';
+import { combine } from '../../utils/general';
 
 const settings = useSettingsStore()
 
@@ -97,7 +97,7 @@ const selected = ref(false)
 }
 
 .referencePointDigital {
-    background-color: var(--col-reference-org);
+    background-color: $primary;
     -webkit-mask: var(--url-org) no-repeat center;
     mask: var(--url-org) no-repeat center cover;
     -webkit-mask-size: cover;

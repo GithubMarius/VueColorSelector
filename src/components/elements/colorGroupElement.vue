@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { ColorGroup } from '../color';
-import colorBlockElement from './colorBlockElement.vue'
-import toggleButton from '../ui/toggleButton.vue'
+import { ColorGroup } from '@/utils/colors/ColorManagement';
+import colorBlockElement from '@/components/elements/colorBlockElement.vue'
+import toggleButton from '@/components/ui/toggleButton.vue'
+import { useGroupStore } from '@/stores/color'
 
 import { ref, nextTick, computed, onMounted, triggerRef, reactive } from 'vue'
 
+const groupStore = useGroupStore()
 
 const props = defineProps({
     'group': ColorGroup,
@@ -23,14 +25,12 @@ function activate_name_editing() {
 }
 
 function submit_name() {
-    const group_name = group_name_input_ref.value
-    if (!ColorGroup.exists(group_name)) {
-        props.group.group_name = group_name_input_ref.value.value
-    }
+    const name = group_name_input_ref.value.value
+    groupStore.rename_group(props.group, name)
     editing_name.value = false
 }
 
-const displayed_group_name = computed(() => props.group.group_name !== '' ? props.group.group_name : 'Groupless Colors')
+const displayed_group_name = computed(() => props.group.name !== '' ? props.group.name : 'Groupless Colors')
 
 console.log(props.group)
 
@@ -39,10 +39,10 @@ console.log(props.group)
 <template>
             <div class="card container mb-2">
                 <div class="card-header row"
-                    :class="{rounded: !group.visibility_group}">
+                    :class="{rounded: !group.visibility}">
                     <div class="col-9 p-0 fs-6">
                         <div class="input-group h-100">
-                            <div class="input-group-text rounded-left" :class="{'rounded': !editing_name}"  v-if="group.group_name !== ''" @click="activate_name_editing()" ><i class="bi bi-pen"></i></div>
+                            <div class="input-group-text rounded-left" :class="{'rounded': !editing_name}"  v-if="group.name !== ''" @click="activate_name_editing()" ><i class="bi bi-pen"></i></div>
                             <input ref="group_name_input_ref" type="text" class="form-control" :value="displayed_group_name" :disabled="!editing_name"
                             :class="{'p-0 disabled-name-input fs-5': !editing_name}"
                             @keydown.enter="submit_name"
@@ -51,13 +51,13 @@ console.log(props.group)
                     </div>
                     <div v-if="!show_all" class="col-3" role="group" aria-label="Basic checkbox toggle button group">
                         <div class="btn-group group-menu">
-                            <toggleButton v-model="group.visibility_group" :icons="['bi-caret-up', 'bi-caret-down']"></toggleButton>
+                            <toggleButton v-model="group.visibility" :icons="['bi-caret-up', 'bi-caret-down']"></toggleButton>
                             <toggleButton v-model="group.visibility_colors" :icons="['bi-eye-fill', 'bi-eye-slash']"></toggleButton>
                         </div>
                     </div>
                 </div>
-                <div class="p-3" v-if="group.visibility_group">
-                    <colorBlockElement v-for="(color, index) in group.colors_sorted" :key="index" :color="color"></colorBlockElement>
+                <div class="p-3" v-if="group.visibility">
+                    <colorBlockElement v-for="(color, index) in group.colors" :key="index" :color="color"></colorBlockElement>
                 </div>
             </div>
 </template>

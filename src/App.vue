@@ -1,42 +1,35 @@
 <script setup lang="ts">
 import "bootstrap-icons/font/bootstrap-icons.css";
 
+// Vue
+import { ref, Ref, provide } from 'vue'
+
 // Stores
 import { useSettingsStore } from './stores/settings'
 
 
 // Tabs
-import settingsTab from './components/tabs/settingsTab.vue'
-import allColorsTab from './components/tabs/allColorsTab.vue'
-import groupedColorsTab from './components/tabs/groupedColorsTab.vue'
-import importExportTab from "./components/tabs/importExportTab.vue";
-import referenceTab from './components/tabs/referencesTab.vue'
+import settingsTab from '@/components/tabs/settingsTab.vue'
+import allColorsTab from '@/components/tabs/allColorsTab.vue'
+import groupedColorsTab from '@/components/tabs/groupedColorsTab.vue'
+import importExportTab from "@/components/tabs/importExportTab.vue";
+import referenceTab from '@/components/tabs/referencesTab.vue'
 
-import imageCanvasElement from './components/imageCanvasElement.vue'
+import imageCanvasElement from '@/components/imageCanvasElement.vue'
+import { toolManagementRef } from '@/components/Tool'
+import rectangularSelectionToolElement from '@/components/rectangularSelectionToolElement.vue'
 
-import { ref, onMounted, Ref, watch, provide } from 'vue'
-import { Color, ColorGroup } from './components/color'
-import { toolManagementRef } from './components/Tool'
-import rectangularSelectionToolElement from './components/rectangularSelectionToolElement.vue'
 
 // Refs
 const imageCanvasInstance = ref(null)
 const colorContainerElement = ref(null)
 const rectSelectionRef = ref(null)
 const imgUrl: Ref<string> = ref('src/assets/Fritz.jpg')
-const colors = Color.colors
-
-const settings = useSettingsStore()
 
 // Provides
 provide('tools', toolManagementRef)
 
 
-onMounted(() => {
-  new Color([0.5, 1, 1, 1],  80, 80)
-})
-
-const groups = ColorGroup.groups
 
 const all_tabs = {
   active_tab: ref(0),
@@ -58,8 +51,7 @@ const all_tabs = {
       <div id="canvas_column" class="col-sm-8 justify-content-center p-0">
         <imageCanvasElement ref="imageCanvasInstance"
         :url="imgUrl"
-        :colorContainerElement="colorContainerElement"
-        :colors="colors"></imageCanvasElement>
+        :colorContainerElement="colorContainerElement"></imageCanvasElement>
       </div>
       <div class="col-sm-4 p-0 bg-light">
           <div class="row m-2">
@@ -81,7 +73,7 @@ const all_tabs = {
             </nav>
           </div>
           <div class="row m-2 p-2 tab-content" id="nav-tabContent">
-            <component :is="Object.values(all_tabs.list)[all_tabs.active_tab.value]" :colors="colors" :groups="groups"></component>
+            <component :is="Object.values(all_tabs.list)[all_tabs.active_tab.value]"></component>
           </div>
         </div>
       </div>
