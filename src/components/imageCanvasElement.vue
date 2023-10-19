@@ -2,6 +2,7 @@
 import { defineProps, inject, onMounted, ref, watch } from 'vue';
 
 import { useColorStore } from '@/stores/color';
+import { useHistoryStore } from '@/stores/history';
 import { useSettingsStore } from '@/stores/settings';
 import { referenceTool } from '@/components/Tool';
 import colorCircleElement from '@/components/elements/colorCircleElement.vue';
@@ -26,7 +27,7 @@ tools.value.tools.push(referenceTool)
 const referenceToolRef = ref(referenceTool)
 
 const settings = useSettingsStore()
-const colors_ = useColorStore()
+const colorStore = useColorStore()
 
 watch(
     () => settings.url,
@@ -91,7 +92,8 @@ function add_color_element(event) {
     // If currently not using a selection tool
     // TODO: Check if timestamp could be removed
     if (!tools.value.active_tool && (tools.value.last_ts !== event.timeStamp)) {
-        colors_.color_from_event(event)
+        const historyStore = useHistoryStore()
+        historyStore.add_color(event)
     } else {
         selection_tool_active.value = false
     }
@@ -115,7 +117,7 @@ onMounted(() => {
         <div>
             <referencePair v-for="(pair, index) in referenceToolRef.pairs" :key="index" :pair="pair" :tool="referenceToolRef">
             </referencePair>
-            <colorCircleElement v-for="(color, index) in colors_.colors" :key="index" :color="color">
+            <colorCircleElement v-for="(color, index) in colorStore.colors" :key="index" :color="color">
             </colorCircleElement>
         </div>
         <referencePoint v-for="(point, index) in referenceToolRef.points" :key="index" :point="point" :tool="referenceToolRef">

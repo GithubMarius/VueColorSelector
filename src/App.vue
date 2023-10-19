@@ -2,10 +2,11 @@
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 // Vue
-import { ref, Ref, provide } from 'vue'
+import { ref, Ref, provide, onMounted } from 'vue'
 
 // Stores
-import { useSettingsStore } from './stores/settings'
+import { useSettingsStore } from '@/stores/settings'
+import { useHistoryStore } from '@/stores/history'
 
 
 // Tabs
@@ -14,6 +15,7 @@ import allColorsTab from '@/components/tabs/allColorsTab.vue'
 import groupedColorsTab from '@/components/tabs/groupedColorsTab.vue'
 import importExportTab from "@/components/tabs/importExportTab.vue";
 import referenceTab from '@/components/tabs/referencesTab.vue'
+import HistoryTab from "@/components/tabs/historyTab.vue";
 
 import imageCanvasElement from '@/components/imageCanvasElement.vue'
 import { toolManagementRef } from '@/components/Tool'
@@ -31,17 +33,33 @@ provide('tools', toolManagementRef)
 
 
 
+
+
 const all_tabs = {
   active_tab: ref(0),
   list:
-  {
-    'All Colors': allColorsTab,
-    'Colors by Group': groupedColorsTab,
-    'References': referenceTab,
-    'Settings': settingsTab,
-    'Import/Export': importExportTab,
+    {
+      'History': HistoryTab,
+      'All Colors': allColorsTab,
+      'Colors by Group': groupedColorsTab,
+      'References': referenceTab,
+      'Settings': settingsTab,
+      'Import/Export': importExportTab,
+  }
 }
-}
+
+const settingsStore = useSettingsStore()
+const historyStore = useHistoryStore()
+
+onMounted(() => {
+  document.addEventListener('keydown', (e) => {
+    if (settingsStore.keycombinations.undo.is_pressed(e)) {
+      historyStore.undo()
+    } else if (settingsStore.keycombinations.forward.is_pressed(e)) {
+        historyStore.forward()
+    }
+  })
+})
 
 </script>
 

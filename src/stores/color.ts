@@ -1,30 +1,34 @@
 import { defineStore } from "pinia";
 import { Color, ColorGroup } from '../utils/colors/ColorManagement'
 import { canvas_position_from_event, get_pixel_color } from '../utils/general'
-import { ref } from "vue"
 
 
-export const useColorStore = defineStore("color", {
+export const useColorStore = defineStore('color', {
   state: () => {
     return {
       colors: <Array<Color>>[],
-      history: [],
       groupStore: useGroupStore()
     }
   },
   actions: {
-    color_from_event(event: MouseEvent) {
+    color_from_event(event) {
+      const [pixelData, x, y] = this.color_data_from_event(event)
+      return this.create_color(pixelData, x, y, '')
+    },
+    color_data_from_event(event) {      
       const [x, y] = canvas_position_from_event(event)
       const pixelData = get_pixel_color(x, y)
-      const group = this.groupStore.get_group('')
-      console.log(group)
-      const color = new Color(<any>pixelData, x, y, group)
-      this.colors.push(color)
+      return [pixelData, x, y]
     },
+
+    color_delete_by_index(index: number) {
+      this.colors.splice(index, 1)
+    },
+
     color_delete(color: Color) {
       // Delete color
       const index = this.colors.indexOf(color)
-      console.log(this.colors.splice(index, 1))
+      this.color_delete_by_index(index)
     },
     color_unhover_all() {
       this.colors.forEach(color => color.hovered = false)
@@ -44,13 +48,16 @@ export const useColorStore = defineStore("color", {
       const selected_colors = this.selected_colors
       this.move_colors_to_group(name, selected_colors)
     },
-      
-
     color_index(color) {
       return this.colors.indexOf(color)
     },
     drop_selection() {
       this.colors.forEach(color => color.selected = false)
+    },
+    create_color(pixelData, x, y, groupname) {
+      const group = this.groupStore.get_group(groupname)
+      const color = new Color(<any>pixelData, x, y, group)
+      return this.colors.push(color)
     }
   },
   getters: {
@@ -61,7 +68,7 @@ export const useColorStore = defineStore("color", {
       return this.colors.filter(color => color.selected)
     }
   },
-}); 
+})
 
 export const useGroupStore = defineStore('group', {
   state: () => {
@@ -92,7 +99,6 @@ export const useGroupStore = defineStore('group', {
           group.name = name
         }
       }
-
 
   },
   getters: {
