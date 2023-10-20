@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, defineProps, onMounted, computed, watch, Ref, inject, StyleValue } from 'vue'
-import { Color } from '@/utils/colors/ColorManagement';
+import { Color } from '@/utils/colors/ColorManagement'
 import selectableElement from '@/components/elements/selectableElement.vue'
-import { useSettingsStore } from '@/stores/settings';
-import { useColorStore } from '@/stores/color';
+import { useSettingsStore } from '@/stores/settings'
+import { useColorStore } from '@/stores/color'
+import { useHistoryStore } from '@/stores/history'
 
 
 const props = defineProps({
@@ -17,17 +18,12 @@ const props = defineProps({
 })
 
 const colorStore = useColorStore()
+const historyStore = useHistoryStore()
 const settings = useSettingsStore()
 
 
 const colorBlockRef = ref(null)
-/*
-const check_group = computed(() => {
-  return props.show_all || ((props.color.group.length === 0) && !props.group_name) || (props.color.group === props.group_name)
-  // return props.show_all || ((props.color.group.length === 0) && !props.group_name) || (props.color.group === props.group_name)
-  // return ((props.color.group.length === 0) && !props.group_name) || props.color.group.includes(props.group_name)
-})
-*/
+
 onMounted(() => {
   })
 </script>
@@ -39,7 +35,7 @@ onMounted(() => {
 
 :class="{highlighted: ($props.color.hovered || props.color.selected || props.color.selecting)}"
 :style="<StyleValue>{backgroundColor: <StyleValue>[settings.color_mode ? props.color.css_rgb : props.color.css_bw_hsl]}"
-@click.ctrl="colorStore.color_delete(color)"
+@click.ctrl="historyStore.delete_color(color)"
 @mouseover="colorStore.color_hover(color)"
 @mouseleave="colorStore.color_unhover_all()"
 :data-color-id="colorStore.color_index(color)"

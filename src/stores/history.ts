@@ -1,54 +1,43 @@
 
 import { defineStore } from "pinia";
-import { useColorStore } from "./color";
-import { canvas_position_from_event, get_pixel_color, mouseCoordinates } from "@/utils/general";
-
-class CustomAction {
-
-  index: number
-  xy: mouseCoordinates
-  pixelData
-
-  constructor(event: MouseEvent) {
-    // Retrieve position and pixeldata of the point
-    this.xy = canvas_position_from_event(event)
-    this.pixelData = get_pixel_color(...this.xy)
-  }
-
-  forward() {
-    // Add color to colorstore and remember index
-    const colorStore = useColorStore()
-    this.index = colorStore.create_color(this.pixelData, ...this.xy, '') - 1
-    console.log(this.index)
-  }
-
-  undo() {
-    // Remove color again (based on index)
-    console.log(this.index)
-    const colorStore = useColorStore()
-    colorStore.color_delete_by_index(this.index)
-  }
-
-  static createAndDoAction(event) {
-    const action = new CustomAction(event)
-    action.forward()
-    return action
-  }
-
-}
+import { AddSelectionToGroup, CreateColorAction, DeleteColorAction, RenameGroup } from "@/actions/coloractions";
+import { Action } from "@/utils/action";
 
 export const useHistoryStore = defineStore('history', {
   state: () => {
     return {
-      history: [],
+      history: <Array<Action>>[],
       index: 0
     }
   },
   actions: {
+    // Add actions here
+
+    // ----------------------->
+
+    // Add color
     add_color(event) {
-      const action = CustomAction.createAndDoAction(event)
-      this._add_action(action)
+      return this.perform_action(CreateColorAction, event)
     },
+
+    // Delete color
+    delete_color(...args) {
+      return this.perform_action(DeleteColorAction, ...args)
+    },
+
+    // Add selection to group
+    add_selection_to_group(...args) {
+      return this.perform_action(AddSelectionToGroup, ...args)
+    },
+
+    // Rename group
+    rename_group(...args) {
+      return this.perform_action(RenameGroup, ...args)
+    },
+
+    // ----------------------->
+
+    // Store methods
     undo() {
       if (this.undo_possible) {
         this.history[this.index].undo()
@@ -61,10 +50,21 @@ export const useHistoryStore = defineStore('history', {
         this.history[this.index].forward()
       }
     },
-    _add_action(action) {
+    add_action(action) {
       this.history.splice(0, this.index)
       this.history.unshift(action)
       this.index = 0
+    },
+    perform_action(ActionToPerform: typeof Action, ...args) {
+      try {
+       const action  = ActionToPerform.createAndPerformAction(...args)
+       this.add_action(action)
+       return {success: true, msg: ''}
+      }
+      catch (err) {
+        console.log(`Could not perform action. Received error: ${err}`)
+        return {success: false, msg: err.message}
+      }
     }
   },
   getters: {

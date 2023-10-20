@@ -21,11 +21,13 @@ export const useColorStore = defineStore('color', {
       return [pixelData, x, y]
     },
 
-    color_delete_by_index(index: number) {
+    delete_color_by_index(index: number) {
+      const color = this.colors[index]
+      this.groupStore.drop_color_from_group(color)
       this.colors.splice(index, 1)
     },
 
-    color_delete(color: Color) {
+    delete_color(color: Color) {
       // Delete color
       const index = this.colors.indexOf(color)
       this.color_delete_by_index(index)
@@ -37,12 +39,17 @@ export const useColorStore = defineStore('color', {
       this.color_unhover_all()
       color.hovered = true
     },
-    move_colors_to_group(name, colors: Array<Color>) {
+    move_colors_to_group_by_name(name, colors: Array<Color>) {
       const group = this.groupStore.get_group(name)
       colors.forEach(
         color => color.change_group(group)
       )
+      this.groupStore.remove_empty_groups()
 
+    },
+    move_colors_to_groups_by_names(group_names: Array<string>, colors: Array<Color>) {
+      group_names.forEach((name, index) => colors[index].change_group(this.groupStore.get_group(name)))
+      this.groupStore.remove_empty_groups()
     },
     move_selected_colors_to_group(name) {
       const selected_colors = this.selected_colors
@@ -54,10 +61,11 @@ export const useColorStore = defineStore('color', {
     drop_selection() {
       this.colors.forEach(color => color.selected = false)
     },
-    create_color(pixelData, x, y, groupname) {
+    create_color(pixelData, x, y, groupname, index=this.colors.length) {
       const group = this.groupStore.get_group(groupname)
       const color = new Color(<any>pixelData, x, y, group)
-      return this.colors.push(color)
+      this.colors.splice(index, 0, color)
+      return index
     }
   },
   getters: {
@@ -66,6 +74,9 @@ export const useColorStore = defineStore('color', {
     },
     selected_colors() {
       return this.colors.filter(color => color.selected)
+    },
+    selected_color_ids() {
+      return [...this.colors.keys()].filter(index => this.colors[index].selected)
     }
   },
 })
@@ -78,6 +89,7 @@ export const useGroupStore = defineStore('group', {
   },
   actions: {
       get_group(name: string): ColorGroup {
+        // Returns groups with name if existing else creates one
         if (this.exists(name)) {
           return this.get_group_by_name(name)
         }
@@ -89,15 +101,38 @@ export const useGroupStore = defineStore('group', {
 
       },
       get_group_by_name(name: string): ColorGroup {
+        // Return existing group with name
         return this.groups.find(group => group.name === name)
       },
       exists(name) {
+        // Check if group with name already exists
         return this.group_names.includes(name)
       },
       rename_group(group, name) {
+        // Change name of group
         if (!this.exists(name)) {
           group.name = name
         }
+      },
+      remove_empty_groups() {
+        // Check for empty groups and delete them
+        const empty_groups = this.groups.filter(group => (group.num_colors === 0) && !group.is_default)
+        empty_groups.forEach(this.delete_group)
+      },
+      delete_group(group: ColorGroup) {
+        // Delete group
+        const index = this.groups.indexOf(group)
+        this.delete_group_by_index(index)
+
+      },
+      delete_group_by_index(index: number) {
+        // Delete group by index
+        this.groups.splice(index, 1)
+      },
+      drop_color_from_group(color: Color) {
+        // Remove color from its group
+        color.drop_from_group()
+        this.remove_empty_groups()
       }
 
   },

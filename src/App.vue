@@ -2,7 +2,7 @@
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 // Vue
-import { ref, Ref, provide, onMounted } from 'vue'
+import { ref, Ref, provide, onMounted, onUnmounted } from 'vue'
 
 // Stores
 import { useSettingsStore } from '@/stores/settings'
@@ -51,14 +51,20 @@ const all_tabs = {
 const settingsStore = useSettingsStore()
 const historyStore = useHistoryStore()
 
-onMounted(() => {
-  document.addEventListener('keydown', (e) => {
+// Keyboard shortcuts
+function key_listener (e) {
     if (settingsStore.keycombinations.undo.is_pressed(e)) {
       historyStore.undo()
     } else if (settingsStore.keycombinations.forward.is_pressed(e)) {
-        historyStore.forward()
+      historyStore.forward()
     }
-  })
+  }
+
+onMounted(() => {
+  document.addEventListener('keydown', key_listener)
+})
+onUnmounted(() => {
+  document.removeEventListener('keydown', key_listener)
 })
 
 </script>

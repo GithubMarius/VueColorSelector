@@ -3,9 +3,12 @@ import { computed, onMounted } from 'vue';
 import { Color } from '@/utils/colors/ColorManagement';
 import { useSettingsStore } from '@/stores/settings';
 import { useColorStore } from '@/stores/color';
+import { useHistoryStore } from '@/stores/history'
 import selectableElement from '@/components/elements/selectableElement.vue'
 
 const colorStore = useColorStore()
+const historyStore = useHistoryStore()
+
 
 const props = defineProps({
   color: {
@@ -29,7 +32,7 @@ onMounted(() => {
       <div ref="colorCircleRef" v-if="props.color.visible"
       :class="{highlighted: (props.color.hovered || props.color.selected || props.color.selecting)}"
       :style="style"
-      @click.ctrl.stop="colorStore.color_delete(color)"
+      @click.ctrl.stop="historyStore.delete_color(color)"
       @click.shift.stop="color.selected = !color.selected"
       @mouseover="colorStore.color_hover(color)"
       @mouseleave="colorStore.color_unhover_all()"

@@ -3,6 +3,7 @@ import { computed, inject, ref } from 'vue';
 import { ToolInterface } from './Tool';
 import { target_is_input } from './target_is_input';
 import { useColorStore } from '../stores/color';
+import { useHistoryStore } from '@/stores/history';
 
 const selectionToolElementRef = ref(null)
 const appContainerRef = ref(null)
@@ -10,6 +11,8 @@ const groupNameInputRef = ref(null)
 
 
 const colorStore = useColorStore()
+const historyStore = useHistoryStore()
+
 const tools: any = inject('tools')
 
 const selectionTool: ToolInterface = {
@@ -178,9 +181,13 @@ const selectedEntries = computed(() => {
 function update_selection_groups(event) {
     // Add enter group name to selected entries
     if (event.target.value.length > 0) {
-        colorStore.move_selected_colors_to_group(event.target.value)
+        historyStore.add_selection_to_group(event.target.value)
         colorStore.drop_selection()
     }
+}
+
+function abort_rename(){
+    colorStore.drop_selection()
 }
 
 tools.value.tools.push(selectionTool)
@@ -197,7 +204,9 @@ tools.value.tools.push(selectionTool)
                     @click.prevent
                     @keydown.stop
                     @keypress.stop
-                    @keyup.enter="update_selection_groups">
+                    @keyup.enter="update_selection_groups"
+                    @keyup.esc="abort_rename"
+                    >
                 </div>
             </Transition>
         </div>

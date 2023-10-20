@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { StyleValue, ref } from 'vue'
 import { useHistoryStore } from '@/stores/history'
 
-console.log( useHistoryStore)
 const historyStore = useHistoryStore()
-console.log(historyStore)
 </script>
 
 <template>

@@ -4,7 +4,7 @@ export class Color {
     // Color
 
     constructor(
-        public RGBA: ColorAlphaArray, public xPos: Number, public yPos: Number, public group: ColorGroup,
+        public RGBA: ColorAlphaArray, public xPos: number, public yPos: number, public group: ColorGroup,
         public hovered: Boolean = false, public selected: Boolean=false,
         public selectingCircle: Boolean = false,
         public selectingBlock: Boolean = false) {
@@ -64,12 +64,19 @@ export class Color {
         return this.yPos + 'px'
     }
 
+    get visible() {
+        // Return whether own group is currently visible (if not color won't displayed)
+        return this.group.visibility_colors
+    }
+
     change_group(group) {
+        // Move to new group
         this.group.move_color_to_group(this, group)
     }
 
-    get visible() {
-        return this.group.visibility_colors
+    drop_from_group() {
+        // Drop from group colors of own group
+        this.group.drop(this)
     }
 }
 
@@ -78,22 +85,31 @@ export class ColorGroup {
     constructor(public name: string = '', public colors: Array<Color> = [], public visibility=true, public visibility_colors: Boolean = true) {}
 
     get is_default() {
+        // Check if default group (nameless group)
         return this.name === ''
     }
 
     add_color(color) {
+        // Add color to own group colors
         this.colors.push(color)
     }
 
     move_color_to_group(color: Color, group: ColorGroup) {
+        // Remove color from own group colors and add to provided group colors
         this.drop(color)
         color.group = group
         group.add_color(color)
     }
 
     drop(color: Color) {
+        // Remove color from own group colors
         const index = this.colors.indexOf(color)
         this.colors.splice(index, 1)
+    }
+
+    get num_colors() {
+        // Return number of colors
+        return this.colors.length
     }
 
 }

@@ -1,3 +1,5 @@
+import { ColorAlphaArray } from "./colors/helpers"
+
 export type mouseCoordinates = [number, number]
 
 export function canvas_position_from_event(event): mouseCoordinates {
@@ -16,7 +18,7 @@ export function get_pixel_color(x, y) {
 
     const canvas = <HTMLCanvasElement>document.getElementById('canvas')
     const ctx = canvas.getContext('2d', { willReadFrequently: true })
-    return ctx.getImageData(x, y, 1, 1).data;
+    return <ColorAlphaArray><unknown>ctx.getImageData(x, y, 1, 1).data;
 }
 
 export function combine(obj1: Object, obj2: Object): Object {
