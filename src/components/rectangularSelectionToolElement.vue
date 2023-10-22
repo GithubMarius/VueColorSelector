@@ -217,7 +217,7 @@ tools.value.tools.push(selectionTool)
     </div>
 </template>
 
-<style>
+<style scoped>
 .rectangular_selection {
     position: absolute;
     padding: 0px;

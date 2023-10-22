@@ -48,6 +48,7 @@ function reset() {
 const displayed_group_name = computed(() => props.group.name !== '' ? props.group.name : 'Groupless Colors')
 const feedback = ref(null)
 
+
 </script>
 
 <template>
@@ -84,7 +85,7 @@ const feedback = ref(null)
             </div>
 </template>
 
-<style>
+<style scoped>
 .group-menu {
     float: right;
 }

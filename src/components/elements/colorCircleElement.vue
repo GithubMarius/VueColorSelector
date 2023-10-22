@@ -40,7 +40,7 @@ onMounted(() => {
   </selectableElement>
 </template>
 
-<style>
+<style scoped>
  .color_circle {
     position: absolute;
     border-radius: 50%;

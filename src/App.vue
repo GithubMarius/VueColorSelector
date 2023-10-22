@@ -62,6 +62,7 @@ function key_listener (e) {
 
 onMounted(() => {
   document.addEventListener('keydown', key_listener)
+  document.documentElement.setAttribute('data-bs-theme', settingsStore.theme)
 })
 onUnmounted(() => {
   document.removeEventListener('keydown', key_listener)
@@ -70,14 +71,14 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <rectangularSelectionToolElement ref="rectSelectionRef">
+  <rectangularSelectionToolElement ref="rectSelectionRef" data-bs-theme="dark">
     <div class="row w-100 vh-100 m-0">
       <div id="canvas_column" class="col-sm-8 justify-content-center p-0">
         <imageCanvasElement ref="imageCanvasInstance"
         :url="imgUrl"
         :colorContainerElement="colorContainerElement"></imageCanvasElement>
       </div>
-      <div class="col-sm-4 p-0 bg-light">
+      <div class="col-sm-4 p-0">
           <div class="row m-2">
             <div class="btn-group" role="group" aria-label="ToolToogles">
               <button v-for="(tool, index) in toolManagementRef.activatable_tools" :key="index" class="btn bi"
@@ -104,7 +105,7 @@ onUnmounted(() => {
   </rectangularSelectionToolElement>
 </template>
 
-<style lang="scss">
+<style>
 
 .deleteCursor {
     cursor: url("src/assets/icons/dash-circle.svg") 12 12 , not-allowed !important;

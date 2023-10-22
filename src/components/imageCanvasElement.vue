@@ -112,8 +112,8 @@ onMounted(() => {
             @contextmenu.prevent
             @click.left.exact="add_color_element"
         >
-        <canvas id="canvas" ref="canvasElement" class="canvas" :style="{opacity: settings.opacity}" :class="{'opacity-0': !settings.color_mode}" ></canvas>
-        <canvas id="canvasBW" ref="canvasElementBW" class="canvas canvasBW" :style="{opacity: settings.opacity}" :class="{'d-none': settings.color_mode}"></canvas>
+        <canvas id="canvas" ref="canvasElement" class="canvas" :style="{opacity: settings.opacity.value}" :class="{'opacity-0': !settings.color_mode}" ></canvas>
+        <canvas id="canvasBW" ref="canvasElementBW" class="canvas canvasBW" :style="{opacity: settings.opacity.value}" :class="{'d-none': settings.color_mode}"></canvas>
         <div>
             <referencePair v-for="(pair, index) in referenceToolRef.pairs" :key="index" :pair="pair" :tool="referenceToolRef">
             </referencePair>
@@ -125,7 +125,7 @@ onMounted(() => {
     </div>
 </template>
 
-<style>
+<style scoped>
 
 
 .dragging {

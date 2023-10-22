@@ -43,7 +43,7 @@ onMounted(() => {
 </selectableElement>
 </template>
 
-<style>
+<style scoped>
 .color_block {
   display: inline-block;
   width: 50px;
