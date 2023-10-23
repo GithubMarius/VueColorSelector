@@ -12,8 +12,7 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       'vue': 'vue/dist/vue.esm-bundler',
-      'icons': './node_modules/bootstrap-icons/icons',
-      'bootstrap': fileURLToPath(new URL('./node-modules/bootstrap', import.meta.url))
+      'icons': './node_modules/bootstrap-icons/icons'
     }
   },
   base: '/VueColorSelectorPages/',

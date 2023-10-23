@@ -19,6 +19,6 @@ function onFileChange(event){
 
 <template>
     <div class="row m-2">
-        <input type="file" class="form-control" data-bs-theme="light"  @change="onFileChange">
+        <input type="file" class="form-control" @change="onFileChange">
       </div>
 </template>

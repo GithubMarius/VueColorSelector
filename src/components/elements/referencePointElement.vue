@@ -81,7 +81,7 @@ const selected = ref(false)
     ></div>
 </template>
 
-<style lang="scss">
+<style>
 :root {
     --url-org: url(src/assets/icons/x.svg);
     --url-scaled: url(src/assets/icons/x.svg);
@@ -97,7 +97,7 @@ const selected = ref(false)
 }
 
 .referencePointDigital {
-    background-color: $primary;
+    background-color: var(--bs-primary);
     -webkit-mask: var(--url-org) no-repeat center;
     mask: var(--url-org) no-repeat center cover;
     -webkit-mask-size: cover;
@@ -105,7 +105,7 @@ const selected = ref(false)
 }
 
 .referencePointReal {
-    background-color: $secondary;
+    background-color: var(--bs-secondary);
     -webkit-mask: var(--url-scaled) no-repeat center;
     mask: var(--url-scaled) no-repeat center;
     -webkit-mask-size: cover;
@@ -120,7 +120,7 @@ const selected = ref(false)
 }
 
 .active_point {
-    background-color: $primary !important;
+    background-color: var(--bs-primary) !important;
     -webkit-mask: var(--url-active) no-repeat center;
     mask: var(--url-active) no-repeat center;
     opacity: 1;

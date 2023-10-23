@@ -70,7 +70,8 @@ class KeyCombination {
 
 const keycombinations = {
     'undo': new KeyCombination('z', [customModifiers.cmd]),
-    'forward': new KeyCombination('y', [customModifiers.cmd])
+    'forward': new KeyCombination('y', [customModifiers.cmd]),
+    'toggle_theme': new KeyCombination('t', [])
 }
 
 export const useSettingsStore = defineStore("settings", {

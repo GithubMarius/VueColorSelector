@@ -44,7 +44,7 @@ const selected = ref(false)
     <hr class="pairline pairline_real" :style="styleReal" v-if="pair.visible && tool.show_real">
 </template>
 
-<style lang="scss">
+<style>
 .pairline {
     position: absolute;
     margin: 0px;
@@ -56,10 +56,10 @@ const selected = ref(false)
 }
 
 .pairline_digital {
-    border-color: $primary;
+    border-color: var(--bs-primary);
 }
 
 .pairline_real {
-    border-color: $secondary;
+    border-color: var(--bs-secondary);
 }
 </style>

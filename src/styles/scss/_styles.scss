@@ -1,4 +1,10 @@
-// $primary: #0d1d2a;
+@import "../../../node_modules/bootstrap/scss/functions";
+@import "../../../node_modules/bootstrap/scss/variables";
+// @import "../../../node_modules/bootstrap/scss/mixins";
+
+/*
+
+$primary: #0d1d2a;
 //$primary: #6fcc8e;
 // $secondary: #f8f9fa;
 // #264760;
@@ -9,14 +15,38 @@ $link-color:                 rgba($primary, .8);
 $link-hover-color:           rgba($primary, .9);
 $link-active-color:          rgba($primary, .9);
 
-@import "../../../node_modules/bootstrap/scss/functions"; 
-@import "../../../node_modules/bootstrap/scss/variables"; */
-
-
-// ...
-
 //$theme-colors: map-merge($theme-colors, (
 //  "primary": $primary,
 //
 //));
+$primary: blue;
+*/
+
+/*
+$component-active-bg: $primary !default;
+
+$theme-colors: map-merge($theme-colors, (
+    "primary": $primary,
+  ));
+
+$link-color:                 rgba($primary, .8);
+$link-hover-color:           rgba($primary, .9);
+$link-active-color:          rgba($primary, .9);
+
+
+@include color-mode(dark) {
+}
+
+*/
+/*
+$primary: #51bb7d;
+$link-color:                 rgba($primary, .8);
+$link-hover-color:           rgba($primary, .9);
+$link-active-color:          rgba($primary, .9);
+  
+$theme-colors: map-merge($theme-colors, (
+  "primary": $primary,
+  ));
+*/
+
 @import "../../../node_modules/bootstrap/scss/bootstrap";

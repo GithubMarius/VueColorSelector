@@ -2,13 +2,13 @@
 import { ColorGroup } from '@/utils/colors/ColorManagement';
 import colorBlockElement from '@/components/elements/colorBlockElement.vue'
 import toggleButton from '@/components/ui/toggleButton.vue'
-import { useGroupStore } from '@/stores/color'
+import { useColorStore } from '@/stores/color'
 import { useHistoryStore } from '@/stores/history';
 
 import { ref, nextTick, computed, onMounted, triggerRef, reactive } from 'vue'
 import { fail } from 'assert';
 
-const groupStore = useGroupStore()
+const colorStore = useColorStore()
 const historyStore = useHistoryStore()
 
 const props = defineProps({
@@ -80,7 +80,7 @@ const feedback = ref(null)
                 </div>
                 </div>
                 <div class="p-3" v-if="group.visibility">
-                    <colorBlockElement v-for="(color, index) in group.colors" :key="index" :color="color"></colorBlockElement>
+                    <colorBlockElement v-for="(color, _) in group.colors" :key="colorStore.color_index(color)" :color="color"></colorBlockElement>
                 </div>
             </div>
 </template>

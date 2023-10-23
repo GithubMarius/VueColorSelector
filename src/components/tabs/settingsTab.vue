@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, ref, watch} from 'vue'
+import { onMounted, ref } from 'vue'
 import { useSettingsStore } from '../../stores/settings';
 import formGroup from '../ui/formGroup.vue';
 import switchButton from '../ui/switchButton.vue'
@@ -18,9 +18,6 @@ const settings = useSettingsStore()
 
 
 
-watch(() => settings.bright, () => {
-  document.documentElement.setAttribute('data-bs-theme', settings.theme)
-})
 
 </script>
 
