@@ -7,6 +7,7 @@ import { ref, Ref, provide, onMounted, onUnmounted, watch } from 'vue'
 // Stores
 import { useSettingsStore } from '@/stores/settings'
 import { useHistoryStore } from '@/stores/history'
+import { useGroupStore } from '@/stores/color'
 
 
 // Tabs
@@ -35,10 +36,12 @@ provide('tools', toolManagementRef)
 // Use stores
 const settingsStore = useSettingsStore()
 const historyStore = useHistoryStore()
+const groupStore = useGroupStore()
 
 // Tabs
 const all_tabs = {
   active_tab: ref(0),
+  tab_buttons: ref(0),
   list:
     {
       'All Colors': allColorsTab,
@@ -47,6 +50,11 @@ const all_tabs = {
       'Settings': settingsTab,
       'Import/Export': importExportTab,
       'History': HistoryTab,
+  },
+  open_tab(index: number) {
+    if ([...this.tab_buttons.value.keys()].includes(index)) {
+      this.active_tab.value = index
+    }
   }
 }
 watch(() => settingsStore.bright, () => {
@@ -54,13 +62,19 @@ watch(() => settingsStore.bright, () => {
 })
 
 // Keyboard shortcuts
-function key_listener (e) {
-    if (settingsStore.keycombinations.undo.is_pressed(e)) {
+function key_listener (event: KeyboardEvent) {
+  if (settingsStore.keycombinations.undo.is_pressed(event)) {
       historyStore.undo()
-    } else if (settingsStore.keycombinations.forward.is_pressed(e)) {
+  } else if (settingsStore.keycombinations.forward.is_pressed(event)) {
       historyStore.forward()
-    } else if (settingsStore.keycombinations.toggle_theme.is_pressed(e)) {
+  } else if (settingsStore.keycombinations.toggle_theme.is_pressed(event)) {
       settingsStore.bright = !settingsStore.bright
+  } else if (settingsStore.keycombinations.toggle_color_group.is_pressed(event)) {
+      groupStore.toggle_group_visibility_by_index(Number(event.key)-1)
+      event.preventDefault()
+  }
+    else if (settingsStore.keycombinations.open_tab.is_pressed(event)) {
+      all_tabs.open_tab(Number(event.key)-1)
     }
   }
 
@@ -101,11 +115,11 @@ onUnmounted(() => {
           <colorViewer>
           </colorViewer>
         </div>
-        <div class="row">
+        <div class="row mt-4">
           <!-- Tab-Selection -->
           <nav>
             <div class="nav nav-tabs px-2" id="nav-tab" role="tablist">
-              <button v-for="(tab, index) in Object.keys(all_tabs.list)" :key="index"
+              <button :ref="all_tabs.tab_buttons" v-for="(tab, index) in Object.keys(all_tabs.list)" :key="index"
               class="nav-link"
               :class="{active: all_tabs.active_tab.value === index}"
               @click="all_tabs.active_tab.value = index">{{ tab }}</button>

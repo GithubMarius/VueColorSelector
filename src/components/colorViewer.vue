@@ -1,26 +1,34 @@
 <script setup lang="ts">
 
-import { rgb, oklab, oklch } from '@/../node_modules/culori'
+// https://culorijs.org/color-spaces/
+
 import formSlider from '@/components/ui/formSlider.vue'
 import formGroup from '@/components/ui/formGroup.vue'
 import toggleGroup from '@/components/ui/toggleGroup.vue'
 import colorViewerElement from './elements/colorViewerElement.vue'
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useColorStore } from '@/stores/color';
+import { Color } from '@/utils/colors/ColorManagement'
+import { useSettingsStore } from '@/stores/settings'
+
+const colorViewerSize = ref({
+    width: 300,
+    height: 300
+})
 
 // Store
 const colorStore = useColorStore()
+const settingsStore = useSettingsStore()
 
 // Refs
 const colorViewerRef = ref(null)
-const chroma = ref(0)
 const color_representation = ref(0)
 
 // Watches
-watch(chroma, () => {
+watch(settingsStore.chrOrSat, () => {
     drawColorViewer()
 })
-watch(color_representation, (_a, _b) => {
+watch(settingsStore.colorspace, (_a, _b) => {
     drawColorViewer()
 })
 
@@ -31,17 +39,12 @@ onMounted(() => {
 function drawColorViewer() {
     const ctx = colorViewerRef.value.getContext("2d");
 
-    const func = Object.values(csscolortransforms)[color_representation.value]
+    const func = current_csscolortransform.value
     for (var row = 0; row < colorViewerRef.value.width; row++) {
         for (var col = 0; col < colorViewerRef.value.height; col++) {
             const hue = col / (colorViewerRef.value.width - 1);
             const light = row / (colorViewerRef.value.height - 1);
-
-            /*
-            ctx.fillStyle = cssoklab(y, x, -1);
-            ctx.fillStyle = csshsl(x, 0, y);
-            */
-            ctx.fillStyle = func(hue, chroma.value, light);
+            ctx.fillStyle = func(hue, settingsStore.chrOrSat.value, light);
             ctx.fillRect(col, row, 1, 1);
         }
     }
@@ -53,25 +56,50 @@ function cssokhcl(h, c, l) {
     return `oklch(${l*100}% ${c*100}% ${h*360}deg)`;
 }
 
-/*
-function cssoklab(a, b, l) {
-    return `oklab(${l*100}% ${-0.4 + 0.8*a} ${-0.4 + 0.8*b})`;
-}
-*/
-
 function csshsl(h, s, l) {
     return `hsl(${h*360}deg ${s*100}% ${l*100}%)`;
 }
 
+// https://culorijs.org/color-spaces/
+function posokhcl(color: Color) {
+    const col_oklch = color.culori_oklch
+    const x = (col_oklch.h? col_oklch.h : 0) * colorViewerSize.value.width / 360
+    const y = col_oklch.l * colorViewerSize.value.height
+    const d = col_oklch.c / 0.4 - settingsStore.chrOrSat.value
+    return [x, y, d]
+}
+
+function poshsl(color: Color) {
+    const col_hsl = color.culori_hsl
+    const x = col_hsl.h * colorViewerSize.value.width /360
+    const y = col_hsl.l * colorViewerSize.value.height
+    const d = col_hsl.s - settingsStore.chrOrSat.value
+    return [x, y, d]
+}
+
 const csscolortransforms = {
-    'hcl': cssokhcl,
+    'okhcl': cssokhcl,
     'hsl': csshsl
 }
 
 const postransforms = {
-    'hcl': posokhcl,
-    'hsl': poshsl
-}
+        'okhcl': posokhcl,
+        'hsl': poshsl
+    }
+
+const current_postransform = computed(() => {
+    return postransforms[settingsStore.colorspace.value]
+})
+
+const current_csscolortransform = computed(() => {
+    return csscolortransforms[settingsStore.colorspace.value]
+})
+
+function current_position(RGB) {
+    return current_postransform.value(RGB)
+} 
+
+
 
 </script>
 
@@ -79,25 +107,26 @@ const postransforms = {
     <div class="color-viewer-container">
         <form class="m-4">
             <formGroup :label="'Chroma/Saturation'">
-                <formSlider v-model="chroma" :min="0" :max="1" :step="0.05"></formSlider>
+                <formSlider v-model="settingsStore.chrOrSat.value" :min="settingsStore.chrOrSat.min" :max="settingsStore.chrOrSat.max" :step="settingsStore.chrOrSat.step"></formSlider>
             </formGroup>
             <formGroup :label="'Colorrepresentation'">
-                <toggleGroup v-model="color_representation" :options="Object.keys(csscolortransforms)"></toggleGroup>
+                <toggleGroup v-model="settingsStore.colorspace.value" :options="settingsStore.colorspace.options"></toggleGroup>
             </formGroup>
         </form>
-        <div class="color-viewer-canvas-container">
-            <canvas ref="colorViewerRef" class="color-viewer" width="200" height="200">
-            </canvas>
-            <colorViewerElement v-for="(color, _) in colorStore.colors" :key="colorStore.color_index(color)" :color="color"></colorViewerElement>
+        <div  :style="{backgroundColor: (colorStore.get_detailed_color()) ? colorStore.get_detailed_color().css_rgb : ''}">
+            <div class="color-viewer-canvas-container">
+                <canvas ref="colorViewerRef" class="color-viewer" :width="colorViewerSize.width" :height="colorViewerSize.height">
+                </canvas>
+                <colorViewerElement v-for="(color, _) in colorStore.colors" :key="colorStore.color_index(color)" :color="color" :pos="current_position(color)"></colorViewerElement>
+            </div>
         </div>
-
     </div>
 </template>
 
 <style>
 
 .color-viewer-canvas-container {
-    position: static;
+    position: relative;
     width: fit-content;
     height: fit-content;
     margin: auto;

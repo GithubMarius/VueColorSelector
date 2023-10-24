@@ -1,19 +1,29 @@
 import {ColorArray, ColorAlphaArray, RGBtoHSL} from '@/utils/colors/helpers'
+import { oklch, hsl } from '@/../node_modules/culori'
 
 export class Color {
     // Color
 
     constructor(
-        public RGBA: ColorAlphaArray, public xPos: number, public yPos: number, public group: ColorGroup,
-        public hovered: Boolean = false, public selected: Boolean=false,
+        public RGBA: ColorAlphaArray,
+        public xPos: number, public yPos: number,
+        public group: ColorGroup,
+        public hovered: Boolean = false,
+        public show_details: Boolean = false,
+        public selected: Boolean=false,
         public selectingCircle: Boolean = false,
-        public selectingBlock: Boolean = false) {
+        public selectingBlock: Boolean = false,
+        public selectingColorViewer: Boolean = false) {
             this.group.add_color(this)
         }
+
+    get highlighted() {
+        return this.selecting || this.selected || this.hovered
+    }
     
     get selecting() {
         // True if either related circle or block is inside current temporary selection
-        return this.selectingCircle || this.selectingBlock
+        return this.selectingCircle || this.selectingBlock || this.selectingColorViewer
     }
 
     get RGB(): ColorArray {
@@ -32,6 +42,14 @@ export class Color {
         const HSLA: ColorArray|any = this.HSL
         HSLA.push(this.RGBA[3])
         return <ColorArray>HSLA
+    }
+
+    get culori_oklch() {
+        return oklch(this.css_rgb)
+    }
+
+    get culori_hsl() {
+        return hsl(this.css_rgb)
     }
 
     get lightness(): number {
@@ -110,6 +128,11 @@ export class ColorGroup {
     get num_colors() {
         // Return number of colors
         return this.colors.length
+    }
+
+    toggle_visibilty_colors() {
+        // Invert visibility of colors
+        this.visibility_colors = !this.visibility_colors 
     }
 
 }

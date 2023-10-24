@@ -22,7 +22,6 @@ const emits = defineEmits(['update:modelValue'])
 
 function update_from_event(event) {
   emits('update:modelValue', event.target.value)
-  console.log(props.modelValue)
 }
 
 </script>

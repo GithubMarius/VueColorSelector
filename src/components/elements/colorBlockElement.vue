@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, defineProps, onMounted, computed, watch, Ref, inject, StyleValue } from 'vue'
 import { Color } from '@/utils/colors/ColorManagement'
-import selectableElement from '@/components/elements/selectableElement.vue'
+import selectableColor from '@/components/elements/selectableColor.vue'
 import { useSettingsStore } from '@/stores/settings'
 import { useColorStore } from '@/stores/color'
 import { useHistoryStore } from '@/stores/history'
@@ -29,18 +29,12 @@ onMounted(() => {
 </script>
 
 <template>
-<selectableElement v-model:selecting="color.selectingBlock" v-model:selected="color.selected">
-<div ref="colorBlockRef" class="color_block"
-
-
-:class="{highlighted: ($props.color.hovered || props.color.selected || props.color.selecting)}"
-:style="<StyleValue>{backgroundColor: <StyleValue>[settings.color_mode ? props.color.css_rgb : props.color.css_bw_hsl]}"
-@click.ctrl="historyStore.delete_color(color)"
-@mouseover="colorStore.color_hover(color)"
-@mouseleave="colorStore.color_unhover_all()"
-:data-color-id="colorStore.color_index(color)"
-></div>
-</selectableElement>
+  <selectableColor :color="color" v-model:selecting="color.selectingBlock">
+    <div ref="colorBlockRef" class="color_block"
+    :class="{highlighted: color.highlighted}"
+    :style="<StyleValue>{backgroundColor: <StyleValue>[settings.color_mode ? props.color.css_rgb : props.color.css_bw_hsl]}"
+    ></div>
+  </selectableColor>
 </template>
 
 <style scoped>

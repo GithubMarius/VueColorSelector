@@ -66,6 +66,23 @@ export const useColorStore = defineStore('color', {
       const color = new Color(<any>pixelData, x, y, group)
       this.colors.splice(index, 0, color)
       return index
+    },
+    update_show_details(color: Color) {
+      this.colors.forEach((col: Color) => 
+          {
+            if (col === color) {
+              col.show_details = !col.show_details
+            }
+            else {
+              col.show_details = false
+            }
+          }
+        )
+    },
+    get_detailed_color(): Color {
+      if (this.colors) {
+        return this.colors.find((color: Color) => color.show_details )
+      }
     }
   },
   getters: {
@@ -133,8 +150,13 @@ export const useGroupStore = defineStore('group', {
         // Remove color from its group
         color.drop_from_group()
         this.remove_empty_groups()
+      },
+      toggle_group_visibility_by_index(index: number) {
+        // Check if group with index exists. If yes: toggle visibility of colors of group.
+        if (index < this.groups.length) {
+          this.groups[index].toggle_visibilty_colors()
+        }
       }
-
   },
   getters: {
     group_names(): Array<string> {

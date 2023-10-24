@@ -1,3 +1,5 @@
+import { Color } from "./ColorManagement"
+
 // Types
 export type ColorArray = [number, number, number]
 export type ColorAlphaArray = [number, number, number, number]
@@ -51,4 +53,9 @@ export function rgbtohsl(rgb: ColorArray): ColorArray {
         }
     }
     return [h, s, l]
+}
+
+export const rgbToChromaOrSaturation = {
+    'okhcl': (color: Color) => color.culori_oklch.c /.4,
+    'hsl': (color: Color) => color.culori_hsl.s
 }

@@ -4,7 +4,7 @@ import { Color } from '@/utils/colors/ColorManagement';
 import { useSettingsStore } from '@/stores/settings';
 import { useColorStore } from '@/stores/color';
 import { useHistoryStore } from '@/stores/history'
-import selectableElement from '@/components/elements/selectableElement.vue'
+import selectableColor from './selectableColor.vue';
 
 const colorStore = useColorStore()
 const historyStore = useHistoryStore()
@@ -19,8 +19,13 @@ const props = defineProps({
 const settings = useSettingsStore()
 
 const style = computed(function(){ return {
-        left: props.color.css_xPos, top: props.color.css_yPos, backgroundColor: settings.color_mode ? props.color.css_rgb : props.color.css_bw_hsl,
-        minWidth: settings.color_circle_radius.css_diameter, minHeight: settings.color_circle_radius.css_diameter
+        left: props.color.css_xPos,
+        top: props.color.css_yPos,
+        backgroundColor: settings.color_mode ? props.color.css_rgb : props.color.css_bw_hsl,
+        minWidth: settings.color_circle_radius.css_diameter,
+        minHeight: settings.color_circle_radius.css_diameter,
+        zIndex: (props.color.show_details) ? '2' : '1',
+        transform: (props.color.show_details) ? 'translate(-50%, -50%) scale(1.3)' : 'translate(-50%, -50%)',
       }})
 
 onMounted(() => {
@@ -28,16 +33,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <selectableElement v-model:selecting="color.selectingCircle" v-model:selected="color.selected">
+  <selectableColor :color="color" v-model:selecting="color.selectingCircle">
       <div ref="colorCircleRef" v-if="props.color.visible"
-      :class="{highlighted: (props.color.hovered || props.color.selected || props.color.selecting)}"
+      :class="{highlighted: color.highlighted}"
       :style="style"
-      @click.ctrl.stop="historyStore.delete_color(color)"
-      @click.shift.stop="color.selected = !color.selected"
-      @mouseover="colorStore.color_hover(color)"
-      @mouseleave="colorStore.color_unhover_all()"
       class="color_circle" :data-color-id="colorStore.color_index(color)"></div>
-  </selectableElement>
+  </selectableColor>
 </template>
 
 <style scoped>
