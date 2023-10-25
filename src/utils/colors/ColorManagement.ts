@@ -1,9 +1,20 @@
 import {ColorArray, ColorAlphaArray, RGBtoHSL} from '@/utils/colors/helpers'
 import { oklch, hsl } from '@/../node_modules/culori'
 
-export class Color {
-    // Color
+export interface ColorDataInterface {
+    RGBA: ColorAlphaArray
+    xPos: number,
+    yPos: number
+    groupname: string
+}
 
+export interface ColorDataWithIndexInterface extends ColorDataInterface {
+    index: number
+}
+
+
+export class Color implements ColorDataInterface {
+    // Color
     constructor(
         public RGBA: ColorAlphaArray,
         public xPos: number, public yPos: number,
@@ -16,6 +27,9 @@ export class Color {
         public selectingColorViewer: Boolean = false) {
             this.group.add_color(this)
         }
+    get groupname () {
+        return this.group.name
+    }
 
     get highlighted() {
         return this.selecting || this.selected || this.hovered
@@ -85,6 +99,15 @@ export class Color {
     get visible() {
         // Return whether own group is currently visible (if not color won't displayed)
         return this.group.visibility_colors
+    }
+
+    toData(): ColorDataInterface {
+        return {
+            RGBA: this.RGBA,
+            xPos: this.xPos,
+            yPos: this.yPos,
+            groupname: this.group.name
+        }
     }
 
     change_group(group) {

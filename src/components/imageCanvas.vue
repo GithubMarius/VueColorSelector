@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, inject, onMounted, ref, watch } from 'vue';
+import { inject, onMounted, ref, watch } from 'vue';
 
 import { useColorStore } from '@/stores/color';
 import { useHistoryStore } from '@/stores/history';

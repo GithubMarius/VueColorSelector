@@ -94,13 +94,13 @@ onUnmounted(() => {
 <template>
   <rectangularSelectionToolElement ref="rectSelectionRef">
     <div class="row w-100 vh-100 m-0">
-      <div id="canvas_column" class="col-sm-8 justify-content-center p-0">
+      <div id="canvas-column" class="col-sm-8 justify-content-center p-0">
         <!-- Image canvas -->
         <imageCanvas ref="imageCanvasInstance"
         :url="imgUrl"
         :colorContainerElement="colorContainerElement"></imageCanvas>
       </div>
-      <div class="col-sm-4 p-0">
+      <div id="settings-column" class="col-sm-4 p-0 mh-100">
         <div class="row m-2">
           <!-- Toolgroup: TODO: Check if could be created with ui/toggleGroup -->
           <div class="btn-group" role="group" aria-label="ToolToogles">
@@ -138,6 +138,10 @@ onUnmounted(() => {
 <style lang="scss">
  @import "./styles/scss/_styles.scss";
 
+:root {
+    --color-highlighted: rgb(14, 137, 231);
+}
+
 .deleteCursor {
     cursor: url("src/assets/icons/dash-circle.svg") 12 12 , not-allowed !important;
 }
@@ -150,10 +154,15 @@ onUnmounted(() => {
   max-height: 100%;
 }
 
-#canvas_column {
+#canvas-column {
   position: relative;
   overflow: auto;
   height: 100vh;
+}
+
+#settings-column {
+  overflow-y: auto;
+  overflow-x: clip;
 }
 
 .color_block {
@@ -164,7 +173,7 @@ onUnmounted(() => {
 
 
 .highlighted {
-  border-color:  rgb(14, 137, 231) !important; 
+  border-color:  var(--color-highlighted) !important; 
 }
 
 /* from https://vuejs.org/guide/built-ins/transition.html#the-transition-component */

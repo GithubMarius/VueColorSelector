@@ -1,6 +1,6 @@
 
 import { defineStore } from "pinia";
-import { AddSelectionToGroup, CreateColorAction, DeleteColorAction, RenameGroup } from "@/actions/coloractions";
+import { AddSelectionToGroup, CreateColorAction, DeleteColorAction, ImportColors, RenameGroup } from "@/actions/coloractions";
 import { Action } from "@/utils/action";
 
 export const useHistoryStore = defineStore('history', {
@@ -23,6 +23,11 @@ export const useHistoryStore = defineStore('history', {
     // Delete color
     delete_color(...args) {
       return this.perform_action(DeleteColorAction, ...args)
+    },
+
+    // Import colors
+    import_colors(...args) {
+      return this.perform_action(ImportColors, ...args)
     },
 
     // Add selection to group

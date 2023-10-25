@@ -10,6 +10,6 @@ defineEmits(['update:modelValue'])
 
 <template>
   <span class="form-switch">
-      <input class="form-check-input" type="checkbox" :checked="modelValue" @input="$emit('update:modelValue', $event.target.checked)" role="switch" id="switchTheme">
+      <input class="form-check-input" type="checkbox" :checked="modelValue" @input="$emit('update:modelValue', $event.target.checked)" role="switch">
   </span>
 </template>

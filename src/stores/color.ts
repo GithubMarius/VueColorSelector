@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { Color, ColorGroup } from '../utils/colors/ColorManagement'
+import { Color, ColorDataInterface, ColorGroup } from '../utils/colors/ColorManagement'
 import { canvas_position_from_event, get_pixel_color } from '../utils/general'
 
 
@@ -12,16 +12,19 @@ export const useColorStore = defineStore('color', {
   },
   actions: {
     color_from_event(event) {
+      // Create color from event
       const [pixelData, x, y] = this.color_data_from_event(event)
       return this.create_color(pixelData, x, y, '')
     },
-    color_data_from_event(event) {      
+    color_data_from_event(event) {    
+      // Get color data from event data  
       const [x, y] = canvas_position_from_event(event)
       const pixelData = get_pixel_color(x, y)
       return [pixelData, x, y]
     },
 
     delete_color_by_index(index: number) {
+      // Remove color at given index
       const color = this.colors[index]
       this.groupStore.drop_color_from_group(color)
       this.colors.splice(index, 1)
@@ -67,6 +70,10 @@ export const useColorStore = defineStore('color', {
       this.colors.splice(index, 0, color)
       return index
     },
+    color_from_color_data(colorData: ColorDataInterface) {
+      this.create_color(Object.values(colorData.RGBA), colorData.xPos, colorData.yPos, colorData.groupname)
+    }
+    ,
     update_show_details(color: Color) {
       this.colors.forEach((col: Color) => 
           {

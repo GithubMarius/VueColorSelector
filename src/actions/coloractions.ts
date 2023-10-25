@@ -1,29 +1,21 @@
 import { isReactive } from "vue";
 import { useColorStore, useGroupStore } from "@/stores/color";
-import { mouseCoordinates, canvas_position_from_event, get_pixel_color } from "@/utils/general";
+import { pointCoordinates, canvas_position_from_event, get_pixel_color } from "@/utils/general";
 import { ColorAlphaArray } from "@/utils/colors/helpers"
 import { Action, ActionInterface } from "@/utils/action"
-import { Color, ColorGroup } from "@/utils/colors/ColorManagement";
+import { Color, ColorDataInterface, ColorGroup } from "@/utils/colors/ColorManagement";
 
-
-export class CreateColorAction extends Action {
-    // Create color/undo creation
-
+class CreateColorBaseAction extends Action {
     index: number
-    xy: mouseCoordinates
-    pixelData: ColorAlphaArray
 
-    constructor(event: MouseEvent) {
-        // Retrieve position and pixeldata of the point
-        super(event)
-        this.xy = canvas_position_from_event(event)
-        this.pixelData = get_pixel_color(...this.xy)
+    constructor(public RGBA: ColorAlphaArray, public xy: pointCoordinates, public groupname: string = '') {
+        super()
     }
 
     override forward() {
         // Create color
         const colorStore = useColorStore()
-        this.index = colorStore.create_color(this.pixelData, ...this.xy, '')
+        this.index = colorStore.create_color(this.RGBA, ...this.xy, this.groupname)
     }
 
     override undo() {
@@ -39,11 +31,69 @@ export class CreateColorAction extends Action {
 
 }
 
+
+
+export class CreateColorAction extends CreateColorBaseAction {
+    // Create color/undo creation
+
+    constructor(event: MouseEvent) {
+        // Retrieve position and pixeldata of the point
+        const xy = canvas_position_from_event(event)
+        const RGBA = get_pixel_color(...xy)
+        super(RGBA, xy)
+    }
+
+    override forward() {
+        // Create color
+        const colorStore = useColorStore()
+        this.index = colorStore.create_color(this.RGBA, ...this.xy, '')
+    }
+
+    override undo() {
+        // Remove color
+        const colorStore = useColorStore()
+        colorStore.delete_color_by_index(this.index)
+    }
+
+    toString() {
+        // Return string representation
+        return `Added color point. (Index: ${this.index})`
+    }
+
+}
+
+export class ImportColors extends Action {
+    // Import colors given in colorDataArray
+
+    actions: CreateColorBaseAction[] = []
+    
+    constructor(public colorDataArray: ColorDataInterface[]) {
+        super()
+        colorDataArray.forEach(colorData => this.actions.push(new CreateColorBaseAction(colorData.RGBA, [colorData.xPos, colorData.yPos], colorData.groupname)))
+    }
+
+    override forward() {
+        // Add colors
+        this.actions.forEach(action => action.forward())
+    }
+
+    override undo() {
+        // Remove colors in reversed order
+        this.actions.reverse()
+        this.actions.forEach(action => action.undo())
+        this.actions.reverse()
+    }
+
+    toString() {
+        return `Import ${this.actions.length} color points.`
+    }
+}
+
 export class DeleteColorAction extends Action implements ActionInterface {
     // Delete color/undo deletion
 
     index: number
-    xy: mouseCoordinates
+    xy: pointCoordinates
     pixelData: ColorAlphaArray
     group_name: string
 

@@ -1,8 +1,8 @@
 import { ColorAlphaArray } from "./colors/helpers"
 
-export type mouseCoordinates = [number, number]
+export type pointCoordinates = [number, number]
 
-export function canvas_position_from_event(event): mouseCoordinates {
+export function canvas_position_from_event(event): pointCoordinates {
     
     const canvas = <HTMLCanvasElement>document.getElementById('canvas')
     

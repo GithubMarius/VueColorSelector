@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, defineProps, onMounted, computed, watch, Ref, inject, StyleValue } from 'vue'
+import { ref, onMounted, StyleValue } from 'vue'
 import { Color } from '@/utils/colors/ColorManagement'
 import selectableColor from '@/components/elements/selectableColor.vue'
 import { useSettingsStore } from '@/stores/settings'
