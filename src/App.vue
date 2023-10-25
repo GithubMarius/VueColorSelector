@@ -5,7 +5,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import { ref, Ref, provide, onMounted, onUnmounted, watch } from 'vue'
 
 // Stores
-import { useSettingsStore } from '@/stores/settings'
+import { KeyCombination, useSettingsStore } from '@/stores/settings'
 import { useHistoryStore } from '@/stores/history'
 import { useGroupStore } from '@/stores/color'
 
@@ -23,6 +23,7 @@ import { toolManagementRef } from '@/components/Tool'
 import imageCanvas from '@/components/imageCanvas.vue'
 import colorViewer from '@/components/colorViewer.vue'
 import rectangularSelectionToolElement from '@/components/rectangularSelectionToolElement.vue'
+import { openDataImportFileDialog, return_download_file } from "./utils/fileManagement";
 
 // Refs
 const imageCanvasInstance = ref(null)
@@ -61,22 +62,43 @@ watch(() => settingsStore.bright, () => {
   document.documentElement.setAttribute('data-bs-theme', settingsStore.theme)
 })
 
-// Keyboard shortcuts
+// Forward/Undo history
+settingsStore.keycombinations.undo.bind(historyStore.undo)
+settingsStore.keycombinations.forward.bind(historyStore.forward)
+
+// Toggle theme
+settingsStore.keycombinations.toggle_theme.bind(() => {
+  settingsStore.bright = !settingsStore.bright
+})
+
+// Toggle group visibility
+settingsStore.keycombinations.toggle_color_group.bind((event) => {
+  groupStore.toggle_group_visibility_by_index(Number(event.key)-1)
+  event.preventDefault()
+})
+
+// Go to tab
+settingsStore.keycombinations.toggle_color_group.bind((event) => {
+  all_tabs.open_tab(Number(event.key)-1)
+})
+
+// Export points
+settingsStore.keycombinations.export.bind((event) => {
+  return_download_file()
+  event.preventDefault()
+})
+
+// Import points
+settingsStore.keycombinations.import.bind((event) => {
+  openDataImportFileDialog()
+  event.preventDefault()
+})
+
+
+// Keyboard shortcut listener
 function key_listener (event: KeyboardEvent) {
-  if (settingsStore.keycombinations.undo.is_pressed(event)) {
-      historyStore.undo()
-  } else if (settingsStore.keycombinations.forward.is_pressed(event)) {
-      historyStore.forward()
-  } else if (settingsStore.keycombinations.toggle_theme.is_pressed(event)) {
-      settingsStore.bright = !settingsStore.bright
-  } else if (settingsStore.keycombinations.toggle_color_group.is_pressed(event)) {
-      groupStore.toggle_group_visibility_by_index(Number(event.key)-1)
-      event.preventDefault()
-  }
-    else if (settingsStore.keycombinations.open_tab.is_pressed(event)) {
-      all_tabs.open_tab(Number(event.key)-1)
-    }
-  }
+  KeyCombination.check_bound_combinations(event)
+}
 
 // Add key listener and set theme attribute
 onMounted(() => {

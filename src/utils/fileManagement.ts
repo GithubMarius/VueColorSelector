@@ -45,3 +45,41 @@ function stringify_colors() {
         colors: colorStore.colors.map(color => color.toData())
     })
 }
+
+export function return_download_file() {
+    // Used example from https://javascript.plainenglish.io/javascript-create-file-c36f8bccb3be
+    const file = create_data_file()
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(file)
+  
+    link.href = url
+    link.download = file.name
+    document.body.appendChild(link)
+    link.click()
+  
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+}
+
+
+function onDataFileChange(event) {
+    //  Open file dialog to import data
+  
+    if (check_data_import_file_type(event.target.files[0])) {
+        read_data_file(event.target.files[0])
+    }
+    else {
+        throw(new Error('Wrong file type.'))
+    }
+  
+}
+  
+  
+export function openDataImportFileDialog() {
+    console.log('hi')
+    var input = document.createElement("input");
+        input.setAttribute("type", "file");
+        // add onchange handler if you wish to get the file :)
+        input.click(); // opening dialog
+        input.onchange = onDataFileChange
+}

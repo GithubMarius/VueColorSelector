@@ -55,8 +55,16 @@ const customModifiers = {
     cmd: [allModifiers.ctrl, allModifiers.meta]
 }
 
-class KeyCombination {
+export class KeyCombination {
     default: Array<Array<string>>
+    static bound_combinations = []
+    _fcn: Function
+
+    static check_bound_combinations(event: KeyboardEvent) {
+        // Check if key combination is already bound to function call
+        this.bound_combinations.forEach(comb => comb.call_if_pressed(event))
+    }
+
     constructor(public key, public modifiers = []) {
         this.default = modifiers
     }
@@ -80,6 +88,18 @@ class KeyCombination {
         // Check if the number of pressed modifiers is correct
         return pressed_modifiers.length === this.modifiers.length
     }
+
+    bind(fcn: Function) {
+        console.log(KeyCombination.bound_combinations)
+        KeyCombination.bound_combinations.push(this)
+        this._fcn = fcn
+    }
+
+    call_if_pressed(event: KeyboardEvent) {
+        if (this.is_pressed(event)) {
+            this._fcn(event)
+        }
+    }
 }
 
 const keycombinations = {
@@ -87,7 +107,9 @@ const keycombinations = {
     'forward': new KeyCombination('y', [customModifiers.cmd]),
     'toggle_theme': new KeyCombination('t', []),
     'toggle_color_group': new KeyCombination('0123456789', [customModifiers.cmd]),
-    'open_tab': new KeyCombination('0123456789', [customModifiers.alt])
+    'open_tab': new KeyCombination('0123456789', [customModifiers.alt]),
+    'import': new KeyCombination('i', [customModifiers.cmd]),
+    'export': new KeyCombination('e', [customModifiers.cmd])
 }
 
 export const useSettingsStore = defineStore("settings", {
