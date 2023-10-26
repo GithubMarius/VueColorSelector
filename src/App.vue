@@ -104,6 +104,21 @@ settingsStore.keycombinations.toggle_cam.bind((_) => {
   captureVideo.value = !captureVideo.value
 })
 
+// Toggle Color Mode
+settingsStore.keycombinations.toggle_color_mode.bind((_) => {
+  settingsStore.color_mode = !settingsStore.color_mode
+})
+
+// Change image opacity
+settingsStore.keycombinations.change_image_opacity.bind((event) => {
+  if (event.key === '+') {
+    settingsStore.opacity.value = Math.min(settingsStore.opacity.value + 0.1, 1)
+  } else {
+    settingsStore.opacity.value = Math.max(settingsStore.opacity.value - 0.1, 0)
+  }
+  event.preventDefault()
+})
+
 
 // Keyboard shortcut listener
 function key_listener (event: KeyboardEvent) {
@@ -136,16 +151,7 @@ onUnmounted(() => {
         :url="imgUrl"
         :colorContainerElement="colorContainerElement"></imageCanvas>
       </div>
-      <div id="settings-column" class="col-sm-4 p-0 mh-100">
-        <div class="row m-2">
-          <!-- Toolgroup: TODO: Check if could be created with ui/toggleGroup -->
-          <div class="btn-group" role="group" aria-label="ToolToogles">
-            <button v-for="(tool, index) in toolManagementRef.activatable_tools" :key="index" class="btn bi"
-            :class="[tool.icon, tool.active ? 'btn-primary': 'btn-outline-primary']"
-            @click="toolManagementRef.toggle_tool(index)"
-            ></button>
-          </div>
-        </div>
+      <div id="settings-column" class="col-sm-4 p-0 mh-100 mw-20">
         <div class="row">
           <!-- Colorviewer -->
           <colorViewer>
@@ -154,7 +160,7 @@ onUnmounted(() => {
         <div class="row mt-4">
           <!-- Tab-Selection -->
           <nav>
-            <div class="nav nav-tabs px-2" id="nav-tab" role="tablist">
+            <div class="nav nav-pills px-2" id="nav-tab" role="tablist">
               <button :ref="all_tabs.tab_buttons" v-for="(tab, index) in Object.keys(all_tabs.list)" :key="index"
               class="nav-link"
               :class="{active: all_tabs.active_tab.value === index}"
@@ -168,7 +174,15 @@ onUnmounted(() => {
         </div>
       </div>
       <!-- overlying menu -->
-      <div class="position-absolute m-2 pe-none"><toggleButton v-model="captureVideo" :icons="['bi-camera-video', 'bi-camera-video-off']" :btnColor="'danger'"></toggleButton></div>
+      <div class="position-absolute m-2 pe-none floating-menu">
+        <span><toggleButton v-model="captureVideo" :icons="['bi-camera-video', 'bi-camera-video-off']" :btnColor="'danger'"></toggleButton></span>
+        <span class="btn-group" role="group" aria-label="ToolToogles">
+          <!-- Toolgroup: TODO: Check if could be created with ui/toggleGroup -->
+          <button v-for="(tool, index) in toolManagementRef.activatable_tools" :key="index" class="btn bi"
+          :class="[tool.icon, tool.active ? 'btn-primary': 'btn-outline-primary']"
+          @click="toolManagementRef.toggle_tool(index)"
+          ></button></span>
+      </div>
     </div>
   </rectangularSelectionToolElement>
 </template>
@@ -178,6 +192,14 @@ onUnmounted(() => {
 
 :root {
     --color-highlighted: rgb(14, 137, 231);
+}
+
+.floating-menu span{
+  pointer-events: all;
+}
+
+.floating-menu span:not(:first-child) {
+  margin-left: 10px;
 }
 
 .deleteCursor {

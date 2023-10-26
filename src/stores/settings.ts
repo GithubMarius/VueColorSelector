@@ -109,7 +109,9 @@ const keycombinations = {
     'open_tab': new KeyCombination('0123456789', [customModifiers.alt]),
     'import': new KeyCombination('i', [customModifiers.cmd]),
     'export': new KeyCombination('e', [customModifiers.cmd]),
-    'toggle_cam': new KeyCombination('q', [customModifiers.cmd])
+    'toggle_cam': new KeyCombination('q', [customModifiers.cmd]),
+    'toggle_color_mode': new KeyCombination('b', [customModifiers.cmd]),
+    'change_image_opacity': new KeyCombination('-+', [customModifiers.cmd])
 }
 
 export const useSettingsStore = defineStore("settings", {
