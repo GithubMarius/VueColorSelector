@@ -108,7 +108,8 @@ const keycombinations = {
     'toggle_color_group': new KeyCombination('0123456789', [customModifiers.cmd]),
     'open_tab': new KeyCombination('0123456789', [customModifiers.alt]),
     'import': new KeyCombination('i', [customModifiers.cmd]),
-    'export': new KeyCombination('e', [customModifiers.cmd])
+    'export': new KeyCombination('e', [customModifiers.cmd]),
+    'toggle_cam': new KeyCombination('q', [customModifiers.cmd])
 }
 
 export const useSettingsStore = defineStore("settings", {
@@ -150,7 +151,7 @@ export const useSettingsStore = defineStore("settings", {
                     return this.get_hueOfColor(color)
                 }
                 case('Chroma/Saturation'): {
-                    return this.get_chrOrSatOfColor(color)
+                    return -this.get_chrOrSatOfColor(color)
                 }
                 case('Lightness'): {
                     return this.get_lightnessOfColor(color)

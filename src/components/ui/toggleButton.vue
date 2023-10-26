@@ -8,14 +8,18 @@ import { computed } from 'vue'
 const props = defineProps({
   modelValue: {},
   icons: undefined,
-  labels: undefined
+  labels: undefined,
+  btnColor: {
+    type: String,
+    default: 'primary' 
+  }
 })
 
 defineEmits(['update:modelValue'])
 
 const css_classes = computed(() => {
   if (props.icons) {
-    return 'bi ' + (props.modelValue ? props.icons[0] + ' btn-primary': props.icons[1] + ' btn-outline-primary')
+    return 'bi ' + (props.modelValue ? props.icons[0] + ' btn-' + props.btnColor: props.icons[1] + ' btn-outline-' + props.btnColor)
   }
   else {
     return props.modelValue ? 'btn-primary' : 'btn-outline-primary'
@@ -31,7 +35,7 @@ const label = computed(() => {
 </script>
 
 <template>
-  <label class="btn" :class="css_classes">{{ label }}
+  <label class="btn pe-auto" :class="css_classes">{{ label }}
     <input style="display:none" type="checkbox" autocomplete="off" :checked="modelValue" @input="$emit('update:modelValue', $event.target.checked)">
   </label>
 </template>

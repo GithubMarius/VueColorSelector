@@ -9,6 +9,8 @@ import { KeyCombination, useSettingsStore } from '@/stores/settings'
 import { useHistoryStore } from '@/stores/history'
 import { useGroupStore } from '@/stores/color'
 
+// UI elements
+import toggleButton from '@/components/ui/toggleButton.vue'
 
 // Tabs
 import settingsTab from '@/components/tabs/settingsTab.vue'
@@ -24,6 +26,7 @@ import imageCanvas from '@/components/imageCanvas.vue'
 import colorViewer from '@/components/colorViewer.vue'
 import rectangularSelectionToolElement from '@/components/rectangularSelectionToolElement.vue'
 import { openDataImportFileDialog, return_download_file } from "./utils/fileManagement";
+import CaptureCamera from "./components/captureCamera.vue";
 
 // Refs
 const imageCanvasInstance = ref(null)
@@ -79,8 +82,9 @@ settingsStore.keycombinations.toggle_color_group.bind((event) => {
 })
 
 // Go to tab
-settingsStore.keycombinations.toggle_color_group.bind((event) => {
+settingsStore.keycombinations.open_tab.bind((event) => {
   all_tabs.open_tab(Number(event.key)-1)
+  event.preventDefault()
 })
 
 // Export points
@@ -95,6 +99,11 @@ settingsStore.keycombinations.import.bind((event) => {
   event.preventDefault()
 })
 
+// Toggle Camera
+settingsStore.keycombinations.toggle_cam.bind((_) => {
+  captureVideo.value = !captureVideo.value
+})
+
 
 // Keyboard shortcut listener
 function key_listener (event: KeyboardEvent) {
@@ -107,6 +116,8 @@ onMounted(() => {
   document.documentElement.setAttribute('data-bs-theme', settingsStore.theme)
 })
 
+const captureCamera = ref()
+const captureVideo = ref(false)
 // Remove key listener again
 onUnmounted(() => {
   document.removeEventListener('keydown', key_listener)
@@ -116,8 +127,10 @@ onUnmounted(() => {
 
 <template>
   <rectangularSelectionToolElement ref="rectSelectionRef">
-    <div class="row w-100 vh-100 m-0">
-      <div id="canvas-column" class="col-sm-8 justify-content-center p-0">
+    <div class="row w-100 vh-100 m-0 overflow-hidden p-0">
+        <div id="canvas-column" class="col-sm-8 justify-content-center p-0">
+        <!-- video capture-->
+        <CaptureCamera ref="captureCamera" v-model:captureVideo="captureVideo"></CaptureCamera>
         <!-- Image canvas -->
         <imageCanvas ref="imageCanvasInstance"
         :url="imgUrl"
@@ -154,6 +167,8 @@ onUnmounted(() => {
           <component :is="Object.values(all_tabs.list)[all_tabs.active_tab.value]"></component>
         </div>
       </div>
+      <!-- overlying menu -->
+      <div class="position-absolute m-2 pe-none"><toggleButton v-model="captureVideo" :icons="['bi-camera-video', 'bi-camera-video-off']" :btnColor="'danger'"></toggleButton></div>
     </div>
   </rectangularSelectionToolElement>
 </template>
