@@ -1,6 +1,6 @@
 <script setup>
 /* Example usage:
-<toggleButton v-model="pair.visible" :icons="['bi-eye-fill', 'bi-eye-slash']"></toggleButton>
+<switchButton v-model="pair.visible"></toggleButton>
 */
 
 defineProps(['modelValue'])

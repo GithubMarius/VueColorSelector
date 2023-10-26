@@ -2,7 +2,7 @@ import { Ref, ref } from "vue"
 import { defineStore } from "pinia"
 import { isStringObject } from "util/types"
 import { Color } from "@/utils/colors/ColorManagement"
-import { rgbToChromaOrSaturation } from "@/utils/colors/helpers"
+import { colorToChromaOrSaturation, colorToLightness, colorToGrayscale, colorToType } from "@/utils/colors/helpers"
 
 
 export class RangeValue {
@@ -90,7 +90,6 @@ export class KeyCombination {
     }
 
     bind(fcn: Function) {
-        console.log(KeyCombination.bound_combinations)
         KeyCombination.bound_combinations.push(this)
         this._fcn = fcn
     }
@@ -121,6 +120,8 @@ export const useSettingsStore = defineStore("settings", {
         color_circle_radius: new Radius('Color circle radius', 15),
         reference_circle_radius: new Radius('Reference circle radius', 8),
         colorspace: new Selection('Color space', ['okhcl', 'hsl']),
+        colorsSortBy: new Selection('Sort colors by', ['Hue', 'Chroma/Saturation', 'Lightness'], 2),
+        colorsOrderAscending: true,
         scale: 0.5,
         bright: true,
         url: 'src/assets/Fritz.jpg',
@@ -129,7 +130,32 @@ export const useSettingsStore = defineStore("settings", {
     },
     actions: {
         set_chrOrSat(color: Color) {
-            this.chrOrSat.value = rgbToChromaOrSaturation[this.colorspace.value](color)
+            this.chrOrSat.value = this.get_chrOrSatOfColor(color)
+        },
+        get_hueOfColor(color: Color): number {
+            return colorToType[this.colorspace.value](color).h
+        },
+        get_chrOrSatOfColor(color: Color): number {
+            return colorToChromaOrSaturation[this.colorspace.value](color)
+        },
+        get_lightnessOfColor(color: Color): number {
+            return colorToLightness[this.colorspace.value](color)
+        },
+        get_grayscaledColor(color: Color) {
+            return colorToGrayscale[this.colorspace.value](color)
+        },
+        get_color_sorting_value(color: Color): number {
+            switch (this.colorsSortBy.value) {
+                case('Hue'): {
+                    return this.get_hueOfColor(color)
+                }
+                case('Chroma/Saturation'): {
+                    return this.get_chrOrSatOfColor(color)
+                }
+                case('Lightness'): {
+                    return this.get_lightnessOfColor(color)
+                }
+            } 
         }
 
     },

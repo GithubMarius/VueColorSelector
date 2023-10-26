@@ -1,5 +1,6 @@
-import {ColorArray, ColorAlphaArray, RGBtoHSL} from '@/utils/colors/helpers'
+import { ColorArray, ColorAlphaArray, RGBtoHSL } from '@/utils/colors/helpers'
 import { oklch, hsl } from '@/../node_modules/culori'
+import { useSettingsStore } from '@/stores/settings'
 
 export interface ColorDataInterface {
     RGBA: ColorAlphaArray

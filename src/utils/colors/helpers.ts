@@ -1,4 +1,5 @@
 import { Color } from "./ColorManagement"
+import { formatCss } from '@/../node_modules/culori'
 
 // Types
 export type ColorArray = [number, number, number]
@@ -55,7 +56,32 @@ export function rgbtohsl(rgb: ColorArray): ColorArray {
     return [h, s, l]
 }
 
-export const rgbToChromaOrSaturation = {
+export const colorToType = {
+    'okhcl': (color: Color) => color.culori_oklch,
+    'hsl': (color: Color) => color.culori_hsl
+}
+
+export const colorToChromaOrSaturation = {
     'okhcl': (color: Color) => color.culori_oklch.c /.4,
     'hsl': (color: Color) => color.culori_hsl.s
+}
+
+export const colorToLightness = {
+    'okhcl': (color: Color) => color.culori_oklch.l,
+    'hsl': (color: Color) => color.culori_hsl.l
+}
+
+export const colorToGrayscale = {
+    'okhcl': (color: Color) => formatCss({
+        l: color.culori_oklch.l,
+        c: 0,
+        h: 0,
+        mode: 'oklch'
+    }),
+    'hsl': (color: Color) => formatCss({
+        h: 0,
+        s: 0,
+        l: color.culori_hsl.l,
+        mode: 'hsl'
+    })
 }

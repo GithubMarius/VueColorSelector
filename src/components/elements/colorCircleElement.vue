@@ -7,7 +7,7 @@ import { useHistoryStore } from '@/stores/history'
 import selectableColor from './selectableColor.vue';
 
 const colorStore = useColorStore()
-const historyStore = useHistoryStore()
+const settings = useSettingsStore()
 
 
 const props = defineProps({
@@ -16,12 +16,11 @@ const props = defineProps({
   }
 })
 
-const settings = useSettingsStore()
 
 const style = computed(function(){ return {
         left: props.color.css_xPos,
         top: props.color.css_yPos,
-        backgroundColor: settings.color_mode ? props.color.css_rgb : props.color.css_bw_hsl,
+        backgroundColor: settings.color_mode ? props.color : settings.get_grayscaledColor(props.color),
         minWidth: settings.color_circle_radius.css_diameter,
         minHeight: settings.color_circle_radius.css_diameter,
         zIndex: (props.color.show_details) ? '2' : '1',

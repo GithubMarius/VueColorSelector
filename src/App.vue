@@ -58,6 +58,7 @@ const all_tabs = {
     }
   }
 }
+
 watch(() => settingsStore.bright, () => {
   document.documentElement.setAttribute('data-bs-theme', settingsStore.theme)
 })

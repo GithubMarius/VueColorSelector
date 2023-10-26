@@ -4,15 +4,17 @@ import colorBlockElement from '@/components/elements/colorBlockElement.vue'
 import toggleButton from '@/components/ui/toggleButton.vue'
 import { useColorStore } from '@/stores/color'
 import { useHistoryStore } from '@/stores/history';
+import cardContainer from '../ui/cardContainer.vue'
 
-import { ref, nextTick, computed, onMounted, triggerRef, reactive } from 'vue'
-import { fail } from 'assert';
+import { ref, nextTick, computed, toRaw, unref } from 'vue'
+import { useSettingsStore } from '@/stores/settings';
 
 const colorStore = useColorStore()
 const historyStore = useHistoryStore()
+const settingsStore = useSettingsStore()
 
 const props = defineProps({
-    'group': ColorGroup,
+    group: ColorGroup,
     show_all:{
         type: Boolean,
         default: false
@@ -48,41 +50,48 @@ function reset() {
 const displayed_group_name = computed(() => props.group.name !== '' ? props.group.name : 'Groupless Colors')
 const feedback = ref(null)
 
-
+function sorted_values() {
+    // Sort colors
+    const colors = props.group.colors
+    const sorting_values = colors.map(settingsStore.get_color_sorting_value)
+    console.log(sorting_values)
+    const indices = [...sorting_values.keys()]
+    indices.sort((b,a) => (settingsStore.colorsOrderAscending) ? sorting_values[a]-sorting_values[b] : sorting_values[b]-sorting_values[a])
+    return indices.map(indice => colors[indice])
+}
 </script>
 
 <template>
-            <div class="card container mb-2">
-                <div class="card-header row"
-                    :class="{rounded: !group.visibility}">
-                    <div class="col-9 p-0 fs-6">
-                        <div class="input-group group-name-container h-100" @click="activate_name_editing()">
-                            <input ref="group_name_input_ref" type="text" class="form-control" :value="displayed_group_name" :disabled="!editing_name"
-                            :class="{
-                                'pl-2 disabled-name-input fs-5': !editing_name,
-                                'group-name-input': !editing_name && !group.is_default,
-                                'is-invalid': feedback && !feedback.success
-                                }"
-                            @keydown.enter="submit_name"
-                            @focusout="reset">
-                            <div class="input-group-text rounded-right" :class="{'group-name-icon-active': editing_name}"
-                            v-if="!group.is_default" ><i class="bi bi-pen"></i></div>
-                        </div>
-                    </div>
-                    <div v-if="!show_all" class="col-3" role="group" aria-label="Basic checkbox toggle button group">
-                        <div class="btn-group group-menu">
-                            <toggleButton v-model="group.visibility" :icons="['bi-caret-up', 'bi-caret-down']"></toggleButton>
-                            <toggleButton v-model="group.visibility_colors" :icons="['bi-eye-fill', 'bi-eye-slash']"></toggleButton>
-                        </div>
-                    </div>
-                <div class="row invalid-feedback text-danger" v-if="feedback && !feedback.success" style="display: block !important;">
-                    {{ feedback.msg }}
-                </div>
-                </div>
-                <div class="p-3" v-if="group.visibility">
-                    <colorBlockElement v-for="(color, _) in group.colors" :key="colorStore.color_index(color)" :color="color"></colorBlockElement>
+    <cardContainer :content-visibility="group.visibility">
+        <template #header>
+            <div class="col-9 p-0 fs-6">
+                <div class="input-group group-name-container h-100" @click="activate_name_editing()">
+                    <input ref="group_name_input_ref" type="text" class="form-control" :value="displayed_group_name" :disabled="!editing_name"
+                    :class="{
+                        'pl-2 disabled-name-input fs-5': !editing_name,
+                        'group-name-input': !editing_name && !group.is_default,
+                        'is-invalid': feedback && !feedback.success
+                        }"
+                    @keydown.enter="submit_name"
+                    @focusout="reset">
+                    <div class="input-group-text rounded-right" :class="{'group-name-icon-active': editing_name}"
+                    v-if="!group.is_default" ><i class="bi bi-pen"></i></div>
                 </div>
             </div>
+            <div v-if="!show_all" class="col-3" role="group" aria-label="Basic checkbox toggle button group">
+                <div class="btn-group group-menu">
+                    <toggleButton v-model="group.visibility" :icons="['bi-chevron-double-up', 'bi-chevron-double-down']"></toggleButton>
+                    <toggleButton v-model="group.visibility_colors" :icons="['bi-eye-fill', 'bi-eye-slash']"></toggleButton>
+                </div>
+            </div>
+            <div class="row invalid-feedback text-danger" v-if="feedback && !feedback.success" style="display: block !important;">
+                {{ feedback.msg }}
+            </div>
+        </template>
+        <template #content>
+            <colorBlockElement v-for="(color, _) in sorted_values()" :key="colorStore.color_index(color)" :color="color"></colorBlockElement>
+        </template>
+    </cardContainer>
 </template>
 
 <style scoped>

@@ -3,8 +3,6 @@ import { ref, onMounted, StyleValue } from 'vue'
 import { Color } from '@/utils/colors/ColorManagement'
 import selectableColor from '@/components/elements/selectableColor.vue'
 import { useSettingsStore } from '@/stores/settings'
-import { useColorStore } from '@/stores/color'
-import { useHistoryStore } from '@/stores/history'
 
 
 const props = defineProps({
@@ -17,10 +15,7 @@ const props = defineProps({
   }
 })
 
-const colorStore = useColorStore()
-const historyStore = useHistoryStore()
 const settings = useSettingsStore()
-
 
 const colorBlockRef = ref(null)
 
@@ -32,7 +27,7 @@ onMounted(() => {
   <selectableColor :color="color" v-model:selecting="color.selectingBlock">
     <div ref="colorBlockRef" class="color_block"
     :class="{highlighted: color.highlighted}"
-    :style="<StyleValue>{backgroundColor: <StyleValue>[settings.color_mode ? props.color.css_rgb : props.color.css_bw_hsl]}"
+    :style="<StyleValue>{backgroundColor: settings.color_mode ? props.color.css_rgb : settings.get_grayscaledColor(props.color)}"
     ></div>
   </selectableColor>
 </template>
