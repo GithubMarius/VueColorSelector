@@ -20,7 +20,7 @@ const props = defineProps({
 const style = computed(function(){ return {
         left: props.color.css_xPos,
         top: props.color.css_yPos,
-        backgroundColor: settings.color_mode ? props.color.css_rgb : settings.get_grayscaledColor(props.color),
+        backgroundColor: settings.color_mode.value ? props.color.css_rgb : settings.get_grayscaledColor(props.color),
         minWidth: settings.color_circle_radius.css_diameter,
         minHeight: settings.color_circle_radius.css_diameter,
         zIndex: (props.color.show_details) ? '2' : '1',

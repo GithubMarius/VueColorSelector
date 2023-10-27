@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import "bootstrap-icons/font/bootstrap-icons.css";
+import 'bootstrap-icons/font/bootstrap-icons.css'
 
 // Vue
 import { ref, Ref, provide, onMounted, onUnmounted, watch } from 'vue'
@@ -9,28 +9,28 @@ import { KeyCombination, useSettingsStore } from '@/stores/settings'
 import { useHistoryStore } from '@/stores/history'
 import { useGroupStore } from '@/stores/color'
 
-// UI elements
-import toggleButton from '@/components/ui/toggleButton.vue'
-
 // Tabs
 import settingsTab from '@/components/tabs/settingsTab.vue'
 import allColorsTab from '@/components/tabs/allColorsTab.vue'
 import groupedColorsTab from '@/components/tabs/groupedColorsTab.vue'
-import importExportTab from "@/components/tabs/importExportTab.vue";
+import importExportTab from '@/components/tabs/importExportTab.vue'
 import referenceTab from '@/components/tabs/referencesTab.vue'
-import HistoryTab from "@/components/tabs/historyTab.vue";
+import HistoryTab from '@/components/tabs/historyTab.vue'
+import CapturedImagesTab from './components/tabs/capturedImagesTab.vue'
 
 import { toolManagementRef } from '@/components/Tool'
 
 import imageCanvas from '@/components/imageCanvas.vue'
 import colorViewer from '@/components/colorViewer.vue'
 import rectangularSelectionToolElement from '@/components/rectangularSelectionToolElement.vue'
-import { openDataImportFileDialog, return_download_file } from "./utils/fileManagement";
-import CaptureCamera from "./components/captureCamera.vue";
+import { openDataImportFileDialog, return_download_file } from '@/utils/fileManagement'
+import captureCamera from '@/components/captureCamera.vue'
+import sideBySideViewer from '@/components/sideBySideViewer.vue'
+import overlyingMenu from '@/components/overlyingMenu.vue'
+import capturedImage from '@/components/capturedImage.vue'
 
 // Refs
 const imageCanvasInstance = ref(null)
-const colorContainerElement = ref(null)
 const rectSelectionRef = ref(null)
 const imgUrl: Ref<string> = ref('src/assets/Fritz.jpg')
 
@@ -48,6 +48,7 @@ const all_tabs = {
   tab_buttons: ref(0),
   list:
     {
+      'Captured Images': CapturedImagesTab,
       'All Colors': allColorsTab,
       'Colors by Group': groupedColorsTab,
       'References': referenceTab,
@@ -62,7 +63,7 @@ const all_tabs = {
   }
 }
 
-watch(() => settingsStore.bright, () => {
+watch(() => settingsStore.light.value, () => {
   document.documentElement.setAttribute('data-bs-theme', settingsStore.theme)
 })
 
@@ -71,8 +72,9 @@ settingsStore.keycombinations.undo.bind(historyStore.undo)
 settingsStore.keycombinations.forward.bind(historyStore.forward)
 
 // Toggle theme
-settingsStore.keycombinations.toggle_theme.bind(() => {
-  settingsStore.bright = !settingsStore.bright
+settingsStore.keycombinations.toggle_theme.bind((event) => {
+  settingsStore.light.toggle()
+  event.preventDefault()
 })
 
 // Toggle group visibility
@@ -101,12 +103,18 @@ settingsStore.keycombinations.import.bind((event) => {
 
 // Toggle Camera
 settingsStore.keycombinations.toggle_cam.bind((_) => {
-  captureVideo.value = !captureVideo.value
+  settingsStore.captureVideo.toggle()
 })
 
 // Toggle Color Mode
 settingsStore.keycombinations.toggle_color_mode.bind((_) => {
-  settingsStore.color_mode = !settingsStore.color_mode
+  settingsStore.color_mode.toggle()
+})
+
+// Toggle Preview Mode
+settingsStore.keycombinations.toggle_preview.bind((event) => {
+  settingsStore.view_side_by_side.toggle()
+  event.preventDefault()
 })
 
 // Change image opacity
@@ -131,25 +139,25 @@ onMounted(() => {
   document.documentElement.setAttribute('data-bs-theme', settingsStore.theme)
 })
 
-const captureCamera = ref()
-const captureVideo = ref(false)
+const captureCameraRef = ref()
 // Remove key listener again
 onUnmounted(() => {
   document.removeEventListener('keydown', key_listener)
 })
-
 </script>
 
 <template>
+  <sideBySideViewer></sideBySideViewer>
   <rectangularSelectionToolElement ref="rectSelectionRef">
     <div class="row w-100 vh-100 m-0 overflow-hidden p-0">
         <div id="canvas-column" class="col-sm-8 justify-content-center p-0">
         <!-- video capture-->
-        <CaptureCamera ref="captureCamera" v-model:captureVideo="captureVideo"></CaptureCamera>
+        <captureCamera ref="captureCameraRef"></captureCamera>
+        <!-- captured image -->
+        <capturedImage></capturedImage>
         <!-- Image canvas -->
         <imageCanvas ref="imageCanvasInstance"
-        :url="imgUrl"
-        :colorContainerElement="colorContainerElement"></imageCanvas>
+        :url="imgUrl"></imageCanvas>
       </div>
       <div id="settings-column" class="col-sm-4 p-0 mh-100 mw-20">
         <div class="row">
@@ -174,15 +182,7 @@ onUnmounted(() => {
         </div>
       </div>
       <!-- overlying menu -->
-      <div class="position-absolute m-2 pe-none floating-menu">
-        <span><toggleButton v-model="captureVideo" :icons="['bi-camera-video', 'bi-camera-video-off']" :btnColor="'danger'"></toggleButton></span>
-        <span class="btn-group" role="group" aria-label="ToolToogles">
-          <!-- Toolgroup: TODO: Check if could be created with ui/toggleGroup -->
-          <button v-for="(tool, index) in toolManagementRef.activatable_tools" :key="index" class="btn bi"
-          :class="[tool.icon, tool.active ? 'btn-primary': 'btn-outline-primary']"
-          @click="toolManagementRef.toggle_tool(index)"
-          ></button></span>
-      </div>
+      <overlyingMenu :captureCamera="captureCameraRef"></overlyingMenu>
     </div>
   </rectangularSelectionToolElement>
 </template>
@@ -192,14 +192,6 @@ onUnmounted(() => {
 
 :root {
     --color-highlighted: rgb(14, 137, 231);
-}
-
-.floating-menu span{
-  pointer-events: all;
-}
-
-.floating-menu span:not(:first-child) {
-  margin-left: 10px;
 }
 
 .deleteCursor {

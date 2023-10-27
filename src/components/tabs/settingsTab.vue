@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useSettingsStore } from '../../stores/settings';
-import formGroup from '../ui/formGroup.vue';
-import switchButton from '../ui/switchButton.vue'
-import cardContainer from '../ui/cardContainer.vue'
+import { useSettingsStore } from '@/stores/settings';
+import formGroup from '@/components/ui/formGroup.vue';
+import switchButton from '@/components/ui/switchButton.vue'
+import cardContainer from '@/components/ui/cardContainer.vue'
 
 
 const rangeColorCircleRadiusRef = ref(null)
@@ -28,8 +28,8 @@ const settings = useSettingsStore()
     UI
   </template>
   <template #content>
-    <formGroup :label="'Dark/Light Mode'">
-        <switchButton v-model="settings.bright"></switchButton>
+    <formGroup :label="settings.light.label">
+        <switchButton v-model="settings.light"></switchButton>
     </formGroup>
     <formGroup :label="'Circle Radius'">
       <input ref="rangeColorCircleRadiusRef" type="range" class="form-range" id="rangeColorCircleSize" @input="update_color_circle_radius" min="4" max="50">
@@ -47,8 +47,8 @@ const settings = useSettingsStore()
     Image
   </template>
   <template #content>
-    <formGroup :label="'Color/BW Mode'">
-      <switchButton v-model="settings.color_mode"></switchButton>
+    <formGroup :label="settings.color_mode.label">
+      <switchButton v-model="settings.color_mode.value"></switchButton>
     </formGroup>
     <formGroup :label="settings.opacity.label">
         <input type="range" class="form-range" id="rangeReferenceCircleSize"

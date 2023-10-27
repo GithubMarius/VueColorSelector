@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useCamImageStore } from '@/stores/camImageStore';
 import { useSettingsStore } from '@/stores/settings';
 import { ref, watch } from 'vue';
 
@@ -6,27 +7,24 @@ const settingsStore = useSettingsStore()
 
 const loadedMetaData = ref(false)
 
-const props = defineProps(['captureVideo'])
-defineEmits(['update:captureVideo'])
-
-watch(() => props.captureVideo, (_prev, _next) => {
-    if (props.captureVideo && !loadedMetaData.value) {
-        openCam()
-        settingsStore.opacity.value = 0.5
-    } else if (props.captureVideo) {
-        videoRef.value.play()
+watch(() => settingsStore.captureVideo.value, (_prev, _next) => {
+    if (settingsStore.captureVideo.value && !videoRef.value.srcObject) {
+        startVideo()
+        if (!settingsStore.view_side_by_side.value) {
+            settingsStore.opacity.value = 0.5
+        }
     } else {
-        videoRef.value.pause()
+        stopVideo()
     }
 })
 
 const videoRef = ref()
 
-function openCam(){
+function startVideo(){
     var All_mediaDevices=navigator.mediaDevices
     if (!All_mediaDevices || !All_mediaDevices.getUserMedia) {
         console.log("getUserMedia() not supported.");
-        return;
+        throw new Error('No camera found.')
     }
     All_mediaDevices.getUserMedia({
         audio: false,
@@ -34,31 +32,60 @@ function openCam(){
         })
         .then(function(vidStream) {
             var video = <HTMLVideoElement>videoRef.value;
+            if ("srcObject" in video) {
+                video.srcObject = vidStream;
+            } else {
+                (<any>video).src = window.URL.createObjectURL(<any>vidStream);
+            }
 
-        if ("srcObject" in video) {
-            video.srcObject = vidStream;
-        } else {
-            (<any>video).src = window.URL.createObjectURL(<any>vidStream);
-        }
-        video.onloadedmetadata = function(_) {
-            loadedMetaData.value = true
-            video.play()
-        };
-        })
-        .catch(function(e) {
-            console.log(e.name + ": " + e.message);
+            video.onloadedmetadata = function(_) {
+                loadedMetaData.value = true
+                video.play()
+            };
+            })
+            .catch(function(e) {
+                console.log(e.name + ": " + e.message)
+            });
+}
+
+function takeImage(){
+    // Take image from current video
+    const video = videoRef.value
+    var canvas = document.createElement('canvas');
+    canvas.height = video.videoHeight;
+    canvas.width = video.videoWidth;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const camImageStore = useCamImageStore()
+    camImageStore.add_image_from_url(canvas.toDataURL())
+}
+
+function stopVideo() {
+    const video = videoRef.value
+    const stream = video.srcObject;
+    if (stream) {
+        const tracks = stream.getTracks();
+
+        tracks.forEach((track) => {
+            track.stop();
         });
     }
+
+    video.srcObject = null;
+}
 
 
 
 defineExpose({
-    openCam
+    openCam: startVideo,
+    takeImage
 })
 </script>
 
 <template>
-  <video ref="videoRef" id="video" :hidden="!captureVideo"></video>
+    <Teleport to="#rightSideOfViewer" :disabled="!settingsStore.view_side_by_side.value">
+        <video ref="videoRef" id="video" :hidden="!settingsStore.captureVideo"></video>
+    </Teleport>
 </template>
 
 <style>
@@ -67,7 +94,6 @@ defineExpose({
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: 100%;
     max-width: 100%;
     max-height: 100%;
 }

@@ -4,8 +4,21 @@ import { isStringObject } from "util/types"
 import { Color } from "@/utils/colors/ColorManagement"
 import { colorToChromaOrSaturation, colorToLightness, colorToGrayscale, colorToType } from "@/utils/colors/helpers"
 
+interface SettingsProperty {
+    label: string
+    value: any
+}
 
-export class RangeValue {
+export class BooleanValue implements SettingsProperty {
+    constructor(public label: string, public value: Boolean = true) {}
+
+    toggle() {
+        this.value = !this.value
+    }
+}
+
+
+export class RangeValue implements SettingsProperty {
     constructor(public label: string, public value: number, public min: number = 0, public max: number = 50, public step: number = 1) {}
 
     update_from_event(event) {
@@ -14,7 +27,7 @@ export class RangeValue {
     }
 }
 
-export class Radius extends RangeValue {
+export class Radius extends RangeValue implements SettingsProperty {
 
     get css_diameter() {
         // Return css diameter
@@ -30,7 +43,7 @@ export class Radius extends RangeValue {
     }
 }
 
-export class Selection {
+export class Selection implements SettingsProperty {
     constructor(public label: string, public options: Array<string>, public current_index: number = 0) {}
 
     get value () {
@@ -104,14 +117,15 @@ export class KeyCombination {
 const keycombinations = {
     'undo': new KeyCombination('z', [customModifiers.cmd]),
     'forward': new KeyCombination('y', [customModifiers.cmd]),
-    'toggle_theme': new KeyCombination('t', []),
+    'toggle_theme': new KeyCombination('g', [customModifiers.cmd]),
     'toggle_color_group': new KeyCombination('0123456789', [customModifiers.cmd]),
     'open_tab': new KeyCombination('0123456789', [customModifiers.alt]),
     'import': new KeyCombination('i', [customModifiers.cmd]),
     'export': new KeyCombination('e', [customModifiers.cmd]),
     'toggle_cam': new KeyCombination('q', [customModifiers.cmd]),
     'toggle_color_mode': new KeyCombination('b', [customModifiers.cmd]),
-    'change_image_opacity': new KeyCombination('-+', [customModifiers.cmd])
+    'change_image_opacity': new KeyCombination('-+', [customModifiers.cmd]),
+    'toggle_preview': new KeyCombination('d', [customModifiers.cmd])
 }
 
 export const useSettingsStore = defineStore("settings", {
@@ -119,16 +133,22 @@ export const useSettingsStore = defineStore("settings", {
       return {
         chrOrSat: new RangeValue('Chroma/Saturation', 0.5, 0, 1, 0.01),
         opacity: new RangeValue('Opacity', 1, 0, 1, 0.01),
-        color_mode: true,
+        color_mode: new BooleanValue('Color/BW mode', true),
         color_circle_radius: new Radius('Color circle radius', 15),
         reference_circle_radius: new Radius('Reference circle radius', 8),
         colorspace: new Selection('Color space', ['okhcl', 'hsl']),
         colorsSortBy: new Selection('Sort colors by', ['Hue', 'Chroma/Saturation', 'Lightness'], 2),
-        colorsOrderAscending: true,
+        colorsOrderAscending: new BooleanValue('Ascending', true),
         scale: 0.5,
-        bright: true,
+        light: new BooleanValue('Light/Dark UI', true),
         url: 'src/assets/Fritz.jpg',
-        keycombinations: keycombinations
+        keycombinations: keycombinations,
+        view_side_by_side: new BooleanValue('View side by side', true),
+        captureVideo: new BooleanValue('Capture video', false),
+        exportSettings: {
+            export_images: new BooleanValue('Export images', true),
+            import_images: new BooleanValue('Import images', true)
+        }
       }
     },
     actions: {
@@ -164,7 +184,7 @@ export const useSettingsStore = defineStore("settings", {
     },
     getters: {
         theme() {
-            return (this.bright) ? 'light' : 'dark'
+            return (this.light.value) ? 'light' : 'dark'
         }
     }
   });

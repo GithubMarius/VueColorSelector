@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Ref, StyleValue, computed, inject, ref } from 'vue';
+import { Ref, StyleValue, computed, ref } from 'vue';
 import { referenceTool, Point } from '../Tool'
 import SelectableElement from './selectableElement.vue';
 import { useSettingsStore } from '../../stores/settings';

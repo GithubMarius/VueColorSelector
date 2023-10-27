@@ -1,14 +1,13 @@
 import { useColorStore } from "@/stores/color"
-import { Color, ColorDataInterface } from "./colors/ColorManagement"
+import { ColorDataInterface } from "./colors/ColorManagement"
 import { useHistoryStore } from "@/stores/history"
+import { useCamImageStore } from "@/stores/camImageStore"
 
 const export_mime_type = 'application/json'
 
 export function create_data_file() {
     // Create json file with color data
-    const file = new File([String(stringify_colors())], 'colors.json', {
-        type: export_mime_type,
-    })
+    const file = new File([stringify_contents()], 'data.json')
     return file
 }
 
@@ -25,9 +24,13 @@ export function read_data_file(file) {
     reader.onload = function (e) {
       //Set the Base64 string return from FileReader as source.
       const data = JSON.parse(<string>reader.result)
-      if (data.colors) {
-        parse_colors(data.colors)
+      switch (data.colors) {
+        case (data.colors):
+            parse_colors(data.colors)
+        case (data.images):
+            parse_images(data.images)
       }
+      
     }
 
 }
@@ -38,12 +41,27 @@ function parse_colors(colorDataArray: ColorDataInterface[]) {
     historyStore.import_colors(colorDataArray)
 }
 
-function stringify_colors() {
-    // Create JSON object with current color data
+function parse_images(imageUrlDataArray) {
+    const camImageStore = useCamImageStore()
+    imageUrlDataArray.forEach(imgUrl => camImageStore.add_image_from_url(imgUrl))
+}
+
+function get_colors() {
+    // Get colors
     const colorStore = useColorStore()
-    return JSON.stringify({
-        colors: colorStore.colors.map(color => color.toData())
-    })
+    return colorStore.colors.map(color => color.toData())
+}
+
+function get_images() {
+    const camImageStore = useCamImageStore()
+    return camImageStore.images.map(img => img.imgUrl)
+}
+
+function stringify_contents() {
+    return new Blob([JSON.stringify({
+        colors: get_colors(),
+        images: get_images()
+    })], { type: export_mime_type })
 }
 
 export function return_download_file() {
@@ -76,10 +94,9 @@ function onDataFileChange(event) {
   
   
 export function openDataImportFileDialog() {
-    console.log('hi')
-    var input = document.createElement("input");
-        input.setAttribute("type", "file");
-        // add onchange handler if you wish to get the file :)
-        input.click(); // opening dialog
+    const input = document.createElement("input")
+        input.setAttribute("type", "file")
+        input.setAttribute("accept", ".json")
+        input.click()
         input.onchange = onDataFileChange
 }

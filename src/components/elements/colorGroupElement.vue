@@ -51,12 +51,11 @@ const displayed_group_name = computed(() => props.group.name !== '' ? props.grou
 const feedback = ref(null)
 
 function sorted_values() {
-    // Sort colors
+    // Sort colors (sorting depends on settings: hue, chroma/saturation or lightness)
     const colors = props.group.colors
     const sorting_values = colors.map(settingsStore.get_color_sorting_value)
-    console.log(sorting_values)
     const indices = [...sorting_values.keys()]
-    indices.sort((b,a) => (settingsStore.colorsOrderAscending) ? sorting_values[a]-sorting_values[b] : sorting_values[b]-sorting_values[a])
+    indices.sort((b,a) => (settingsStore.colorsOrderAscending.value) ? sorting_values[a]-sorting_values[b] : sorting_values[b]-sorting_values[a])
     return indices.map(indice => colors[indice])
 }
 </script>

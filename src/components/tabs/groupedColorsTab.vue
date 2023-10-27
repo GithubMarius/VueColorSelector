@@ -24,7 +24,7 @@ const colorStore = useColorStore()
             <toggleGroup v-model="settingsStore.colorsSortBy.value" :options="settingsStore.colorsSortBy.options"></toggleGroup>
         </formGroup>
         <formGroup :label="'Color order'">
-            <toggleButton v-model="settingsStore.colorsOrderAscending" :icons="['bi-arrow-up-right', 'bi-arrow-down-right']" :labels="[' Ascending', ' Descending']"></toggleButton>
+            <toggleButton v-model="settingsStore.colorsOrderAscending.value" :icons="['bi-arrow-up-right', 'bi-arrow-down-right']" :labels="[' Ascending', ' Descending']"></toggleButton>
         </formGroup>
     </template>
 </cardContainer>

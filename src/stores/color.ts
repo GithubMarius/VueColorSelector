@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { Color, ColorDataInterface, ColorGroup } from '../utils/colors/ColorManagement'
 import { canvas_position_from_event, get_pixel_color } from '../utils/general'
+import { ColorAlphaArray } from "@/utils/colors/helpers";
 
 
 export const useColorStore = defineStore('color', {
@@ -66,7 +67,7 @@ export const useColorStore = defineStore('color', {
     },
     create_color(pixelData, x, y, groupname, index=this.colors.length) {
       const group = this.groupStore.get_group(groupname)
-      const color = new Color(<any>pixelData, x, y, group)
+      const color = new Color(<ColorAlphaArray>[...pixelData], x, y, group)
       this.colors.splice(index, 0, color)
       return index
     },

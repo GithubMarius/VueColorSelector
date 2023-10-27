@@ -27,7 +27,7 @@ onMounted(() => {
   <selectableColor :color="color" v-model:selecting="color.selectingBlock">
     <div ref="colorBlockRef" class="color_block"
     :class="{highlighted: color.highlighted}"
-    :style="<StyleValue>{backgroundColor: settings.color_mode ? props.color.css_rgb : settings.get_grayscaledColor(props.color)}"
+    :style="<StyleValue>{backgroundColor: settings.color_mode.value ? props.color.css_rgb : settings.get_grayscaledColor(props.color)}"
     ></div>
   </selectableColor>
 </template>
