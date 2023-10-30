@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useCamImageStore } from '@/stores/camImageStore';
 import { useSettingsStore } from '@/stores/settings';
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 
 const settingsStore = useSettingsStore()
 
@@ -10,7 +10,7 @@ const loadedMetaData = ref(false)
 watch(() => settingsStore.captureVideo.value, (_prev, _next) => {
     if (settingsStore.captureVideo.value && !videoRef.value.srcObject) {
         startVideo()
-        if (!settingsStore.view_side_by_side.value) {
+        if (!settingsStore.preview_mode.value) {
             settingsStore.opacity.value = 0.5
         }
     } else {
@@ -80,10 +80,17 @@ defineExpose({
     openCam: startVideo,
     takeImage
 })
+
+const mounted = ref(false)
+
+onMounted(() => {
+    mounted.value = true
+})
+
 </script>
 
 <template>
-    <Teleport to="#rightSideOfViewer" :disabled="!settingsStore.view_side_by_side.value">
+    <Teleport to="#canvasColumn" :disabled="!settingsStore.preview_mode.value" v-if="mounted">
         <video ref="videoRef" id="video" :hidden="!settingsStore.captureVideo"></video>
     </Teleport>
 </template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Color } from '@/utils/colors/ColorManagement';
-import SelectableElement from './selectableElement.vue';
+import SelectableElement from './SelectableElement.vue';
 import { useColorStore } from '@/stores/color'
 import { useHistoryStore } from '@/stores/history'
 import { useSettingsStore } from '@/stores/settings';

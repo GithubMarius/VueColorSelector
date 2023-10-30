@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, StyleValue } from 'vue'
 import { Color } from '@/utils/colors/ColorManagement'
-import selectableColor from '@/components/elements/selectableColor.vue'
+import SelectableColor from '@/components/elements/SelectableColor.vue'
 import { useSettingsStore } from '@/stores/settings'
 
 
@@ -24,12 +24,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <selectableColor :color="color" v-model:selecting="color.selectingBlock">
+  <SelectableColor :color="color" v-model:selecting="color.selectingBlock">
     <div ref="colorBlockRef" class="color_block"
     :class="{highlighted: color.highlighted}"
     :style="<StyleValue>{backgroundColor: settings.color_mode.value ? props.color.css_rgb : settings.get_grayscaledColor(props.color)}"
     ></div>
-  </selectableColor>
+  </SelectableColor>
 </template>
 
 <style scoped>

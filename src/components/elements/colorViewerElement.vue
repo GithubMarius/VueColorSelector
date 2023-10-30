@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Color } from '@/utils/colors/ColorManagement';
-import selectableColor from '@/components/elements/selectableColor.vue'
+import SelectableColor from '@/components/elements/SelectableColor.vue'
 import { StyleValue, computed } from 'vue';
 
 const props = defineProps({
@@ -43,14 +43,14 @@ function get_selected_icon_class() {
 </script>
 
 <template>
-  <selectableColor :color="color" v-model:selecting="color.selectingColorViewer" v-if="color.visible">
+  <SelectableColor :color="color" v-model:selecting="color.selectingColorViewer" v-if="color.visible">
         <div class="color-viewer-element bi" :style="style_container"
             :class="[{'highlighted': color.highlighted}]"
         >
             <div class="bi icon" :class="get_not_selected_icon_class()"></div>
             <div class="bi icon" :class="get_selected_icon_class()" :style="{color: (color.highlighted) ? 'var(--color-highlighted)' : 'black'}"></div>
         </div>
-  </selectableColor>
+  </SelectableColor>
 </template>
 
 <style scoped lang="scss">

@@ -4,10 +4,10 @@ import { onMounted, ref, watch } from 'vue';
 import { useColorStore } from '@/stores/color';
 import { useHistoryStore } from '@/stores/history';
 import { useSettingsStore } from '@/stores/settings';
-import { referenceTool, toolManagementRef } from '@/components/Tool';
-import colorCircleElement from '@/components/elements/colorCircleElement.vue';
-import referencePair from '@/components/elements/referencePairElement.vue';
-import referencePoint from '@/components/elements/referencePointElement.vue';
+import { referenceTool, toolManagementRef } from '@/utils/Tools';
+import ColorCircleElement from '@/components/elements/ColorCircleElement.vue';
+import referencePair from '@/components/elements/ReferencePairElement.vue';
+import referencePoint from '@/components/elements/ReferencePointElement.vue';
 
 const props = defineProps(['url'])
 
@@ -111,15 +111,13 @@ onMounted(() => {
             @contextmenu.prevent
             @click.left.exact="add_color_element"
         >
-        <Teleport to="#leftSideOfViewer" :disabled="!settings.view_side_by_side.value">
-            <canvas id="canvasBW" ref="canvasElementBW" class="canvas canvasBW" :style="{opacity: settings.opacity.value}" :class="{'d-none': settings.color_mode.value}"></canvas>
-            <canvas id="canvas" ref="canvasElement" class="canvas" :style="{opacity: settings.opacity.value}" :class="{'opacity-0': !settings.color_mode.value}" ></canvas>
-        </Teleport>
+        <canvas id="canvasBW" ref="canvasElementBW" class="canvas canvasBW" :style="{opacity: settings.opacity.value}" :class="{'d-none': settings.color_mode.value}"></canvas>
+        <canvas id="canvas" ref="canvasElement" class="canvas" :style="{opacity: settings.opacity.value}" :class="{'opacity-0': !settings.color_mode.value}" ></canvas>
         <div>
             <referencePair v-for="(pair, index) in referenceToolRef.pairs" :key="index" :pair="pair" :tool="referenceToolRef">
             </referencePair>
-            <colorCircleElement v-for="(color, index) in colorStore.colors" :key="index" :color="color">
-            </colorCircleElement>
+            <ColorCircleElement v-for="(color, index) in colorStore.colors" :key="index" :color="color">
+            </ColorCircleElement>
         </div>
         <referencePoint v-for="(point, index) in referenceToolRef.points" :key="index" :point="point" :tool="referenceToolRef">
         </referencePoint>

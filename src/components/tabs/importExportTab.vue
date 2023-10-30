@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { useSettingsStore } from '@/stores/settings'
 import { return_download_file, openDataImportFileDialog } from '@/utils/fileManagement';
-import cardContainer from '@/components/ui/cardContainer.vue'
-import switchButton from '@/components/ui/switchButton.vue'
-import formGroup from '@/components/ui/formGroup.vue'
+import SwitchButton from '@/components/ui/SwitchButton.vue'
+import formGroup from '@/components/ui/FormGroup.vue'
 
 
 
@@ -23,21 +22,21 @@ function onImgFileChange(event){
 <template>
 
   
-  <cardContainer>
+  <CardContainer>
     <template #header>
       Export/Import Settings
     </template>
     <template #content>
       <formGroup :label="settingsStore.exportSettings.export_images.label">
-        <switchButton v-model="settingsStore.exportSettings.export_images.value"></switchButton>
+        <SwitchButton v-model="settingsStore.exportSettings.export_images.value"></SwitchButton>
       </formGroup>
       <formGroup :label="settingsStore.exportSettings.import_images.label">
-        <switchButton v-model="settingsStore.exportSettings.import_images.value"></switchButton>
+        <SwitchButton v-model="settingsStore.exportSettings.import_images.value"></SwitchButton>
       </formGroup>
     </template>
-  </cardContainer>
+  </CardContainer>
   
-  <cardContainer>
+  <CardContainer>
     <template #header>
       Open Image/Export/Import
     </template>
@@ -53,5 +52,5 @@ function onImgFileChange(event){
         <button class="btn btn-primary" @click="openDataImportFileDialog">Import colors{{ (settingsStore.exportSettings.import_images.value) ? ' & Images' : '' }}</button>
       </div>
     </template>
-  </cardContainer>
+  </CardContainer>
 </template>

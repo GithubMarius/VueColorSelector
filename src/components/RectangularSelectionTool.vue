@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { computed, inject, ref } from 'vue';
-import { ToolInterface } from './Tool';
-import { target_is_input } from './target_is_input';
-import { useColorStore } from '../stores/color';
+import { ToolInterface } from '@/utils/Tools';
+import { target_is_input } from '@/utils/general';
+import { useColorStore } from '@/stores/color';
 import { useHistoryStore } from '@/stores/history';
 
+// Refs
 const selectionToolElementRef = ref(null)
 const appContainerRef = ref(null)
 const groupNameInputRef = ref(null)
 
-
+// Stores
 const colorStore = useColorStore()
 const historyStore = useHistoryStore()
 

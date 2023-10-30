@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { ColorGroup } from '@/utils/colors/ColorManagement';
-import colorBlockElement from '@/components/elements/colorBlockElement.vue'
-import toggleButton from '@/components/ui/toggleButton.vue'
+import ColorBlockElement from '@/components/elements/ColorBlockElement.vue'
+import ToggleButton from '@/components/ui/ToggleButton.vue'
 import { useColorStore } from '@/stores/color'
 import { useHistoryStore } from '@/stores/history';
-import cardContainer from '../ui/cardContainer.vue'
 
 import { ref, nextTick, computed, toRaw, unref } from 'vue'
 import { useSettingsStore } from '@/stores/settings';
@@ -61,7 +60,7 @@ function sorted_values() {
 </script>
 
 <template>
-    <cardContainer :content-visibility="group.visibility">
+    <CardContainer :content-visibility="group.visibility">
         <template #header>
             <div class="col-9 p-0 fs-6">
                 <div class="input-group group-name-container h-100" @click="activate_name_editing()">
@@ -79,8 +78,8 @@ function sorted_values() {
             </div>
             <div v-if="!show_all" class="col-3" role="group" aria-label="Basic checkbox toggle button group">
                 <div class="btn-group group-menu">
-                    <toggleButton v-model="group.visibility" :icons="['bi-chevron-double-up', 'bi-chevron-double-down']"></toggleButton>
-                    <toggleButton v-model="group.visibility_colors" :icons="['bi-eye-fill', 'bi-eye-slash']"></toggleButton>
+                    <ToggleButton v-model="group.visibility" :icons="['bi-chevron-double-up', 'bi-chevron-double-down']"></ToggleButton>
+                    <ToggleButton v-model="group.visibility_colors" :icons="['bi-eye-fill', 'bi-eye-slash']"></ToggleButton>
                 </div>
             </div>
             <div class="row invalid-feedback text-danger" v-if="feedback && !feedback.success" style="display: block !important;">
@@ -88,9 +87,9 @@ function sorted_values() {
             </div>
         </template>
         <template #content>
-            <colorBlockElement v-for="(color, _) in sorted_values()" :key="colorStore.color_index(color)" :color="color"></colorBlockElement>
+            <ColorBlockElement v-for="(color, _) in sorted_values()" :key="colorStore.color_index(color)" :color="color"></ColorBlockElement>
         </template>
-    </cardContainer>
+    </CardContainer>
 </template>
 
 <style scoped>

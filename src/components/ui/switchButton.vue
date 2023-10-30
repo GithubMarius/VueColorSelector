@@ -1,6 +1,6 @@
 <script setup>
 /* Example usage:
-<switchButton v-model="pair.visible"></toggleButton>
+<SwitchButton v-model="pair.visible"></ToggleButton>
 */
 
 defineProps(['modelValue'])

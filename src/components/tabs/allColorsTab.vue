@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import colorBlockElement from '@/components/elements/colorBlockElement.vue'
+import ColorBlockElement from '@/components/elements/ColorBlockElement.vue'
 
 import { useColorStore } from '@/stores/color';
 const colorStore = useColorStore()
@@ -10,6 +10,6 @@ const colorStore = useColorStore()
 
 <template>
     <span>
-        <colorBlockElement v-for="(color, index) in colorStore.colors" :key="index" :color="color"></colorBlockElement>
+        <ColorBlockElement v-for="(color, index) in colorStore.colors" :key="index" :color="color"></ColorBlockElement>
     </span>
 </template>

@@ -2,37 +2,39 @@
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
 // Vue
-import { ref, Ref, provide, onMounted, onUnmounted, watch } from 'vue'
+import { Ref, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 
 // Stores
-import { KeyCombination, useSettingsStore } from '@/stores/settings'
-import { useHistoryStore } from '@/stores/history'
 import { useGroupStore } from '@/stores/color'
+import { useHistoryStore } from '@/stores/history'
+import { KeyCombination, useSettingsStore } from '@/stores/settings'
 
 // Tabs
-import settingsTab from '@/components/tabs/settingsTab.vue'
-import allColorsTab from '@/components/tabs/allColorsTab.vue'
-import groupedColorsTab from '@/components/tabs/groupedColorsTab.vue'
-import importExportTab from '@/components/tabs/importExportTab.vue'
-import referenceTab from '@/components/tabs/referencesTab.vue'
-import HistoryTab from '@/components/tabs/historyTab.vue'
-import CapturedImagesTab from './components/tabs/capturedImagesTab.vue'
+import AllColorsTab from '@/components/tabs/AllColorsTab.vue'
+import GroupedColorsTab from '@/components/tabs/GroupedColorsTab.vue'
+import HistoryTab from '@/components/tabs/HistoryTab.vue'
+import ImportExportTab from '@/components/tabs/ImportExportTab.vue'
+import ReferenceTab from '@/components/tabs/ReferencesTab.vue'
+import SettingsTab from '@/components/tabs/SettingsTab.vue'
+import CapturedImagesTab from './components/tabs/CapturedImagesTab.vue'
 
-import { toolManagementRef } from '@/components/Tool'
+// Other components
+import CaptureCamera from '@/components/CaptureCamera.vue'
+import ImageCanvas from '@/components/ImageCanvas.vue'
+import CapturedImage from '@/components/CapturedImage.vue'
+import ColorViewer from '@/components/ColorViewer.vue'
+import OverlyingMenu from '@/components/OverlyingMenu.vue'
+import RectangularSelectionTool from '@/components/RectangularSelectionTool.vue'
 
-import imageCanvas from '@/components/imageCanvas.vue'
-import colorViewer from '@/components/colorViewer.vue'
-import rectangularSelectionToolElement from '@/components/rectangularSelectionToolElement.vue'
+// Utils
+import { toolManagementRef } from '@/utils/Tools'
 import { openDataImportFileDialog, return_download_file } from '@/utils/fileManagement'
-import captureCamera from '@/components/captureCamera.vue'
-import sideBySideViewer from '@/components/sideBySideViewer.vue'
-import overlyingMenu from '@/components/overlyingMenu.vue'
-import capturedImage from '@/components/capturedImage.vue'
 
 // Refs
-const imageCanvasInstance = ref(null)
+const ImageCanvasInstance = ref(null)
 const rectSelectionRef = ref(null)
 const imgUrl: Ref<string> = ref('src/assets/Fritz.jpg')
+const captureCameraRef = ref()
 
 // Provides
 provide('tools', toolManagementRef)
@@ -42,18 +44,18 @@ const settingsStore = useSettingsStore()
 const historyStore = useHistoryStore()
 const groupStore = useGroupStore()
 
-// Tabs
-const all_tabs = {
+// Create tabs object
+const tabs = {
   active_tab: ref(0),
   tab_buttons: ref(0),
   list:
     {
       'Captured Images': CapturedImagesTab,
-      'All Colors': allColorsTab,
-      'Colors by Group': groupedColorsTab,
-      'References': referenceTab,
-      'Settings': settingsTab,
-      'Import/Export': importExportTab,
+      'All Colors': AllColorsTab,
+      'Colors by Group': GroupedColorsTab,
+      'References': ReferenceTab,
+      'Settings': SettingsTab,
+      'Import/Export': ImportExportTab,
       'History': HistoryTab,
   },
   open_tab(index: number) {
@@ -63,9 +65,12 @@ const all_tabs = {
   }
 }
 
+// Watch for theme change
 watch(() => settingsStore.light.value, () => {
   document.documentElement.setAttribute('data-bs-theme', settingsStore.theme)
 })
+
+// Key Bindings
 
 // Forward/Undo history
 settingsStore.keycombinations.undo.bind(historyStore.undo)
@@ -85,7 +90,7 @@ settingsStore.keycombinations.toggle_color_group.bind((event) => {
 
 // Go to tab
 settingsStore.keycombinations.open_tab.bind((event) => {
-  all_tabs.open_tab(Number(event.key)-1)
+  tabs.open_tab(Number(event.key)-1)
   event.preventDefault()
 })
 
@@ -113,7 +118,7 @@ settingsStore.keycombinations.toggle_color_mode.bind((_) => {
 
 // Toggle Preview Mode
 settingsStore.keycombinations.toggle_preview.bind((event) => {
-  settingsStore.view_side_by_side.toggle()
+  settingsStore.preview_mode.toggle()
   event.preventDefault()
 })
 
@@ -127,7 +132,6 @@ settingsStore.keycombinations.change_image_opacity.bind((event) => {
   event.preventDefault()
 })
 
-
 // Keyboard shortcut listener
 function key_listener (event: KeyboardEvent) {
   KeyCombination.check_bound_combinations(event)
@@ -139,7 +143,6 @@ onMounted(() => {
   document.documentElement.setAttribute('data-bs-theme', settingsStore.theme)
 })
 
-const captureCameraRef = ref()
 // Remove key listener again
 onUnmounted(() => {
   document.removeEventListener('keydown', key_listener)
@@ -147,44 +150,45 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <sideBySideViewer></sideBySideViewer>
-  <rectangularSelectionToolElement ref="rectSelectionRef">
+  <RectangularSelectionTool ref="rectSelectionRef">
     <div class="row w-100 vh-100 m-0 overflow-hidden p-0">
-        <div id="canvas-column" class="col-sm-8 justify-content-center p-0">
-        <!-- video capture-->
-        <captureCamera ref="captureCameraRef"></captureCamera>
-        <!-- captured image -->
-        <capturedImage></capturedImage>
+      <div id="canvasColumn" class="col-sm justify-content-center p-0 overflow-scroll">
         <!-- Image canvas -->
-        <imageCanvas ref="imageCanvasInstance"
-        :url="imgUrl"></imageCanvas>
+        <ImageCanvas ref="ImageCanvasInstance"
+        :url="imgUrl"></ImageCanvas>
+      </div>
+      <div id="split-column" class="col-sm justify-content-center p-0 overflow-scroll position-relative" :class="[settingsStore.split_mode.value ? 'col-sm' : 'd-none']">
+        <!-- captured image -->
+        <CapturedImage></CapturedImage>
+        <!-- video capture-->
+        <CaptureCamera ref="captureCameraRef"></CaptureCamera>
       </div>
       <div id="settings-column" class="col-sm-4 p-0 mh-100 mw-20">
         <div class="row">
           <!-- Colorviewer -->
-          <colorViewer>
-          </colorViewer>
+          <ColorViewer>
+          </ColorViewer>
         </div>
         <div class="row mt-4">
           <!-- Tab-Selection -->
           <nav>
             <div class="nav nav-pills px-2" id="nav-tab" role="tablist">
-              <button :ref="all_tabs.tab_buttons" v-for="(tab, index) in Object.keys(all_tabs.list)" :key="index"
+              <button :ref="tabs.tab_buttons" v-for="(tab, index) in Object.keys(tabs.list)" :key="index"
               class="nav-link"
-              :class="{active: all_tabs.active_tab.value === index}"
-              @click="all_tabs.active_tab.value = index">{{ tab }}</button>
+              :class="{active: tabs.active_tab.value === index}"
+              @click="tabs.active_tab.value = index">{{ tab }}</button>
             </div>
           </nav>
         </div>
         <div class="row m-2 p-2 tab-content" id="nav-tabContent">
           <!-- Tabs -->
-          <component :is="Object.values(all_tabs.list)[all_tabs.active_tab.value]"></component>
+          <component :is="Object.values(tabs.list)[tabs.active_tab.value]"></component>
         </div>
       </div>
       <!-- overlying menu -->
-      <overlyingMenu :captureCamera="captureCameraRef"></overlyingMenu>
+      <OverlyingMenu :CaptureCamera="captureCameraRef"></OverlyingMenu>
     </div>
-  </rectangularSelectionToolElement>
+  </RectangularSelectionTool>
 </template>
 
 <style lang="scss">

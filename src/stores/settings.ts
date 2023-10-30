@@ -1,59 +1,8 @@
-import { Ref, ref } from "vue"
 import { defineStore } from "pinia"
-import { isStringObject } from "util/types"
 import { Color } from "@/utils/colors/ColorManagement"
 import { colorToChromaOrSaturation, colorToLightness, colorToGrayscale, colorToType } from "@/utils/colors/helpers"
+import { BooleanProperty, RadiusProperty, RangeProperty, SelectionProperty } from "@/utils/properties"
 
-interface SettingsProperty {
-    label: string
-    value: any
-}
-
-export class BooleanValue implements SettingsProperty {
-    constructor(public label: string, public value: Boolean = true) {}
-
-    toggle() {
-        this.value = !this.value
-    }
-}
-
-
-export class RangeValue implements SettingsProperty {
-    constructor(public label: string, public value: number, public min: number = 0, public max: number = 50, public step: number = 1) {}
-
-    update_from_event(event) {
-        // Input event handler
-        this.value = event.target.value
-    }
-}
-
-export class Radius extends RangeValue implements SettingsProperty {
-
-    get css_diameter() {
-        // Return css diameter
-        return this.value * 2 + 'px'
-    }
-
-    get css_size() {
-        // Return width & height properties
-        return {
-            width: this.css_diameter,
-            height: this.css_diameter
-        }
-    }
-}
-
-export class Selection implements SettingsProperty {
-    constructor(public label: string, public options: Array<string>, public current_index: number = 0) {}
-
-    get value () {
-        return this.options[this.current_index]
-    }
-    
-    set value (value: string) {
-        this.current_index = this.options.indexOf(value)
-    }
-}
 
 const allModifiers = {
     shift: 'shiftKey',
@@ -131,24 +80,27 @@ const keycombinations = {
 export const useSettingsStore = defineStore("settings", {
     state: () => {
       return {
-        chrOrSat: new RangeValue('Chroma/Saturation', 0.5, 0, 1, 0.01),
-        opacity: new RangeValue('Opacity', 1, 0, 1, 0.01),
-        color_mode: new BooleanValue('Color/BW mode', true),
-        color_circle_radius: new Radius('Color circle radius', 15),
-        reference_circle_radius: new Radius('Reference circle radius', 8),
-        colorspace: new Selection('Color space', ['okhcl', 'hsl']),
-        colorsSortBy: new Selection('Sort colors by', ['Hue', 'Chroma/Saturation', 'Lightness'], 2),
-        colorsOrderAscending: new BooleanValue('Ascending', true),
+        chrOrSat: new RangeProperty('Chroma/Saturation', 0.5, 0, 1, 0.01),
+        opacity: new RangeProperty('Opacity', 1, 0, 1, 0.01),
+        color_mode: new BooleanProperty('Color/BW mode', true),
+        color_circle_radius: new RadiusProperty('Color circle radius', 15, 4, 50),
+        reference_circle_radius: new RadiusProperty('Reference circle radius', 8, 2, 50),
+        colorspace: new SelectionProperty('Color space', ['okhcl', 'hsl']),
+        colorsSortBy: new SelectionProperty('Sort colors by', ['Hue', 'Chroma/Saturation', 'Lightness'], 2),
+        colorsOrderAscending: new BooleanProperty('Ascending', true),
         scale: 0.5,
-        light: new BooleanValue('Light/Dark UI', true),
+        light: new BooleanProperty('Light/Dark UI', true),
         url: 'src/assets/Fritz.jpg',
         keycombinations: keycombinations,
-        view_side_by_side: new BooleanValue('View side by side', true),
-        captureVideo: new BooleanValue('Capture video', false),
+        preview_mode: new BooleanProperty('Preview mode', true),
+        split_mode: new BooleanProperty('Split mode', false),
+        captureVideo: new BooleanProperty('Capture video', false),
         exportSettings: {
-            export_images: new BooleanValue('Export images', true),
-            import_images: new BooleanValue('Import images', true)
-        }
+            export_images: new BooleanProperty('Export images', true),
+            import_images: new BooleanProperty('Import images', true)
+        },
+        // Development
+        debug_mode: new BooleanProperty('Debug mode', true)
       }
     },
     actions: {

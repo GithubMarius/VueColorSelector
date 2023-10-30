@@ -2,7 +2,7 @@
 
 import { computed } from 'vue'
 /* Example usage:
-<toggleButton v-model="pair.visible" :icons="['bi-eye-fill', 'bi-eye-slash']"></toggleButton>
+<ToggleButton v-model="pair.visible" :icons="['bi-eye-fill', 'bi-eye-slash']"></ToggleButton>
 */
 
 const props = defineProps({

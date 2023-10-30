@@ -4,7 +4,7 @@ import { Color } from '@/utils/colors/ColorManagement';
 import { useSettingsStore } from '@/stores/settings';
 import { useColorStore } from '@/stores/color';
 import { useHistoryStore } from '@/stores/history'
-import selectableColor from './selectableColor.vue';
+import SelectableColor from './SelectableColor.vue';
 
 const colorStore = useColorStore()
 const settings = useSettingsStore()
@@ -32,12 +32,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <selectableColor :color="color" v-model:selecting="color.selectingCircle">
+  <SelectableColor :color="color" v-model:selecting="color.selectingCircle">
       <div ref="colorCircleRef" v-if="props.color.visible"
       :class="{highlighted: color.highlighted}"
       :style="style"
       class="color_circle" :data-color-id="colorStore.color_index(color)"></div>
-  </selectableColor>
+  </SelectableColor>
 </template>
 
 <style scoped>

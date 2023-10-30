@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Ref, StyleValue, computed, ref } from 'vue';
 import { referenceTool, Point } from '../Tool'
-import SelectableElement from './selectableElement.vue';
+import SelectableElement from './SelectableElement.vue';
 import { useSettingsStore } from '../../stores/settings';
 import { combine } from '../../utils/general';
 
@@ -42,7 +42,7 @@ const selected = ref(false)
 </script>
 
 <template>
-    <selectableElement v-model:selecting="selecting" v-model:selected="selected">
+    <SelectableElement v-model:selecting="selecting" v-model:selected="selected">
     <div class="user-select-none referencePoint referencePointDigital"
     :class="{
         active_point: point===tool.last_active,
@@ -71,7 +71,7 @@ const selected = ref(false)
     @dragstart.prevent
     v-if="tool.show_digital"
     ></div>
-    </selectableElement>
+    </SelectableElement>
     <div class="user-select-none referencePoint referencePointReal" :style="styleReal"
     @mousedown.left="tool.update_call = ($event) => point.scale_from_event($event)"
     @mousedown.stop

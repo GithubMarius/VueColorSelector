@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { StyleValue, computed, ref } from 'vue';
 import { Pair } from '../Tool'
-import SelectableElement from './selectableElement.vue';
+import SelectableElement from './SelectableElement.vue';
 
 const props = defineProps({
   pair: {
@@ -38,9 +38,9 @@ const selected = ref(false)
 </script>
 
 <template>
-    <selectableElement v-model:selecting="selecting" v-model:selected="selected">
+    <SelectableElement v-model:selecting="selecting" v-model:selected="selected">
         <hr class="pairline pairline_digital" :class="{'pairline_select': selecting}" :style="styleDigital" v-if="pair.visible && tool.show_digital">
-    </selectableElement>
+    </SelectableElement>
     <hr class="pairline pairline_real" :style="styleReal" v-if="pair.visible && tool.show_real">
 </template>
 

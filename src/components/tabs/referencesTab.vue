@@ -1,9 +1,9 @@
 <script setup lang="ts">
 
 import { ref } from 'vue';
-import toggleButton from '../ui/toggleButton.vue'
-import switchButton from '../ui/switchButton.vue'
-import formGroup from '../ui/formGroup.vue'
+import ToggleButton from '../ui/ToggleButton.vue'
+import SwitchButton from '../ui/SwitchButton.vue'
+import formGroup from '../ui/FormGroup.vue'
 
 
 import { referenceTool } from '../Tool';
@@ -40,16 +40,16 @@ function update_scale(event) {
         <div class="card-header">Visibility</div>
         <span class="form-group row p-4">
             <formGroup :label="'Digital'">
-                <switchButton v-model="referenceToolRef.show_digital"></switchButton>
+                <SwitchButton v-model="referenceToolRef.show_digital"></SwitchButton>
             </formGroup>
             <formGroup :label="'Real'">
-                <switchButton v-model="referenceToolRef.show_real"></switchButton>
+                <SwitchButton v-model="referenceToolRef.show_real"></SwitchButton>
             </formGroup>
         </span>
     </div>
     <ul class="list-group p-0 mt-2">
         <li class="list-group-item" v-for="(pair, _) in referenceToolRef.pairs">{{ pair.length_org.toFixed(2) }}<span class="btn-group float-end">
-            <toggleButton v-model="pair.visible" :icons="['bi-eye-fill', 'bi-eye-slash']"></toggleButton>
+            <ToggleButton v-model="pair.visible" :icons="['bi-eye-fill', 'bi-eye-slash']"></ToggleButton>
             <button class="btn btn-danger bi bi-trash" @click="referenceToolRef.remove_pair(pair)"></button>
         </span></li>
     </ul>
