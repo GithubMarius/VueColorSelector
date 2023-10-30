@@ -2,7 +2,7 @@
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
 // Vue
-import { Ref, onMounted, onUnmounted, provide, ref, watch } from 'vue'
+import { onMounted, onUnmounted, provide, ref, watch } from 'vue'
 
 // Stores
 import { useGroupStore } from '@/stores/color'
@@ -10,7 +10,6 @@ import { useHistoryStore } from '@/stores/history'
 import { KeyCombination, useSettingsStore } from '@/stores/settings'
 
 // Tabs
-import AllColorsTab from '@/components/tabs/AllColorsTab.vue'
 import GroupedColorsTab from '@/components/tabs/GroupedColorsTab.vue'
 import HistoryTab from '@/components/tabs/HistoryTab.vue'
 import ImportExportTab from '@/components/tabs/ImportExportTab.vue'
@@ -33,7 +32,6 @@ import { openDataImportFileDialog, return_download_file } from '@/utils/fileMana
 // Refs
 const ImageCanvasInstance = ref(null)
 const rectSelectionRef = ref(null)
-const imgUrl: Ref<string> = ref('src/assets/Fritz.jpg')
 const captureCameraRef = ref()
 
 // Provides
@@ -51,8 +49,7 @@ const tabs = {
   list:
     {
       'Captured Images': CapturedImagesTab,
-      'All Colors': AllColorsTab,
-      'Colors by Group': GroupedColorsTab,
+      'Colors': GroupedColorsTab,
       'References': ReferenceTab,
       'Settings': SettingsTab,
       'Import/Export': ImportExportTab,
@@ -66,7 +63,7 @@ const tabs = {
 }
 
 // Watch for theme change
-watch(() => settingsStore.light.value, () => {
+watch(() => settingsStore.ui.light.value, () => {
   document.documentElement.setAttribute('data-bs-theme', settingsStore.theme)
 })
 
@@ -78,7 +75,7 @@ settingsStore.keycombinations.forward.bind(historyStore.forward)
 
 // Toggle theme
 settingsStore.keycombinations.toggle_theme.bind((event) => {
-  settingsStore.light.toggle()
+  settingsStore.ui.light.toggle()
   event.preventDefault()
 })
 
@@ -118,16 +115,16 @@ settingsStore.keycombinations.toggle_color_mode.bind((_) => {
 
 // Toggle Preview Mode
 settingsStore.keycombinations.toggle_preview.bind((event) => {
-  settingsStore.preview_mode.toggle()
+  settingsStore.ui.hide_settings_column.toggle()
   event.preventDefault()
 })
 
 // Change image opacity
 settingsStore.keycombinations.change_image_opacity.bind((event) => {
   if (event.key === '+') {
-    settingsStore.opacity.value = Math.min(settingsStore.opacity.value + 0.1, 1)
+    settingsStore.ui.opacity.value = Math.min(settingsStore.ui.opacity.value + 0.1, 1)
   } else {
-    settingsStore.opacity.value = Math.max(settingsStore.opacity.value - 0.1, 0)
+    settingsStore.ui.opacity.value = Math.max(settingsStore.ui.opacity.value - 0.1, 0)
   }
   event.preventDefault()
 })
@@ -152,18 +149,17 @@ onUnmounted(() => {
 <template>
   <RectangularSelectionTool ref="rectSelectionRef">
     <div class="row w-100 vh-100 m-0 overflow-hidden p-0">
-      <div id="canvasColumn" class="col-sm justify-content-center p-0 overflow-scroll">
+      <div id="canvasColumn" class="col-sm p-0 position-relative overflow-auto">
         <!-- Image canvas -->
-        <ImageCanvas ref="ImageCanvasInstance"
-        :url="imgUrl"></ImageCanvas>
+        <ImageCanvas ref="ImageCanvasInstance"></ImageCanvas>
       </div>
-      <div id="split-column" class="col-sm justify-content-center p-0 overflow-scroll position-relative" :class="[settingsStore.split_mode.value ? 'col-sm' : 'd-none']">
+      <div id="split-column" class="col-sm p-0 position-relative overflow-auto mh-100" :class="[settingsStore.ui.split_mode.value ? 'col-sm' : 'd-none']">
         <!-- captured image -->
         <CapturedImage></CapturedImage>
         <!-- video capture-->
         <CaptureCamera ref="captureCameraRef"></CaptureCamera>
       </div>
-      <div id="settings-column" class="col-sm-4 p-0 mh-100 mw-20">
+      <div id="settings-column" class="col-sm-4 p-0 mh-100 mw-20 bg-body-tertiary" :class="[!settingsStore.ui.hide_settings_column.value? 'col-sm-4' : 'd-none']">
         <div class="row">
           <!-- Colorviewer -->
           <ColorViewer>
@@ -213,7 +209,7 @@ onUnmounted(() => {
 #canvas-column {
   position: relative;
   overflow: auto;
-  height: 100vh;
+  height: fit-content;
 }
 
 #settings-column {

@@ -80,21 +80,31 @@ const keycombinations = {
 export const useSettingsStore = defineStore("settings", {
     state: () => {
       return {
+        keycombinations: keycombinations,
+
         chrOrSat: new RangeProperty('Chroma/Saturation', 0.5, 0, 1, 0.01),
-        opacity: new RangeProperty('Opacity', 1, 0, 1, 0.01),
         color_mode: new BooleanProperty('Color/BW mode', true),
-        color_circle_radius: new RadiusProperty('Color circle radius', 15, 4, 50),
-        reference_circle_radius: new RadiusProperty('Reference circle radius', 8, 2, 50),
         colorspace: new SelectionProperty('Color space', ['okhcl', 'hsl']),
         colorsSortBy: new SelectionProperty('Sort colors by', ['Hue', 'Chroma/Saturation', 'Lightness'], 2),
         colorsOrderAscending: new BooleanProperty('Ascending', true),
-        scale: 0.5,
-        light: new BooleanProperty('Light/Dark UI', true),
-        url: 'src/assets/Fritz.jpg',
-        keycombinations: keycombinations,
-        preview_mode: new BooleanProperty('Preview mode', true),
-        split_mode: new BooleanProperty('Split mode', false),
+
+        url: 'src/assets/YemiWallington.jpg',
+        
         captureVideo: new BooleanProperty('Capture video', false),
+
+        ui: {
+            light: new BooleanProperty('Light/Dark UI', true),
+            hide_settings_column: new BooleanProperty('Hide side menu', false),
+            split_mode: new BooleanProperty('Split mode', false),
+
+            color_circle_radius: new RadiusProperty('Color circle radius', 15, 4, 50),
+            reference_circle_radius: new RadiusProperty('Reference circle radius', 8, 2, 50),
+
+            scale: new RangeProperty('Scale', 0.5, 0, 5, 0.01),
+            opacity: new RangeProperty('Opacity', 1, 0, 1, 0.01),
+
+        },
+
         exportSettings: {
             export_images: new BooleanProperty('Export images', true),
             import_images: new BooleanProperty('Import images', true)
@@ -130,13 +140,16 @@ export const useSettingsStore = defineStore("settings", {
                 case('Lightness'): {
                     return this.get_lightnessOfColor(color)
                 }
-            } 
+            }
+        },
+        get_circle_radius() {
+            return this.ui.color_circle_radius.value / this.ui.scale.value
         }
 
     },
     getters: {
         theme() {
-            return (this.light.value) ? 'light' : 'dark'
+            return (this.ui.light.value) ? 'light' : 'dark'
         }
     }
   });

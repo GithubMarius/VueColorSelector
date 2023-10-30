@@ -11,6 +11,10 @@ import { useColorStore } from '@/stores/color';
 import { Color } from '@/utils/colors/ColorManagement'
 import { useSettingsStore } from '@/stores/settings'
 
+import { inGamut } from '@/../node_modules/culori'
+
+const inRgb = inGamut('rgb')
+
 const ColorViewerSize = ref({
     width: 300,
     height: 300
@@ -22,7 +26,6 @@ const settingsStore = useSettingsStore()
 
 // Refs
 const colorViewerRef = ref(null)
-const color_representation = ref(0)
 
 // Watches
 watch(settingsStore.chrOrSat, () => {
@@ -38,22 +41,26 @@ onMounted(() => {
 })
 function drawColorViewer() {
     const ctx = colorViewerRef.value.getContext("2d");
+    ctx.clearRect(0, 0, ColorViewerSize.value.width, ColorViewerSize.value.height);
 
     const func = current_csscolortransform.value
     for (var row = 0; row < colorViewerRef.value.width; row++) {
         for (var col = 0; col < colorViewerRef.value.height; col++) {
             const hue = col / (colorViewerRef.value.width - 1);
             const light = row / (colorViewerRef.value.height - 1);
-            ctx.fillStyle = func(hue, settingsStore.chrOrSat.value, light);
+            ctx.fillStyle = checkGamut(func, [hue, settingsStore.chrOrSat.value, light]);
             ctx.fillRect(col, row, 1, 1);
         }
     }
 }
 
+function checkGamut(func, pars) {
+    const css_color = func(...pars)
+    return inRgb(css_color) ? css_color : func(...pars, 40)
+}
 
-
-function cssokhcl(h, c, l) {
-    return `oklch(${l*100}% ${c*100}% ${h*360}deg)`;
+function cssokhcl(h, c, l, alpha=100) {
+    return `oklch(${l*100}% ${c*0.4} ${h*360}deg / ${alpha}%)`;
 }
 
 function csshsl(h, s, l) {
@@ -83,9 +90,9 @@ const csscolortransforms = {
 }
 
 const postransforms = {
-        'okhcl': posokhcl,
-        'hsl': poshsl
-    }
+    'okhcl': posokhcl,
+    'hsl': poshsl
+}
 
 const current_postransform = computed(() => {
     return postransforms[settingsStore.colorspace.value]

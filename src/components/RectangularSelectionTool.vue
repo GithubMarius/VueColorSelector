@@ -20,12 +20,13 @@ const selectionTool: ToolInterface = {
     key: 's',
     active: false,
     passive: false,
+    ignore_current_events: false,
     icon: 'bi-square',
     _start_selection: [0, 0],
     end_selection: [0, 0],
 
     get has_size() {
-        return (this.width + this.height) !== 0
+        return (selectionToolObjectRef.value.width + selectionToolObjectRef.value.height) !== 0
     },
 
     set start_selection(value) {
@@ -149,11 +150,13 @@ const selectionTool: ToolInterface = {
     },
     mousedownleftshift(event: MouseEvent) {    
         if (!target_is_input(event)) {
-            selectionToolObjectRef.value.start_selection = [event.clientX, event.clientY];
+            selectionToolObjectRef.value.start_selection = [event.clientX, event.clientY]
+        } else {
+            selectionToolObjectRef.value.ignore_current_events = true
         }
     },
     mousemove(event: MouseEvent) {
-    if (event.buttons === 1) {            
+    if (event.buttons === 1 && !selectionToolObjectRef.value.ignore_current_events) {            
             // Emit selecting event to selectables
             this.selectables.forEach((element: HTMLElement) => this.dispatchSelectingEvent(element))
 
@@ -165,8 +168,10 @@ const selectionTool: ToolInterface = {
     mouseup(event: MouseEvent) {
         tools.value.last_ts = event.timeStamp
         this.manifest_selection()
+        selectionToolObjectRef.value.ignore_current_events = false
     },
     mouseleave(_) {
+        selectionToolObjectRef.value.ignore_current_events = false
         groupNameInputRef.value?.focus()
     }
 }

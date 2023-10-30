@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 import { useColorStore } from '@/stores/color';
 import { useHistoryStore } from '@/stores/history';
@@ -9,11 +9,8 @@ import ColorCircleElement from '@/components/elements/ColorCircleElement.vue';
 import referencePair from '@/components/elements/ReferencePairElement.vue';
 import referencePoint from '@/components/elements/ReferencePointElement.vue';
 
-const props = defineProps(['url'])
-
 const canvasElement = ref(null)
 const canvasElementBW = ref(null)
-const canvasContainerRef = ref(null)
 
 const selection_tool_active = ref(false)
 
@@ -44,6 +41,19 @@ watch(
      }
 )
 
+const canvasContainerStyle = computed(() => {
+    return {
+        transform: `scale(${settings.ui.scale.value})`
+    }
+})
+
+
+const canvasStyle = computed(() => {
+    return {
+        opacity: settings.ui.opacity.value
+    }
+})
+
 function showImage(url: string) {
     // Open image from url
     image.value = new Image()
@@ -60,10 +70,6 @@ function set_canvas_dimensions() {
 
     canvasElementBW.value.width = image.value.width
     canvasElementBW.value.height = image.value.height
-
-    // Set container width
-    canvasContainerRef.value.style.width = image.value.width + 'px'
-    canvasContainerRef.value.style.height = image.value.height + 'px'
 }
 
 function drawImage() {
@@ -99,26 +105,23 @@ function add_color_element(event) {
 }
 
 onMounted(() => {
-    showImage(props.url)
+    showImage(settings.url)
     ctx.value = canvasElement.value.getContext('2d', { willReadFrequently: true })
     ctxBW.value = canvasElementBW.value.getContext('2d')
     })
 </script>
 
 <template>
-    <div ref="canvasContainerRef" class="container position-relative"
-            :class="{dragging: referenceToolRef.update_call}"
+    <div id="canvas-container"
             @contextmenu.prevent
             @click.left.exact="add_color_element"
-        >
-        <canvas id="canvasBW" ref="canvasElementBW" class="canvas canvasBW" :style="{opacity: settings.opacity.value}" :class="{'d-none': settings.color_mode.value}"></canvas>
-        <canvas id="canvas" ref="canvasElement" class="canvas" :style="{opacity: settings.opacity.value}" :class="{'opacity-0': !settings.color_mode.value}" ></canvas>
-        <div>
-            <referencePair v-for="(pair, index) in referenceToolRef.pairs" :key="index" :pair="pair" :tool="referenceToolRef">
-            </referencePair>
-            <ColorCircleElement v-for="(color, index) in colorStore.colors" :key="index" :color="color">
-            </ColorCircleElement>
-        </div>
+        :style="canvasContainerStyle">
+        <canvas id="canvasBW" ref="canvasElementBW" class="canvas canvasBW" :style="canvasStyle" :class="{'d-none': settings.color_mode.value}"></canvas>
+        <canvas id="canvas" ref="canvasElement" class="canvas" :style="canvasStyle" :class="{'opacity-0': !settings.color_mode.value}" ></canvas>
+        <referencePair v-for="(pair, index) in referenceToolRef.pairs" :key="index" :pair="pair" :tool="referenceToolRef">
+        </referencePair>
+        <ColorCircleElement v-for="(color, index) in colorStore.colors" :key="index" :color="color">
+        </ColorCircleElement>
         <referencePoint v-for="(point, index) in referenceToolRef.points" :key="index" :point="point" :tool="referenceToolRef">
         </referencePoint>
     </div>
@@ -126,18 +129,22 @@ onMounted(() => {
 
 <style scoped>
 
-
-.dragging {
-    cursor: grabbing;
-    cursor: -moz-grabbing;
-    cursor: -webkit-grabbing;
+#canvas-container {
+    position: relative;
+    margin: auto;
+    width: fit-content;
+    height: fit-content;
+    transform-origin: top;
 }
 
-.canvas {
-    position: absolute;
+#canvas-container div{
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 
 .canvasBW {
+    position: absolute;
     pointer-events: none;
 }
 

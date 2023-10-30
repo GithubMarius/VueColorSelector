@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { Color, ColorDataInterface, ColorGroup } from '../utils/colors/ColorManagement'
-import { canvas_position_from_event, get_pixel_color } from '../utils/general'
+import { canvas_container_position_from_event, get_pixel_color } from '../utils/general'
 import { ColorAlphaArray } from "@/utils/colors/helpers";
 
 
@@ -19,7 +19,7 @@ export const useColorStore = defineStore('color', {
     },
     color_data_from_event(event) {    
       // Get color data from event data  
-      const [x, y] = canvas_position_from_event(event)
+      const [x, y] = canvas_container_position_from_event(event)
       const pixelData = get_pixel_color(x, y)
       return [pixelData, x, y]
     },

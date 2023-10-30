@@ -6,7 +6,7 @@ import SwitchButton from '../ui/SwitchButton.vue'
 import formGroup from '../ui/FormGroup.vue'
 
 
-import { referenceTool } from '../Tool';
+import { referenceTool } from '@/utils/Tools';
 
 const referenceToolRef = ref(referenceTool)
 

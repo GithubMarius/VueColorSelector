@@ -8,9 +8,9 @@ const camImageStore = useCamImageStore()
 
 const CapturedImageStyle = computed(() => {
     const img = camImageStore.active_image
-    const offSetTranslation = (settingsStore.preview_mode.value) ? 'translateY(-50%)' : ` translate(${img.offSetX}px, ${img.offSetY}px)`
+    const offSetTranslation = (settingsStore.ui.hide_settings_column.value) ? 'translateY(-50%)' : ` translate(${img.offSetX}px, ${img.offSetY}px)`
     return {
-        top: (settingsStore.preview_mode.value) ? '50%' : '0px',
+        top: (settingsStore.ui.hide_settings_column.value) ? '50%' : '0px',
         transform: `translate(-50%, 0%)${offSetTranslation} scale(${img.scale.value}) rotate(${img.angle.css_angle})`
     }
 })
@@ -24,12 +24,9 @@ onMounted(() => {
 </script>
 
 <template>
-    <Teleport to="#canvasColumn" :disabled="<any>settingsStore.split_mode.value" v-if="mounted">
-        <div class="captured-image-container">
-            {{ camImageStore.activated_image_exists }}
-            {{  !settingsStore.captureVideo.value }}
-            {{  camImageStore.activated_image_exists && !settingsStore.captureVideo.value }}
-            <img :src="camImageStore.active_image.imgUrl" :style="CapturedImageStyle" v-if="camImageStore.activated_image_exists && !settingsStore.captureVideo.value">
+    <Teleport to="#canvasColumn" :disabled="<any>settingsStore.ui.split_mode.value" v-if="mounted">
+        <div class="captured-image-container" v-if="camImageStore.activated_image_exists && !settingsStore.captureVideo.value">
+            <img :src="camImageStore.active_image.imgUrl" :style="CapturedImageStyle">
         </div>
     </Teleport>
 </template>
@@ -37,10 +34,12 @@ onMounted(() => {
 <style scoped>
 img {
     position: absolute;
+    top: 0px;
     left: 50%;
 }
 
 .captured-image-container {
+    top: 0px;
     position: absolute;
     width: 100%;
     height: 100%;

@@ -5,7 +5,7 @@ import formGroup from '@/components/ui/FormGroup.vue';
 import SwitchButton from '@/components/ui/SwitchButton.vue'
 import AutoForm from '../ui/AutoForm.vue';
 
-const settings = useSettingsStore()
+const settingsStore = useSettingsStore()
 
 
 
@@ -17,14 +17,14 @@ const settings = useSettingsStore()
     UI
   </template>
   <template #content>
-    <formGroup :label="settings.light.label">
-        <SwitchButton v-model="settings.light.value"></SwitchButton>
+    <formGroup :label="settingsStore.ui.light.label">
+        <SwitchButton v-model="settingsStore.ui.light.value"></SwitchButton>
     </formGroup>
-    <formGroup :label="settings.split_mode.label">
-        <SwitchButton v-model="settings.split_mode.value"></SwitchButton>
+    <formGroup :label="settingsStore.ui.split_mode.label">
+        <SwitchButton v-model="settingsStore.ui.split_mode.value"></SwitchButton>
     </formGroup>
-    <AutoForm v-model="settings.color_circle_radius"></AutoForm>
-    <AutoForm v-model="settings.reference_circle_radius"></AutoForm>
+    <AutoForm v-model="settingsStore.ui.color_circle_radius"></AutoForm>
+    <AutoForm v-model="settingsStore.ui.reference_circle_radius"></AutoForm>
   </template>
 </CardContainer>
 <CardContainer>
@@ -32,10 +32,11 @@ const settings = useSettingsStore()
     Image
   </template>
   <template #content>
-    <formGroup :label="settings.color_mode.label">
-      <SwitchButton v-model="settings.color_mode.value"></SwitchButton>
+    <formGroup :label="settingsStore.color_mode.label">
+      <SwitchButton v-model="settingsStore.color_mode.value"></SwitchButton>
     </formGroup>
-    <AutoForm v-model="settings.opacity"></AutoForm>
+    <AutoForm v-model="settingsStore.ui.opacity"></AutoForm>
+    <AutoForm v-model="settingsStore.ui.scale"></AutoForm>
     </template>
 </CardContainer>
 

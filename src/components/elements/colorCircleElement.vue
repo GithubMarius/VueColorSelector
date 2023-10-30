@@ -21,8 +21,8 @@ const style = computed(function(){ return {
         left: props.color.css_xPos,
         top: props.color.css_yPos,
         backgroundColor: settings.color_mode.value ? props.color.css_rgb : settings.get_grayscaledColor(props.color),
-        minWidth: settings.color_circle_radius.css_diameter,
-        minHeight: settings.color_circle_radius.css_diameter,
+        minWidth: settings.get_circle_radius() + 'px',
+        minHeight: settings.get_circle_radius() + 'px',
         zIndex: (props.color.show_details) ? '2' : '1',
         transform: (props.color.show_details) ? 'translate(-50%, -50%) scale(1.3)' : 'translate(-50%, -50%)',
       }})

@@ -2,15 +2,17 @@ import { ColorAlphaArray } from "./colors/helpers"
 
 export type pointCoordinates = [number, number]
 
-export function canvas_position_from_event(event): pointCoordinates {
+export function canvas_container_position_from_event(event): pointCoordinates {
     
-    const canvas = <HTMLCanvasElement>document.getElementById('canvas')
-    
+    const container = <HTMLCanvasElement>document.getElementById('canvas-container')
+
     // Calculate xy position relative to canvas
-    const canvasRect = canvas.getBoundingClientRect()
+    const canvasRect = container.getBoundingClientRect()
     const targetRect = event.target.getBoundingClientRect()
+
+    const scale = container.offsetWidth/container.getBoundingClientRect().width
     
-    return [targetRect.x - canvasRect.x + event.offsetX, targetRect.y - canvasRect.y + event.offsetY]
+    return [(targetRect.x - canvasRect.x) * scale + event.offsetX, (targetRect.y - canvasRect.y) * scale + event.offsetY]
 }
 
 export function get_pixel_color(x, y) {

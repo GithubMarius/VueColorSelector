@@ -69,7 +69,7 @@ onUnmounted(() => {
       Adjust Image
     </template>
     <template #content>
-      <AutoForm v-model="settingsStore.opacity"></AutoForm>
+      <AutoForm v-model="settingsStore.ui.opacity"></AutoForm>
       <AutoForm v-model="camImageStore.active_image.angle"></AutoForm>
       <AutoForm v-model="camImageStore.active_image.scale"></AutoForm>
       <formGroup label="Adjust position">

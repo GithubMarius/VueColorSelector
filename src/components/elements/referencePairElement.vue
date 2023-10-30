@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { StyleValue, computed, ref } from 'vue';
-import { Pair } from '../Tool'
-import SelectableElement from './SelectableElement.vue';
+import { Pair } from '@/utils/Tools'
+import SelectableElement from '@/components/elements/SelectableElement.vue';
 
 const props = defineProps({
   pair: {

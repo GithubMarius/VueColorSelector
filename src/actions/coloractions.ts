@@ -1,6 +1,5 @@
-import { isReactive } from "vue";
 import { useColorStore, useGroupStore } from "@/stores/color";
-import { pointCoordinates, canvas_position_from_event, get_pixel_color } from "@/utils/general";
+import { pointCoordinates, canvas_container_position_from_event, get_pixel_color } from "@/utils/general";
 import { ColorAlphaArray } from "@/utils/colors/helpers"
 import { Action, ActionInterface } from "@/utils/action"
 import { Color, ColorDataInterface, ColorGroup } from "@/utils/colors/ColorManagement";
@@ -38,7 +37,7 @@ export class CreateColorAction extends CreateColorBaseAction {
 
     constructor(event: MouseEvent) {
         // Retrieve position and pixeldata of the point
-        const xy = canvas_position_from_event(event)
+        const xy = canvas_container_position_from_event(event)
         const RGBA = get_pixel_color(...xy)
         super(RGBA, xy)
     }

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { Ref, StyleValue, computed, ref } from 'vue';
-import { referenceTool, Point } from '../Tool'
-import SelectableElement from './SelectableElement.vue';
-import { useSettingsStore } from '../../stores/settings';
-import { combine } from '../../utils/general';
+import { StyleValue, computed, ref } from 'vue';
+import { Point } from '@/utils/Tools'
+import SelectableElement from '@/components/elements/SelectableElement.vue';
+import { useSettingsStore } from '@/stores/settings';
+import { combine } from '@/utils/general';
 
 const settings = useSettingsStore()
 
@@ -19,8 +19,8 @@ const props = defineProps({
 
 const styleDigital = computed(function(): StyleValue {
     const styleSize = {
-        width: settings.reference_circle_radius.value * 2 + Number(selecting.value || selected.value) * 5 + 'px',
-        height: settings.reference_circle_radius.value * 2 + Number(selecting.value || selected.value) * 5 + 'px'
+        width: settings.ui.reference_circle_radius.value * 2 + Number(selecting.value || selected.value) * 5 + 'px',
+        height: settings.ui.reference_circle_radius.value * 2 + Number(selecting.value || selected.value) * 5 + 'px'
     }
     const xy = props.point.get_org()
     return <StyleValue>combine({
@@ -34,7 +34,7 @@ const styleReal = computed(function(): StyleValue {
     return <StyleValue>combine({
         left: xy[0] + 'px',
         top: xy[1] + 'px'
-    }, settings.reference_circle_radius.css_size)
+    }, settings.ui.reference_circle_radius.css_size)
 })
 
 const selecting = ref(false)
