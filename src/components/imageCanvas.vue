@@ -135,6 +135,7 @@ onMounted(() => {
     width: fit-content;
     height: fit-content;
     transform-origin: top;
+    z-index: 5;
 }
 
 #canvas-container div{

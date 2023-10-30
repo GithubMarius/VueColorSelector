@@ -2,6 +2,7 @@ import { useColorStore } from "@/stores/color"
 import { ColorDataInterface } from "./colors/ColorManagement"
 import { useHistoryStore } from "@/stores/history"
 import { useCamImageStore } from "@/stores/camImageStore"
+import { useSettingsStore } from "@/stores/settings"
 
 const export_mime_type = 'application/json'
 
@@ -89,9 +90,17 @@ function onDataFileChange(event) {
     else {
         throw(new Error('Wrong file type.'))
     }
-  
 }
-  
+
+export function onImgFileChange(event){
+    var reader = new FileReader();
+    reader.readAsDataURL(event.target.files[0]);
+    reader.onload = function (e) {
+        const settingsStore = useSettingsStore()
+        settingsStore.url = <string>e.target.result;
+        resetStores()
+    }
+}
   
 export function openDataImportFileDialog() {
     const input = document.createElement("input")
@@ -99,4 +108,14 @@ export function openDataImportFileDialog() {
         input.setAttribute("accept", ".json")
         input.click()
         input.onchange = onDataFileChange
+}
+
+export function resetStores() {
+    const historyStore = useHistoryStore()
+    const colorStore = useColorStore()
+    const camImageStore = useCamImageStore()
+
+    historyStore.reset()
+    colorStore.reset()
+    camImageStore.reset()
 }

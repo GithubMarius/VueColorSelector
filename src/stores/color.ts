@@ -91,6 +91,10 @@ export const useColorStore = defineStore('color', {
       if (this.colors) {
         return this.colors.find((color: Color) => color.show_details )
       }
+    },
+    reset() {
+      this.colors.length = 0
+      this.groupStore.reset()
     }
   },
   getters: {
@@ -164,6 +168,9 @@ export const useGroupStore = defineStore('group', {
         if (index < this.groups.length) {
           this.groups[index].toggle_visibilty_colors()
         }
+      },
+      reset() {
+        this.groups.length = 0
       }
   },
   getters: {

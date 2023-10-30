@@ -70,6 +70,9 @@ export const useHistoryStore = defineStore('history', {
         console.log(`Could not perform action. Received error: ${err}`)
         return {success: false, msg: err.message}
       }
+    },
+    reset() {
+      this.history.length = 0
     }
   },
   getters: {

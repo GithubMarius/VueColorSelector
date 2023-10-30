@@ -54,6 +54,9 @@ export const useCamImageStore = defineStore('camImageStore', {
         },
         is_active_index(index) {
             return this.active_image_index === index
+        },
+        reset() {
+          this.images.length = 0
         }
     }, 
     getters: {

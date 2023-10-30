@@ -205,7 +205,7 @@ tools.value.tools.push(selectionTool)
     <div ref="appContainerRef" class="row w-100 vh-100 m-0 position-relative">
         <div>
             <Transition @after-enter="groupNameInputRef.focus()">
-                <div class="position-absolute z-1 rounded group-name-input-div" v-if="numberSelectedEntries > 0">
+                <div class="position-absolute rounded group-name-input-div" v-if="numberSelectedEntries > 0">
                     <input ref="groupNameInputRef" id="groupName" class="form-control" type="text" placeholder="GROUP NAME"
                     @click.prevent
                     @keydown.stop
@@ -225,6 +225,7 @@ tools.value.tools.push(selectionTool)
 
 <style scoped>
 .rectangular_selection {
+    z-index: 15;
     position: absolute;
     padding: 0px;
     min-width: 0px;
@@ -233,6 +234,7 @@ tools.value.tools.push(selectionTool)
 }
 
 .group-name-input-div{
+    z-index: 20;
     top: 10px;
     left: 50%;
     transform: translateX(-50%)

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useSettingsStore } from '@/stores/settings'
-import { return_download_file, openDataImportFileDialog } from '@/utils/fileManagement';
+import { return_download_file, openDataImportFileDialog, resetStores, onImgFileChange } from '@/utils/fileManagement';
 import SwitchButton from '@/components/ui/SwitchButton.vue'
 import formGroup from '@/components/ui/FormGroup.vue'
 
@@ -8,20 +8,10 @@ import formGroup from '@/components/ui/FormGroup.vue'
 
 const settingsStore = useSettingsStore()
 
-function onImgFileChange(event){
-  var reader = new FileReader();
-  reader.readAsDataURL(event.target.files[0]);
-  reader.onload = function (e) {
-    //Set the Base64 string return from FileReader as source.
-    settingsStore.url = <string>e.target.result;
-  }
-}
-
 </script>
 
 <template>
 
-  
   <CardContainer>
     <template #header>
       Export/Import Settings
