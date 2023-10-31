@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useCamImageStore } from '@/stores/camImageStore';
+import { useCamImageStore } from '@/stores/camimages';
 import { useSettingsStore } from '@/stores/settings';
 import { computed, onMounted, ref } from 'vue';
 

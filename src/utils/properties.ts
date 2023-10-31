@@ -1,4 +1,5 @@
 import FormSlider from "@/components/ui/FormSlider.vue"
+import ToggleButton from "@/components/ui/ToggleButton.vue"
 import { markRaw, Raw } from "vue"
 
 export interface SettingsProperty {
@@ -7,7 +8,7 @@ export interface SettingsProperty {
 }
 
 export interface AutoFormSettingsProperty extends SettingsProperty{
-    form_component: any
+    form_component: Raw<any>
 }
 
 export class AutoFormProperty {
@@ -18,8 +19,9 @@ export class AutoFormProperty {
     }
 }
 
-export class BooleanProperty implements SettingsProperty {
+export class BooleanProperty extends AutoFormProperty implements SettingsProperty {
     constructor(public label: string, public value: Boolean = true) {
+        super()
     }
 
     toggle() {
@@ -27,6 +29,22 @@ export class BooleanProperty implements SettingsProperty {
     }
 }
 
+export class BooleanPropertyWithIcons extends BooleanProperty implements AutoFormSettingsProperty {
+    
+    form_component = markRaw(ToggleButton)
+    constructor(public label: string, public value: Boolean = true, public icons: Array<String>=[], public btnColor: string = 'primary') {
+        super(label, value)
+    }
+
+    get props() {
+        return {
+            icons: this.icons,
+            btnColor: this.btnColor
+        }
+    }
+
+    
+}
 
 export class RangeProperty extends AutoFormProperty implements AutoFormSettingsProperty {
 

@@ -1,7 +1,8 @@
+import { ColorDataInterface } from "@/utils/colors/ColorManagement"
+
 import { useColorStore } from "@/stores/color"
-import { ColorDataInterface } from "./colors/ColorManagement"
 import { useHistoryStore } from "@/stores/history"
-import { useCamImageStore } from "@/stores/camImageStore"
+import { useCamImageStore } from "@/stores/camimages"
 import { useSettingsStore } from "@/stores/settings"
 
 const export_mime_type = 'application/json'

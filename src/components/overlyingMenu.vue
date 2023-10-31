@@ -4,6 +4,7 @@ import { toolManagementRef } from '@/utils/Tools';
 
 // UI elements
 import ToggleButton from '@/components/ui/ToggleButton.vue'
+import AutoForm from './ui/AutoForm.vue';
 
 defineProps(['CaptureCamera'])
 
@@ -15,7 +16,11 @@ const settingsStore = useSettingsStore()
     <div class="position-absolute m-2 pe-none floating-menu">
       <span><ToggleButton v-model="settingsStore.captureVideo.value" :icons="['bi-camera-video', 'bi-camera-video-off']" :btnColor="'danger'"></ToggleButton></span>
       <span v-if="settingsStore.captureVideo.value"><button class="btn btn-primary bi bi-camera" @click="CaptureCamera.takeImage()"></button></span>
-      <span class="flip"><ToggleButton v-model="settingsStore.ui.hide_settings_column.value" :icons="['bi-window', 'bi-window-sidebar']" :btnColor="'warning'"></ToggleButton></span>
+      <span class="flip">
+        <!-- TODO Add props inheritance to AutoForm (e.g. props="{btnColor: 'warning'}" being forwarded to ToggleButton) -->
+        <AutoForm v-model="settingsStore.ui.hide_settings_column" :shown_in_group="false"></AutoForm>
+
+      </span>
       <span class="btn-group" role="group" aria-label="ToolToogles" v-if="!settingsStore.ui.hide_settings_column.value">
         <!-- Toolgroup: TODO: Check if could be created with ui/ToggleGroup -->
         <button v-for="(tool, index) in toolManagementRef.activatable_tools" :key="index" class="btn bi"
@@ -38,6 +43,7 @@ const settingsStore = useSettingsStore()
     margin-left: 10px;
 }
 
+/* Fix flip */
 .flip {
     transform: rotateY(180deg);
 }

@@ -43,7 +43,7 @@ watch(
 
 const canvasContainerStyle = computed(() => {
     return {
-        transform: `scale(${settings.ui.scale.value})`
+        transform: `transformX(-50%) scale(${settings.ui.scale.value})`
     }
 })
 
@@ -130,10 +130,11 @@ onMounted(() => {
 <style scoped>
 
 #canvas-container {
-    position: relative;
-    margin: auto;
+    position: absolute;
+    left: 50%;
     width: fit-content;
     height: fit-content;
+    transform: translateX(-50%);
     transform-origin: top;
     z-index: 5;
 }

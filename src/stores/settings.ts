@@ -1,7 +1,7 @@
 import { defineStore } from "pinia"
 import { Color } from "@/utils/colors/ColorManagement"
 import { colorToChromaOrSaturation, colorToLightness, colorToGrayscale, colorToType } from "@/utils/colors/helpers"
-import { BooleanProperty, RadiusProperty, RangeProperty, SelectionProperty } from "@/utils/properties"
+import { BooleanProperty, BooleanPropertyWithIcons , RadiusProperty, RangeProperty, SelectionProperty } from "@/utils/properties"
 
 
 const allModifiers = {
@@ -94,7 +94,7 @@ export const useSettingsStore = defineStore("settings", {
 
         ui: {
             light: new BooleanProperty('Light/Dark UI', true),
-            hide_settings_column: new BooleanProperty('Hide side menu', false),
+            hide_settings_column: new BooleanPropertyWithIcons('Hide side menu', false, ['bi-window', 'bi-window-sidebar'], 'warning'),
             split_mode: new BooleanProperty('Split mode', false),
 
             color_circle_radius: new RadiusProperty('Color circle radius', 15, 4, 50),

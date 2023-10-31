@@ -12,17 +12,25 @@ const props = defineProps({
   btnColor: {
     type: String,
     default: 'primary' 
+  },
+  outlineOnly: {
+    type: Boolean,
+    default: false
   }
 })
 
 defineEmits(['update:modelValue'])
 
+function btn_style() {
+  return ( (!props.modelValue || props.outlineOnly) ? 'btn-outline-' : 'btn-') + props.btnColor
+}
+
 const css_classes = computed(() => {
   if (props.icons) {
-    return 'bi ' + (props.modelValue ? props.icons[0] + ' btn-' + props.btnColor: props.icons[1] + ' btn-outline-' + props.btnColor)
+    return 'bi ' + (props.modelValue ? props.icons[0] + ' ' + btn_style() : props.icons[1] + ' ' + btn_style())
   }
   else {
-    return props.modelValue ? 'btn-primary' : 'btn-outline-primary'
+    return btn_style()
   }
 })
 
