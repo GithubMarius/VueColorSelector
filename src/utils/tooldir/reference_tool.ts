@@ -1,16 +1,12 @@
-import { Tool, BaseTool } from '@/utils/tooldir/helpers'
+import { ToolInterface, BaseToolWithSelection } from '@/utils/tooldir/helpers'
 import { KeyCombination } from '@/utils/keyboardinput'
 
-export const referenceTool = <Tool>{
-    ...BaseTool,
+export const referenceTool = <ToolInterface>{
+    ...BaseToolWithSelection,
     icon: 'bi bi-circle',
     keybaord_shortcut: new KeyCombination('a', []),
-    listeners: {
-        mousedown() {
-            console.log('a')
-        },
-        mousemove() {
-            console.log('hi')
-        }
-    }
+    listener_calls: [
+        function mousemove() {console.log('hi')},
+        function mouseup() {console.log('up')}
+    ]
 }

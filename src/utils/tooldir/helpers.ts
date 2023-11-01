@@ -1,6 +1,10 @@
 import { KeyCombination } from '@/utils/keyboardinput'
 
-export interface Tool {
+export interface StoreInterface {
+    active_tool: ToolInterface
+}
+
+export interface ToolInterface {
     // Keybaord Shortcut to activate tool
     keybaord_shortcut: null | KeyCombination
     
@@ -14,11 +18,40 @@ export interface Tool {
     activate(): void
     deactivate(): void
 
-    // Add and remove listeners to document
+    // Get, add and remove listeners to document
     add_listeners(): void
+    create_listeners(): void
     remove_listeners(): void
-    listeners: any
-    get_store
+    listener_calls: Function[]
+    listeners: Listener[]
+
+    // Get store
+    get_store(): any | StoreInterface
+}
+
+class Listener {
+    fcn: Function
+    name: String
+
+    constructor(fcn: Function) {
+        this.fcn = fcn
+        this.name = <String>fcn.name
+    }
+
+    bind(target) {
+        // Bind target to fcn
+        this.fcn = this.fcn.bind(target)
+    }
+
+    add() {
+        // Adding event listeners to document
+        document.addEventListener(<any>this.name, <any>this.fcn)
+    }
+
+    remove() {
+        // Removing event listeners from document
+        document.removeEventListener(<any>this.name, <any>this.fcn)
+    }
 }
 
 export const BaseTool = {
@@ -40,50 +73,50 @@ export const BaseTool = {
             this.active = false
         }
     },
+    get_listener_calls() {
+        // Return all listener calls (adjust in case additional should be added)
+        return this.listener_calls
+    },
     add_listeners() {
         // Add listeners to document
-        Object.entries(this.listeners).forEach( ([key, entry]) => {
-            const bound_listener = (<Function>entry).bind(this)
-            this.bound_listeners[key] = bound_listener
-            document.addEventListener(key, bound_listener)
+        this.listeners.forEach( (listener: Listener) => {
+            listener.add()
         })
     },
     remove_listeners() {
         // Remove bound listeners from document
-        Object.entries(this.bound_listeners).forEach( ([key, entry]) => {
-            document.removeEventListener(key, <any>entry)
+        this.listeners.forEach( (listener: Listener) => {
+            listener.remove()
         })
     },
-    // Object with listeners
-    listeners: {},
-    bound_listeners: {},
+    create_listeners() {
+        // Create listener objects from calls and bind this
+        this.listeners = this.get_listener_calls().map(fcn => {
+            const listener = new Listener(fcn)
+            listener.bind(this)
+            return listener
+        })
+    },
+
+    listeners: [],
+    listener_calls: [],
     get_store: null
 }
 
-const FirstTool = <Tool>{
-    ...BaseTool,
-    icon: 'bi bi-circle',
-    keybaord_shortcut: new KeyCombination('a', []),
-    listeners: {
-        mousedown() {
-            console.log('a')
-        },
-        mousemove() {
-            console.log('hi')
-        }
-    }
-}
-
-const SecondTool = <Tool>{
-    ...BaseTool,
-    icon: 'bi bi-circle',
-    keybaord_shortcut: new KeyCombination('b', []),
-    listeners: {
-        mousedown() {
-            console.log('b')
-        },
-        mousemove() {
-            console.log('hi')
-        }
+export const BaseToolWithSelection = {
+    // Add selection to tool
+    ... BaseTool,
+    selection_listener_calls: [
+        function keydown() {},
+        function mousedown() {},
+        function mousemove() {},
+        function mouseup() {}
+    ],
+    get_selection_listener_calls() {
+        return this.listener_calls.concat(this.selection_listener_calls)
+    },
+    get_listener_calls() {
+        // Return all listener calls (adjust in case additional should be added)
+        return this.get_selection_listener_calls()
     }
 }

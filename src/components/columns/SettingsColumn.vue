@@ -49,9 +49,9 @@ import { useToolsStore } from '@/stores/tools'
 const toolStore = useToolsStore()
 console.log(toolStore)
 console.log('No tool activated yet.')
-console.log(toolStore.tools.referenceTool.activate())
+toolStore.tools.referenceTool.activate()
 console.log('First tool activated.')
-console.log(toolStore.tools.referenceTool.activate())
+toolStore.tools.referenceTool.activate()
 </script>
 
 <template>
