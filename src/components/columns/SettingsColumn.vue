@@ -43,10 +43,23 @@ settingsStore.keycombinations.open_tab.bind((event) => {
   event.preventDefault()
 })
 
+
+import { useToolsStore } from '@/stores/tools'
+
+const toolStore = useToolsStore()
+console.log(toolStore)
+console.log('No tool activated yet.')
+console.log(toolStore.tools.referenceTool.activate())
+console.log('First tool activated.')
+console.log(toolStore.tools.referenceTool.activate())
 </script>
 
 <template>
     <div id="settings-column" class="col-4 p-0 mh-100 mw-20 bg-body-tertiary" :class="[!settingsStore.ui.hide_settings_column.value? 'col-sm-4' : 'd-none']">
+
+        Test
+        {{ toolStore }}
+
         <div class="row">
             <!-- Colorviewer -->
             <ColorViewer>

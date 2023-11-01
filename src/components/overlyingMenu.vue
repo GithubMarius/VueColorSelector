@@ -2,9 +2,7 @@
 import { useSettingsStore } from '@/stores/settings';
 import { toolManagementRef } from '@/utils/Tools';
 
-// UI elements
-import ToggleButton from '@/components/ui/ToggleButton.vue'
-import AutoForm from './ui/AutoForm.vue';
+import AutoForm from '@/components/ui/AutoForm.vue';
 
 defineProps(['CaptureCamera'])
 
@@ -14,12 +12,13 @@ const settingsStore = useSettingsStore()
 
 <template>
     <div class="position-absolute m-2 pe-none floating-menu">
-      <span><ToggleButton v-model="settingsStore.captureVideo.value" :icons="['bi-camera-video', 'bi-camera-video-off']" :btnColor="'danger'"></ToggleButton></span>
+      <span>
+        <AutoForm v-model="settingsStore.captureVideo" :shown_in_group="false"></AutoForm>
+      </span>
       <span v-if="settingsStore.captureVideo.value"><button class="btn btn-primary bi bi-camera" @click="CaptureCamera.takeImage()"></button></span>
       <span class="flip">
         <!-- TODO Add props inheritance to AutoForm (e.g. props="{btnColor: 'warning'}" being forwarded to ToggleButton) -->
         <AutoForm v-model="settingsStore.ui.hide_settings_column" :shown_in_group="false"></AutoForm>
-
       </span>
       <span class="btn-group" role="group" aria-label="ToolToogles" v-if="!settingsStore.ui.hide_settings_column.value">
         <!-- Toolgroup: TODO: Check if could be created with ui/ToggleGroup -->

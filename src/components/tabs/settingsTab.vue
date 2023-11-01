@@ -7,8 +7,6 @@ import AutoForm from '../ui/AutoForm.vue';
 
 const settingsStore = useSettingsStore()
 
-
-
 </script>
 
 <template>

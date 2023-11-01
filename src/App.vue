@@ -7,14 +7,12 @@ import { onMounted, onUnmounted, provide, ref, watch } from 'vue'
 // Stores
 import { useGroupStore } from '@/stores/color'
 import { useHistoryStore } from '@/stores/history'
-import { KeyCombination, useSettingsStore } from '@/stores/settings'
+import { useSettingsStore } from '@/stores/settings'
 
 // Columns
 import SettingsColumn from '@/components/columns/SettingsColumn.vue'
 
 // Other components
-import CaptureCamera from '@/components/CaptureCamera.vue'
-import CapturedImage from '@/components/CapturedImage.vue'
 import OverlyingMenu from '@/components/OverlyingMenu.vue'
 import RectangularSelectionTool from '@/components/RectangularSelectionTool.vue'
 
@@ -22,6 +20,7 @@ import RectangularSelectionTool from '@/components/RectangularSelectionTool.vue'
 import { toolManagementRef } from '@/utils/Tools'
 import { openDataImportFileDialog, return_download_file } from '@/utils/fileManagement'
 import ContentColumn from './components/columns/ContentColumn.vue'
+import { KeyCombination } from './utils/keyboardinput'
 
 // Refs
 const rectSelectionRef = ref(null)
@@ -115,6 +114,8 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('keydown', key_listener)
 })
+
+
 </script>
 
 <template>
