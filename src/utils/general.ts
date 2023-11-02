@@ -1,4 +1,10 @@
-import { ColorAlphaArray } from "./colors/helpers"
+import {ColorAlphaArray} from "./colors/helpers"
+import {StyleValue} from "vue";
+
+interface cssStylePosition {
+    left: String,
+    top: String
+}
 
 export type pointCoordinates = [number, number]
 
@@ -15,7 +21,7 @@ export function canvas_container_position_from_event(event): pointCoordinates {
     return [(targetRect.x - canvasRect.x) * scale + event.offsetX, (targetRect.y - canvasRect.y) * scale + event.offsetY]
 }
 
-export function get_pixel_color(x, y) {
+export function get_pixel_color(x: number, y: number) {
     // Get color at position (x, y)
 
     const canvas = <HTMLCanvasElement>document.getElementById('canvas')
@@ -27,6 +33,9 @@ export function combine(obj1: Object, obj2: Object): Object {
     return Object.assign({}, obj1, obj2)
 }
 
-export function target_is_input(event: MouseEvent): Boolean {
-    return (<HTMLElement>event.target).tagName === 'INPUT';
-}    
+export function pointCoordinatesToStyle(point: pointCoordinates): cssStylePosition {
+    return {
+        left: point[0] + 'px',
+        top: point[1] + 'px'
+    }
+}

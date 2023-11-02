@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
 import { useSettingsStore } from '@/stores/settings';
 import formGroup from '@/components/ui/FormGroup.vue';
 import SwitchButton from '@/components/ui/SwitchButton.vue'

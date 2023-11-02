@@ -1,11 +1,6 @@
 <script setup lang="ts">
-import { computed, inject, ref } from 'vue';
-import { ToolInterface } from '@/utils/Tools';
-import { target_is_input } from '@/utils/general';
-import { useColorStore } from '@/stores/color';
-import { useHistoryStore } from '@/stores/history';
 
-// Refs
+/* // Refs
 const selectionToolElementRef = ref(null)
 const appContainerRef = ref(null)
 const groupNameInputRef = ref(null)
@@ -13,8 +8,6 @@ const groupNameInputRef = ref(null)
 // Stores
 const colorStore = useColorStore()
 const historyStore = useHistoryStore()
-
-const tools: any = inject('tools')
 
 const selectionTool: ToolInterface = {
     key: 's',
@@ -116,11 +109,11 @@ const selectionTool: ToolInterface = {
 
     manifest_selection() {
         // Permanently select colors within selection
-        /* this.selected_colors.forEach(color => {
+         this.selected_colors.forEach(color => {
             color.selected = true
             color.selecting = false
         })
-        */
+        
         this.selectables.forEach(this.dispatchToSelectionEvent)
         groupNameInputRef.value?.focus()
         this.start_selection = [0,0]
@@ -196,15 +189,26 @@ function abort_rename(){
     colorStore.drop_selection()
 }
 
-tools.value.tools.push(selectionTool)
+ */
+
+
+import { useToolsStore } from '@/stores/tools'
+
+const toolStore = useToolsStore()
+
+console.log(toolStore.selectionTool.end)
+console.log(toolStore.selectionTool.start)
+
+console.log(toolStore.selectionTool.end.style)
 
 </script>
 
 
+
 <template>
-    <div ref="appContainerRef" class="row w-100 vh-100 m-0 position-relative">
+    <div class="row w-100 vh-100 m-0 position-relative">
         <div>
-            <Transition @after-enter="groupNameInputRef.focus()">
+<!--             <Transition @after-enter="groupNameInputRef.focus()">
                 <div class="position-absolute rounded group-name-input-div" v-if="numberSelectedEntries > 0">
                     <input ref="groupNameInputRef" id="groupName" class="form-control" type="text" placeholder="GROUP NAME"
                     @click.prevent
@@ -214,16 +218,33 @@ tools.value.tools.push(selectionTool)
                     @keyup.esc="abort_rename"
                     >
                 </div>
-            </Transition>
+            </Transition> -->
         </div>
         <slot>
         </slot>
-        <div ref="selectionToolElementRef" class="rectangular_selection" v-if="selectionToolObjectRef.active && selectionToolObjectRef.has_size" :style="selectionToolObjectRef.style">
+        <div class="point"> {{  }}</div>
+        <div class="point"> {{ (toolStore.selectionTool).start }}</div>
+      <div class="point"> {{ (toolStore.selectionTool).end }} </div>
+      <div class="point"> {{ toolStore.selectionTool.end }} </div>
+        <div class="point" :style="(<any>toolStore.selectionTool).start.style"></div>
+        <div class="point" :style="(<any>toolStore.selectionTool).end.style"></div>
+        <div class="point"> {{ (toolStore.selectionTool).end.style }} </div>
+        <div id="rectangular-selection-div">
         </div>
     </div>
 </template>
 
 <style scoped>
+.point {
+    z-index: 20;
+    border-radius: 50%;
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    transform: translate(-50%, -50%);
+}
+
 .rectangular_selection {
     z-index: 15;
     position: absolute;

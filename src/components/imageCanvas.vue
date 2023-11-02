@@ -4,7 +4,6 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useColorStore } from '@/stores/color';
 import { useHistoryStore } from '@/stores/history';
 import { useSettingsStore } from '@/stores/settings';
-import { referenceTool, toolManagementRef } from '@/utils/Tools';
 import ColorCircleElement from '@/components/elements/ColorCircleElement.vue';
 import referencePair from '@/components/elements/ReferencePairElement.vue';
 import referencePoint from '@/components/elements/ReferencePointElement.vue';
@@ -17,11 +16,6 @@ const selection_tool_active = ref(false)
 const image = ref(null)
 const ctx = ref(null)
 const ctxBW = ref(null)
-
-
-const referenceToolRef = ref(referenceTool)
-toolManagementRef.value.tools.push(referenceTool)
-
 const settings = useSettingsStore()
 const colorStore = useColorStore()
 
@@ -96,12 +90,8 @@ function drawImageInBw() {
 function add_color_element(event) {
     // If currently not using a selection tool
     // TODO: Check if timestamp could be removed
-    if (!toolManagementRef.value.active_tool && (toolManagementRef.value.last_ts !== event.timeStamp)) {
-        const historyStore = useHistoryStore()
-        historyStore.add_color(event)
-    } else {
-        selection_tool_active.value = false
-    }
+    const historyStore = useHistoryStore()
+    historyStore.add_color(event)
 }
 
 onMounted(() => {
@@ -118,12 +108,15 @@ onMounted(() => {
         :style="canvasContainerStyle">
         <canvas id="canvasBW" ref="canvasElementBW" class="canvas canvasBW" :style="canvasStyle" :class="{'d-none': settings.color_mode.value}"></canvas>
         <canvas id="canvas" ref="canvasElement" class="canvas" :style="canvasStyle" :class="{'opacity-0': !settings.color_mode.value}" ></canvas>
-        <referencePair v-for="(pair, index) in referenceToolRef.pairs" :key="index" :pair="pair" :tool="referenceToolRef">
-        </referencePair>
         <ColorCircleElement v-for="(color, index) in colorStore.colors" :key="index" :color="color">
         </ColorCircleElement>
+        
+        <!--
+        <referencePair v-for="(pair, index) in referenceToolRef.pairs" :key="index" :pair="pair" :tool="referenceToolRef">
+        </referencePair>
         <referencePoint v-for="(point, index) in referenceToolRef.points" :key="index" :point="point" :tool="referenceToolRef">
         </referencePoint>
+        -->
     </div>
 </template>
 

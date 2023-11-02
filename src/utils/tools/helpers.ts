@@ -1,4 +1,4 @@
-import { KeyCombination } from '@/utils/keyboardinput'
+import {KeyCombination} from '@/utils/keyboardinput'
 
 export interface StoreInterface {
     active_tool: ToolInterface
@@ -6,7 +6,7 @@ export interface StoreInterface {
 
 export interface ToolInterface {
     // Keybaord Shortcut to activate tool
-    keybaord_shortcut: null | KeyCombination
+    keyboard_shortcut: KeyCombination
     
     // Icons
     icon: String
@@ -28,8 +28,20 @@ export interface ToolInterface {
     // Get store
     get_store(): any | StoreInterface
 }
+interface ListenerCalls {
+    [key: string]: Function;
+ }
 
-class Listener {
+export class Listener {
+
+    static createListeners(obj ,listener_calls: ListenerCalls) {
+        return Object.values(listener_calls).map((fcn: Function) => {
+            const listener = new Listener(fcn)
+            listener.bind(obj)
+            return listener
+        })
+    }
+
     fcn: Function
     name: String
 
@@ -43,14 +55,31 @@ class Listener {
         this.fcn = this.fcn.bind(target)
     }
 
-    add() {
+    listen() {
         // Adding event listeners to document
         document.addEventListener(<any>this.name, <any>this.fcn)
     }
 
-    remove() {
+    mute() {
         // Removing event listeners from document
         document.removeEventListener(<any>this.name, <any>this.fcn)
+    }
+
+}
+
+export const BaseWithListenerCreation = {
+    listener_calls: <ListenerCalls>{},
+    listeners: <Array<Listener>>[],
+    create_listeners() {
+        this.listeners = Listener.createListeners(this, this.listener_calls)
+    },
+
+    listen() {
+        this.listeners.forEach(listener => listener.listen())
+    },
+
+    mute(){
+        this.listeners.forEach(listener => listener.mute())
     }
 }
 
@@ -58,18 +87,18 @@ export const BaseTool = {
     active: false,
     activate() {
         // Save as active tool in store, add listeners to document and set active true
+        this.add_listeners()
         const store = this.get_store()
+        
         store.active_tool?.deactivate()
         store.active_tool = this
-        this.add_listeners()
         this.active = true
     },
     deactivate() {
         // Set active tool in store to null, remove listeners from document and set active false if this.active
         if (this.active) {
-            const store = this.get_store()
-            store.active_tool = null
             this.remove_listeners()
+            this.get_store().active_tool = null
             this.active = false
         }
     },
@@ -80,22 +109,30 @@ export const BaseTool = {
     add_listeners() {
         // Add listeners to document
         this.listeners.forEach( (listener: Listener) => {
-            listener.add()
+            listener.listen()
         })
     },
     remove_listeners() {
         // Remove bound listeners from document
         this.listeners.forEach( (listener: Listener) => {
-            listener.remove()
+            listener.mute()
         })
     },
-    create_listeners() {
+    create_listeners(tool) {
+        console.log(this)
         // Create listener objects from calls and bind this
         this.listeners = this.get_listener_calls().map(fcn => {
             const listener = new Listener(fcn)
-            listener.bind(this)
+            listener.bind(tool)
             return listener
         })
+    },
+    toggle() {
+        if (this.active) {
+            this.deactivate()
+        } else {
+            this.activate()
+        }
     },
 
     listeners: [],
@@ -103,20 +140,3 @@ export const BaseTool = {
     get_store: null
 }
 
-export const BaseToolWithSelection = {
-    // Add selection to tool
-    ... BaseTool,
-    selection_listener_calls: [
-        function keydown() {},
-        function mousedown() {},
-        function mousemove() {},
-        function mouseup() {}
-    ],
-    get_selection_listener_calls() {
-        return this.listener_calls.concat(this.selection_listener_calls)
-    },
-    get_listener_calls() {
-        // Return all listener calls (adjust in case additional should be added)
-        return this.get_selection_listener_calls()
-    }
-}

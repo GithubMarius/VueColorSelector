@@ -10,24 +10,20 @@ import { useHistoryStore } from '@/stores/history'
 import { useSettingsStore } from '@/stores/settings'
 
 // Columns
+import ContentColumn from './components/columns/ContentColumn.vue'
 import SettingsColumn from '@/components/columns/SettingsColumn.vue'
 
 // Other components
 import OverlyingMenu from '@/components/OverlyingMenu.vue'
-import RectangularSelectionTool from '@/components/RectangularSelectionTool.vue'
+import RectangularSelectionTool from '@/components/RectangularSelection.vue'
 
 // Utils
-import { toolManagementRef } from '@/utils/Tools'
 import { openDataImportFileDialog, return_download_file } from '@/utils/fileManagement'
-import ContentColumn from './components/columns/ContentColumn.vue'
 import { KeyCombination } from './utils/keyboardinput'
 
 // Refs
 const rectSelectionRef = ref(null)
 const captureCameraRef = ref()
-
-// Provides
-provide('tools', toolManagementRef)
 
 // Use stores
 const settingsStore = useSettingsStore()

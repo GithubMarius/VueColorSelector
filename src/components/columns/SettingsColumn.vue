@@ -5,7 +5,8 @@ import { ref } from 'vue';
 import GroupedColorsTab from '@/components/tabs/GroupedColorsTab.vue'
 import HistoryTab from '@/components/tabs/HistoryTab.vue'
 import ImportExportTab from '@/components/tabs/ImportExportTab.vue'
-import ReferenceTab from '@/components/tabs/ReferencesTab.vue'
+
+// import ReferenceTab from '@/components/tabs/ReferencesTab.vue'
 import SettingsTab from '@/components/tabs/SettingsTab.vue'
 import CapturedImagesTab from '@/components/tabs/CapturedImagesTab.vue'
 
@@ -25,7 +26,7 @@ const tabs = {
     {
       'Captured Images': CapturedImagesTab,
       'Colors': GroupedColorsTab,
-      'References': ReferenceTab,
+//      'References': ReferenceTab,
       'Settings': SettingsTab,
       'Import/Export': ImportExportTab,
       'History': HistoryTab,
@@ -47,19 +48,14 @@ settingsStore.keycombinations.open_tab.bind((event) => {
 import { useToolsStore } from '@/stores/tools'
 
 const toolStore = useToolsStore()
-console.log(toolStore)
-console.log('No tool activated yet.')
-toolStore.tools.referenceTool.activate()
-console.log('First tool activated.')
-toolStore.tools.referenceTool.activate()
+toolStore.selectionTool
+toolStore.tools
 </script>
 
 <template>
     <div id="settings-column" class="col-4 p-0 mh-100 mw-20 bg-body-tertiary" :class="[!settingsStore.ui.hide_settings_column.value? 'col-sm-4' : 'd-none']">
 
-        Test
-        {{ toolStore }}
-
+        {{ toolStore.selectionTool.style }}
         <div class="row">
             <!-- Colorviewer -->
             <ColorViewer>
