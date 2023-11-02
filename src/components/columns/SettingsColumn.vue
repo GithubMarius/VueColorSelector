@@ -43,19 +43,10 @@ settingsStore.keycombinations.open_tab.bind((event) => {
   tabs.open_tab(Number(event.key)-1)
   event.preventDefault()
 })
-
-
-import { useToolsStore } from '@/stores/tools'
-
-const toolStore = useToolsStore()
-toolStore.selectionTool
-toolStore.tools
 </script>
 
 <template>
     <div id="settings-column" class="col-4 p-0 mh-100 mw-20 bg-body-tertiary" :class="[!settingsStore.ui.hide_settings_column.value? 'col-sm-4' : 'd-none']">
-
-        {{ toolStore.selectionTool.style }}
         <div class="row">
             <!-- Colorviewer -->
             <ColorViewer>

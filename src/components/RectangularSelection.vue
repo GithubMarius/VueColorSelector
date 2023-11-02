@@ -206,7 +206,7 @@ console.log(toolStore.selectionTool.end.style)
 
 
 <template>
-    <div class="row w-100 vh-100 m-0 position-relative">
+    <div class="row w-100 vh-100 m-0 position-relative" ondragstart="return false;" ondrop="return false;">
         <div>
 <!--             <Transition @after-enter="groupNameInputRef.focus()">
                 <div class="position-absolute rounded group-name-input-div" v-if="numberSelectedEntries > 0">
@@ -222,14 +222,8 @@ console.log(toolStore.selectionTool.end.style)
         </div>
         <slot>
         </slot>
-        <div class="point"> {{  }}</div>
-        <div class="point"> {{ (toolStore.selectionTool).start }}</div>
-      <div class="point"> {{ (toolStore.selectionTool).end }} </div>
-      <div class="point"> {{ toolStore.selectionTool.end }} </div>
-        <div class="point" :style="(<any>toolStore.selectionTool).start.style"></div>
-        <div class="point" :style="(<any>toolStore.selectionTool).end.style"></div>
-        <div class="point"> {{ (toolStore.selectionTool).end.style }} </div>
-        <div id="rectangular-selection-div">
+        <div class="point" :style="(<any>toolStore.selectionTool).end.style" v-if="toolStore.selectionTool.visible"></div>
+        <div id="rectangular-selection" :style="toolStore.selectionTool.style">
         </div>
     </div>
 </template>
@@ -239,18 +233,19 @@ console.log(toolStore.selectionTool.end.style)
     z-index: 20;
     border-radius: 50%;
     position: absolute;
-    width: 20px;
-    height: 20px;
-    background-color: red;
+    width: 3px;
+    height: 3px;
+    padding: 0;
+    background-color: var(--bs-dark);
+    opacity: 0.5;
     transform: translate(-50%, -50%);
 }
 
-.rectangular_selection {
+#rectangular-selection {
     z-index: 15;
     position: absolute;
-    padding: 0px;
-    min-width: 0px;
-    background-color: None;
+    padding: 0;
+    background-color: transparent;
     border: 1px dashed black;
 }
 

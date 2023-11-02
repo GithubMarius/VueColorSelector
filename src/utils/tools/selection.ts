@@ -22,17 +22,41 @@ export const selectionTool = {
     ...BaseWithListenerCreation,
     listener_calls: {
         mousedown(event: MouseEvent) {
-            this.start.from_event(event)
+            if (event.buttons === 1) {
+                this.start.from_event(event)
+                this.end.from_event(event)
+                this.refresh_selectables()
+            }
 
         },
         mousemove(event: MouseEvent) {
-            this.end.from_event(event)
+            console.log(event.buttons)
+            if (event.buttons === 1) {
+                this.end.from_event(event)
+                this.refresh_visibility()
+                if (this.visible) {
+                    console.log(this.selectables)
+                }
+            }
+        },
+        mouseup(_: MouseEvent) {
+            this.reset()
+        },
+        mouseenter(event: MouseEvent) {
+            // TODO: ADD
+        },
+        mouseleave(event: MouseEvent) {
+            // TODO: ADD
         }
     },
+    selectables: [],
+    visible: false,
     start: reactive(new Point()),
     end: reactive(new Point()),
+
     get style(){
         return {
+            display: (this.visible) ? 'block' : 'none',
             left: this.left + 'px',
             top: this.top + 'px',
             width: this.width + 'px',
@@ -50,7 +74,38 @@ export const selectionTool = {
     },
     get height() {
         return Math.abs(this.end.coords[1]-this.start.coords[1])
+    },
+    get diameter_squared() {
+        return this.width**2 + this.height**2
+    },
+
+    refresh_visibility() {
+        if (!this.visible && this.diameter_squared > 900) {
+            this.visible = true
+        }
+    },
+    reset() {
+        this.visible = false
+        this.start.coords = [0,0]
+        this.end.coords = [0,0]
+    },
+
+    // Find selectable elements,
+    refresh_selectables() {
+        this.selectables = this.get_selectables()
+    },
+
+    get get_selectables() {
+        return this.get_visible_elements_of_class('selectable')
+    },
+
+    get_visible_elements_of_class(css_class: string): Array<Element> {
+        // Find all html elements with css_class that are currently visible
+        const collection = document.getElementsByClassName(css_class)
+        return [...Object.values(collection)].filter(element => element.childElementCount > 0 && element.checkVisibility())
     }
+
+    // TODO: Check which selectables are in bounds.
 }
 selectionTool.create_listeners()
 selectionTool.listen()
