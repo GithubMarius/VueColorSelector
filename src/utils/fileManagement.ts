@@ -1,16 +1,15 @@
-import { ColorDataInterface } from "@/utils/colors/ColorManagement"
+import {ColorDataInterface} from "@/utils/colors/ColorManagement"
 
-import { useColorStore } from "@/stores/color"
-import { useHistoryStore } from "@/stores/history"
-import { useCamImageStore } from "@/stores/camimages"
-import { useSettingsStore } from "@/stores/settings"
+import {useColorStore} from "@/stores/color"
+import {useHistoryStore} from "@/stores/history"
+import {useCamImageStore} from "@/stores/camimages"
+import {useSettingsStore} from "@/stores/settings"
 
 const export_mime_type = 'application/json'
 
 export function create_data_file() {
     // Create json file with color data
-    const file = new File([stringify_contents()], 'data.json')
-    return file
+    return new File([stringify_contents()], 'data.json')
 }
 
 export function check_data_import_file_type(file: File): Boolean {
@@ -21,18 +20,20 @@ export function check_data_import_file_type(file: File): Boolean {
 export function read_data_file(file) {
     // Read file with color point data
 
-    var reader = new FileReader();
+    const reader = new FileReader();
     reader.readAsText(file);
     reader.onload = function (e) {
-      //Set the Base64 string return from FileReader as source.
-      const data = JSON.parse(<string>reader.result)
-      switch (data.colors) {
-        case (data.colors):
+        //Set the Base64 string return from FileReader as source.
+        const data = JSON.parse(<string>reader.result)
+
+        if (data.colors) {
             parse_colors(data.colors)
-        case (data.images):
+        }
+
+        if (data.images) {
             parse_images(data.images)
-      }
-      
+        }
+
     }
 
 }
@@ -63,7 +64,7 @@ function stringify_contents() {
     return new Blob([JSON.stringify({
         colors: get_colors(),
         images: get_images()
-    })], { type: export_mime_type })
+    })], {type: export_mime_type})
 }
 
 export function return_download_file() {
@@ -71,12 +72,12 @@ export function return_download_file() {
     const file = create_data_file()
     const link = document.createElement('a')
     const url = URL.createObjectURL(file)
-  
+
     link.href = url
     link.download = file.name
     document.body.appendChild(link)
     link.click()
-  
+
     document.body.removeChild(link)
     window.URL.revokeObjectURL(url)
 }
@@ -84,16 +85,15 @@ export function return_download_file() {
 
 function onDataFileChange(event) {
     //  Open file dialog to import data
-  
+
     if (check_data_import_file_type(event.target.files[0])) {
         read_data_file(event.target.files[0])
-    }
-    else {
-        throw(new Error('Wrong file type.'))
+    } else {
+        throw (new Error('Wrong file type.'))
     }
 }
 
-export function onImgFileChange(event){
+export function onImgFileChange(event) {
     var reader = new FileReader();
     reader.readAsDataURL(event.target.files[0]);
     reader.onload = function (e) {
@@ -102,13 +102,13 @@ export function onImgFileChange(event){
         resetStores()
     }
 }
-  
+
 export function openDataImportFileDialog() {
     const input = document.createElement("input")
-        input.setAttribute("type", "file")
-        input.setAttribute("accept", ".json")
-        input.click()
-        input.onchange = onDataFileChange
+    input.setAttribute("type", "file")
+    input.setAttribute("accept", ".json")
+    input.click()
+    input.onchange = onDataFileChange
 }
 
 export function resetStores() {

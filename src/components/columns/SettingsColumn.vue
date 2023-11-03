@@ -15,6 +15,7 @@ import ColorViewer from '@/components/ColorViewer.vue'
 
 // Stores
 import { useSettingsStore } from '@/stores/settings'
+import {useToolsStore} from "../../stores/tools";
 
 const settingsStore = useSettingsStore()
 
@@ -43,10 +44,13 @@ settingsStore.keycombinations.open_tab.bind((event) => {
   tabs.open_tab(Number(event.key)-1)
   event.preventDefault()
 })
+
+const toolStore = useToolsStore()
 </script>
 
 <template>
     <div id="settings-column" class="col-4 p-0 mh-100 mw-20 bg-body-tertiary" :class="[!settingsStore.ui.hide_settings_column.value? 'col-sm-4' : 'd-none']">
+        {{ toolStore.selectionTool.selectables }}
         <div class="row">
             <!-- Colorviewer -->
             <ColorViewer>

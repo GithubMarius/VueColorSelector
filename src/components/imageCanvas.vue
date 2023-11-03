@@ -87,7 +87,7 @@ function drawImageInBw() {
 }
 
 
-function add_color_element(event) {
+function add_color_element(event: MouseEvent) {
     // If currently not using a selection tool
     // TODO: Check if timestamp could be removed
     const historyStore = useHistoryStore()

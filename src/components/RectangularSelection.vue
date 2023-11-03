@@ -195,12 +195,6 @@ function abort_rename(){
 import { useToolsStore } from '@/stores/tools'
 
 const toolStore = useToolsStore()
-
-console.log(toolStore.selectionTool.end)
-console.log(toolStore.selectionTool.start)
-
-console.log(toolStore.selectionTool.end.style)
-
 </script>
 
 

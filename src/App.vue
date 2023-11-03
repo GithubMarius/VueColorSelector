@@ -20,6 +20,7 @@ import RectangularSelectionTool from '@/components/RectangularSelection.vue'
 // Utils
 import { openDataImportFileDialog, return_download_file } from '@/utils/fileManagement'
 import { KeyCombination } from './utils/keyboardinput'
+import Toasts from "@/components/Toasts.vue";
 
 // Refs
 const rectSelectionRef = ref(null)
@@ -110,8 +111,6 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('keydown', key_listener)
 })
-
-
 </script>
 
 <template>
@@ -123,6 +122,8 @@ onUnmounted(() => {
       <SettingsColumn></SettingsColumn>
       <!-- Overlying menu -->
       <OverlyingMenu :CaptureCamera="captureCameraRef"></OverlyingMenu>
+      <!-- Toasts (popups with temporarily displayed information) -->
+      <Toasts></Toasts>
     </div>
   </RectangularSelectionTool>
 </template>
