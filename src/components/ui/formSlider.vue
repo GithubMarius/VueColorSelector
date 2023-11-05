@@ -1,5 +1,5 @@
 <script setup>
-import { defineEmits } from 'vue';
+import {defineEmits} from 'vue';
 
 /* Example usage:
 <ToggleButton v-model="pair.visible" :icons="['bi-eye-fill', 'bi-eye-slash']"></ToggleButton>
@@ -27,10 +27,10 @@ function update_from_event(event) {
 </script>
 
 <template>
-    <input type="range" class="form-range"
-    @input="update_from_event"
-    :value="modelValue"
-    :min="min" :max="max"
-    :step="step">
+  <input type="range" class="form-range"
+         @input="update_from_event"
+         :value="modelValue"
+         :min="min" :max="max"
+         :step="step">
 </template>
 

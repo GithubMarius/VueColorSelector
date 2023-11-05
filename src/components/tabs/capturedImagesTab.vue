@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useCamImageStore } from '@/stores/camimages';
-import { useSettingsStore } from '@/stores/settings';
-import { onUnmounted } from 'vue';
+import {useCamImageStore} from '@/stores/camimages';
+import {useSettingsStore} from '@/stores/settings';
+import {onUnmounted} from 'vue';
 import AutoForm from '../ui/AutoForm.vue';
 
 
@@ -74,23 +74,31 @@ onUnmounted(() => {
       <AutoForm v-model="camImageStore.active_image.scale"></AutoForm>
       <formGroup label="Adjust position">
         <div class="position-relative align-container">
-          <button class="position-absolute top-0 start-50 translate-middle-x btn btn-outline-primary" @click="adjust_position($event, 0)"><i class="bi bi-arrow-up"></i></button>
-          <button class="position-absolute top-50 end-0 translate-middle-y btn btn-outline-primary" @click="adjust_position($event, 1)"><i class="bi bi-arrow-right"></i></button>
-          <button class="position-absolute top-50 start-50 translate-middle btn btn-outline-primary" @click="reset"><i class="bi bi-crosshair"></i></button>
-          <button class="position-absolute top-0 start-0 btn btn-outline-primary" @click="flip(0)"><i class="bi bi-arrow-clockwise"></i></button>
-          <button class="position-absolute top-0 end-0 btn btn-outline-primary" @click="flip(1)"><i class="bi bi-arrow-counterclockwise"></i></button>
-          <button class="position-absolute bottom-0 start-50 translate-middle-x btn btn-outline-primary" @click="adjust_position($event, 2)"><i class="bi bi-arrow-down"></i></button>
-          <button class="position-absolute top-50 start-0 translate-middle-y btn btn-outline-primary" @click="adjust_position($event, 3)"><i class="bi bi-arrow-left"></i></button>
+          <button class="position-absolute top-0 start-50 translate-middle-x btn btn-outline-primary"
+                  @click="adjust_position($event, 0)"><i class="bi bi-arrow-up"></i></button>
+          <button class="position-absolute top-50 end-0 translate-middle-y btn btn-outline-primary"
+                  @click="adjust_position($event, 1)"><i class="bi bi-arrow-right"></i></button>
+          <button class="position-absolute top-50 start-50 translate-middle btn btn-outline-primary" @click="reset"><i
+              class="bi bi-crosshair"></i></button>
+          <button class="position-absolute top-0 start-0 btn btn-outline-primary" @click="flip(0)"><i
+              class="bi bi-arrow-clockwise"></i></button>
+          <button class="position-absolute top-0 end-0 btn btn-outline-primary" @click="flip(1)"><i
+              class="bi bi-arrow-counterclockwise"></i></button>
+          <button class="position-absolute bottom-0 start-50 translate-middle-x btn btn-outline-primary"
+                  @click="adjust_position($event, 2)"><i class="bi bi-arrow-down"></i></button>
+          <button class="position-absolute top-50 start-0 translate-middle-y btn btn-outline-primary"
+                  @click="adjust_position($event, 3)"><i class="bi bi-arrow-left"></i></button>
         </div>
       </formGroup>
     </template>
   </CardContainer>
-  
-  
+
+
   <div class="container px-4">
     <div class="row row-cols-3 gx-5">
-      <div class="col p-3 overflow-hidden position-relative" v-for="(imgUrl, index) in camImageStore.imageUrls" >
-        <img class="mw-100 rounded" :class="{'border border-primary border-5': camImageStore.is_active_index(index)}" :src="imgUrl" @click="camImageStore.activate_by_index(index)">
+      <div class="col p-3 overflow-hidden position-relative" v-for="(imgUrl, index) in camImageStore.imageUrls">
+        <img class="mw-100 rounded" :class="{'border border-primary border-5': camImageStore.is_active_index(index)}"
+             :src="imgUrl" @click="camImageStore.activate_by_index(index)">
         <button class="bi bi-gear position-absolute edit-icon" @click="edit_image(index)"></button>
       </div>
     </div>
@@ -137,6 +145,7 @@ img {
   background-color: transparent;
   border: none;
 }
+
 .edit-icon:hover {
   opacity: 0.7;
 }
