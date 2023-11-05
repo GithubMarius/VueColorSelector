@@ -1,40 +1,55 @@
 import {KeyCombination} from '@/utils/keyboardinput'
+import {reactive, toRaw} from "vue";
+import {useToastStore} from "@/stores/toasts";
 
 export interface StoreInterface {
     active_tool: ToolInterface
 }
 
 export interface ToolInterface {
-    // Keybaord Shortcut to activate tool
+    // Name
+    name: String
+
+    // Keyboard shortcut to activate tool
     keyboard_shortcut: KeyCombination
-    
+
     // Icons
     icon: String
 
-    // Boolean active state
-    active: Boolean
+    // state
+    state: null | {
+        active: Boolean
+    }
 
     // Activate and deactivate tool
     activate(): void
+
     deactivate(): void
 
     // Get, add and remove listeners to document
-    add_listeners(): void
     create_listeners(): void
-    remove_listeners(): void
+
+    listen(): void
+
+    mute(): void
+
     listener_calls: Function[]
     listeners: Listener[]
+
+    // Using selection?
+    with_selection: Boolean
 
     // Get store
     get_store(): any | StoreInterface
 }
+
 interface ListenerCalls {
     [key: string]: Function;
- }
+}
 
 export class Listener {
 
-    static createListeners(obj ,listener_calls: ListenerCalls) {
+    static createListeners(obj: any, listener_calls: ListenerCalls) {
         return Object.values(listener_calls).map((fcn: Function) => {
             const listener = new Listener(fcn)
             listener.bind(obj)
@@ -45,98 +60,104 @@ export class Listener {
     fcn: Function
     name: String
 
-    constructor(fcn: Function) {
+    constructor(fcn: Function, public id: null | string = null, public className: null | string = null) {
         this.fcn = fcn
         this.name = <String>fcn.name
     }
 
-    bind(target) {
+    bind(target: any) {
         // Bind target to fcn
         this.fcn = this.fcn.bind(target)
     }
 
     listen() {
         // Adding event listeners to document
-        document.addEventListener(<any>this.name, <any>this.fcn)
+        this.target.addEventListener(<any>this.name, <any>this.fcn)
     }
 
     mute() {
         // Removing event listeners from document
-        document.removeEventListener(<any>this.name, <any>this.fcn)
+        this.target.removeEventListener(<any>this.name, <any>this.fcn)
+    }
+
+    get target() {
+        if (!this.id) {
+            return document
+        } else {
+            return document.getElementById(this.id)
+        }
+    }
+}
+
+export class KeyboardListener {
+
+    constructor(public fcn: Function, public combination: KeyCombination) {
+        this.mute()
+    }
+
+    listen() {
+        this.combination.listen()
+    }
+
+    mute() {
+        this.combination.mute()
+    }
+
+    bind(target: any) {
+        this.combination.bind(this.fcn, target)
     }
 
 }
 
 export const BaseWithListenerCreation = {
+    state: null,
     listener_calls: <ListenerCalls>{},
     listeners: <Array<Listener>>[],
+    additional_listeners: <Array<Listener | KeyboardListener>>[],
     create_listeners() {
-        this.listeners = Listener.createListeners(this, this.listener_calls)
+        this.state =
+            reactive({
+                active: false
+            })
+        this.additional_listeners.forEach((listener: Listener | KeyboardListener) => listener.bind(this))
+        this.listeners = Listener.createListeners(this, this.listener_calls).concat(this.additional_listeners)
     },
 
     listen() {
-        this.listeners.forEach(listener => listener.listen())
+        this.listeners.forEach((listener: Listener | KeyboardListener) => listener.listen())
     },
 
-    mute(){
-        this.listeners.forEach(listener => listener.mute())
-    }
+    mute() {
+        this.listeners.forEach((listener: Listener | KeyboardListener) => listener.mute())
+    },
 }
 
 export const BaseTool = {
-    active: false,
-    activate() {
-        // Save as active tool in store, add listeners to document and set active true
-        this.add_listeners()
-        const store = this.get_store()
-        
-        store.active_tool?.deactivate()
-        store.active_tool = this
-        this.active = true
-    },
-    deactivate() {
-        // Set active tool in store to null, remove listeners from document and set active false if this.active
-        if (this.active) {
-            this.remove_listeners()
-            this.get_store().active_tool = null
-            this.active = false
-        }
-    },
-    get_listener_calls() {
-        // Return all listener calls (adjust in case additional should be added)
-        return this.listener_calls
-    },
-    add_listeners() {
-        // Add listeners to document
-        this.listeners.forEach( (listener: Listener) => {
-            listener.listen()
-        })
-    },
-    remove_listeners() {
-        // Remove bound listeners from document
-        this.listeners.forEach( (listener: Listener) => {
-            listener.mute()
-        })
-    },
-    create_listeners(tool) {
-        console.log(this)
-        // Create listener objects from calls and bind this
-        this.listeners = this.get_listener_calls().map(fcn => {
-            const listener = new Listener(fcn)
-            listener.bind(tool)
-            return listener
-        })
-    },
-    toggle() {
-        if (this.active) {
-            this.deactivate()
-        } else {
-            this.activate()
-        }
-    },
+    ...BaseWithListenerCreation,
 
-    listeners: [],
-    listener_calls: [],
+    activate(this: typeof BaseWithListenerCreation | typeof BaseTool) {
+        const store = this.get_store()
+        if (toRaw(store.activeTool) !== this) {
+            store.activeTool?.deactivate()
+            store.activeTool = this
+            if (this.use_selection) {
+                store.selectionTool.state.active = true
+            }
+
+            this.state.active = true
+            this.listen()
+
+            const toastStore = useToastStore()
+            toastStore.push_info(this.name)
+        }
+    },
+    deactivate(this: typeof BaseWithListenerCreation | typeof BaseTool) {
+        const store = this.get_store()
+        store.selectionTool.state.active = false
+        store.selectionTool.trigger_drop_from_selection()
+        store.activeTool = null
+        this.state.active = false
+        this.mute()
+    },
     get_store: null
 }
-

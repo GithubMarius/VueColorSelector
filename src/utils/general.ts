@@ -1,5 +1,4 @@
 import {ColorAlphaArray} from "./colors/helpers"
-import {StyleValue} from "vue";
 
 interface cssStylePosition {
     left: String,
@@ -9,15 +8,15 @@ interface cssStylePosition {
 export type pointCoordinates = [number, number]
 
 export function canvas_container_position_from_event(event): pointCoordinates {
-    
+
     const container = <HTMLCanvasElement>document.getElementById('canvas-container')
 
     // Calculate xy position relative to canvas
     const canvasRect = container.getBoundingClientRect()
     const targetRect = event.target.getBoundingClientRect()
 
-    const scale = container.offsetWidth/container.getBoundingClientRect().width
-    
+    const scale = container.offsetWidth / container.getBoundingClientRect().width
+
     return [(targetRect.x - canvasRect.x) * scale + event.offsetX, (targetRect.y - canvasRect.y) * scale + event.offsetY]
 }
 
@@ -25,7 +24,7 @@ export function get_pixel_color(x: number, y: number) {
     // Get color at position (x, y)
 
     const canvas = <HTMLCanvasElement>document.getElementById('canvas')
-    const ctx = canvas.getContext('2d', { willReadFrequently: true })
+    const ctx = canvas.getContext('2d', {willReadFrequently: true})
     return <ColorAlphaArray><unknown>ctx.getImageData(x, y, 1, 1).data;
 }
 

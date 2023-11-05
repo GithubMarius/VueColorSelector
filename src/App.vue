@@ -2,12 +2,12 @@
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
 // Vue
-import { onMounted, onUnmounted, provide, ref, watch } from 'vue'
+import {onMounted, onUnmounted, ref, watch} from 'vue'
 
 // Stores
-import { useGroupStore } from '@/stores/color'
-import { useHistoryStore } from '@/stores/history'
-import { useSettingsStore } from '@/stores/settings'
+import {useGroupStore} from '@/stores/color'
+import {useHistoryStore} from '@/stores/history'
+import {useSettingsStore} from '@/stores/settings'
 
 // Columns
 import ContentColumn from './components/columns/ContentColumn.vue'
@@ -18,9 +18,10 @@ import OverlyingMenu from '@/components/OverlyingMenu.vue'
 import RectangularSelectionTool from '@/components/RectangularSelection.vue'
 
 // Utils
-import { openDataImportFileDialog, return_download_file } from '@/utils/fileManagement'
-import { KeyCombination } from './utils/keyboardinput'
+import {openDataImportFileDialog, return_download_file} from '@/utils/fileManagement'
+import {KeyCombination} from './utils/keyboardinput'
 import Toasts from "@/components/Toasts.vue";
+import {useToolsStore} from "@/stores/tools";
 
 // Refs
 const rectSelectionRef = ref(null)
@@ -32,7 +33,6 @@ const historyStore = useHistoryStore()
 const groupStore = useGroupStore()
 
 
-
 // Watch for theme change
 watch(() => settingsStore.ui.light.value, () => {
   document.documentElement.setAttribute('data-bs-theme', settingsStore.theme)
@@ -42,52 +42,57 @@ watch(() => settingsStore.ui.light.value, () => {
 // Key Bindings
 
 // Forward/Undo history
-settingsStore.keycombinations.undo.bind(historyStore.undo)
-settingsStore.keycombinations.forward.bind(historyStore.forward)
+settingsStore.keyCombinations.undo.bind(historyStore.undo)
+settingsStore.keyCombinations.forward.bind(historyStore.forward)
 
 // Toggle theme
-settingsStore.keycombinations.toggle_theme.bind((event) => {
+settingsStore.keyCombinations.toggle_theme.bind((event) => {
   settingsStore.ui.light.toggle()
   event.preventDefault()
 })
 
 // Toggle group visibility
-settingsStore.keycombinations.toggle_color_group.bind((event) => {
-  groupStore.toggle_group_visibility_by_index(Number(event.key)-1)
+settingsStore.keyCombinations.toggle_color_group.bind((event) => {
+  groupStore.toggle_group_visibility_by_index(Number(event.key) - 1)
   event.preventDefault()
 })
 
 
 // Export points
-settingsStore.keycombinations.export.bind((event) => {
+settingsStore.keyCombinations.export.bind((event) => {
   return_download_file()
   event.preventDefault()
 })
 
 // Import points
-settingsStore.keycombinations.import.bind((event) => {
+settingsStore.keyCombinations.import.bind((event) => {
   openDataImportFileDialog()
   event.preventDefault()
 })
 
 // Toggle Camera
-settingsStore.keycombinations.toggle_cam.bind((_) => {
+settingsStore.keyCombinations.toggle_cam.bind((_) => {
   settingsStore.captureVideo.toggle()
 })
 
 // Toggle Color Mode
-settingsStore.keycombinations.toggle_color_mode.bind((_) => {
+settingsStore.keyCombinations.toggle_color_mode.bind((_) => {
   settingsStore.color_mode.toggle()
 })
 
 // Toggle Preview Mode
-settingsStore.keycombinations.toggle_preview.bind((event) => {
+settingsStore.keyCombinations.toggle_preview.bind((event: KeyboardEvent) => {
   settingsStore.ui.hide_settings_column.toggle()
   event.preventDefault()
 })
 
+// Toggle Split Mode
+settingsStore.keyCombinations.toggle_split_mode.bind((_) => {
+  settingsStore.ui.split_mode.toggle()
+})
+
 // Change image opacity
-settingsStore.keycombinations.change_image_opacity.bind((event) => {
+settingsStore.keyCombinations.change_image_opacity.bind((event: KeyboardEvent) => {
   if (event.key === '+') {
     settingsStore.ui.opacity.value = Math.min(settingsStore.ui.opacity.value + 0.1, 1)
   } else {
@@ -97,7 +102,7 @@ settingsStore.keycombinations.change_image_opacity.bind((event) => {
 })
 
 // Keyboard shortcut listener
-function key_listener (event: KeyboardEvent) {
+function key_listener(event: KeyboardEvent) {
   KeyCombination.check_bound_combinations(event)
 }
 
@@ -105,23 +110,26 @@ function key_listener (event: KeyboardEvent) {
 onMounted(() => {
   document.addEventListener('keydown', key_listener)
   document.documentElement.setAttribute('data-bs-theme', settingsStore.theme)
+  toolStore.tools.colorsTool.activate()
 })
 
 // Remove key listener again
 onUnmounted(() => {
   document.removeEventListener('keydown', key_listener)
 })
+
+const toolStore = useToolsStore()
 </script>
 
 <template>
-  <RectangularSelectionTool ref="rectSelectionRef">
+  <RectangularSelectionTool ref="rectSelectionRef" :class="{'user-select-none': toolStore.selectionTool.state.active}">
+    <!-- Overlying menu -->
+    <OverlyingMenu :CaptureCamera="captureCameraRef"></OverlyingMenu>
     <div class="row column-container">
       <!-- Column with image and cam images -->
       <ContentColumn></ContentColumn>
       <!-- Settings column -->
       <SettingsColumn></SettingsColumn>
-      <!-- Overlying menu -->
-      <OverlyingMenu :CaptureCamera="captureCameraRef"></OverlyingMenu>
       <!-- Toasts (popups with temporarily displayed information) -->
       <Toasts></Toasts>
     </div>
@@ -129,18 +137,18 @@ onUnmounted(() => {
 </template>
 
 <style lang="scss">
- @import "./styles/scss/_styles.scss";
+@import "./styles/scss/_styles.scss";
 
 :root {
-    --color-highlighted: rgb(14, 137, 231);
+  --color-highlighted: rgb(14, 137, 231);
 }
 
 .deleteCursor {
-    cursor: url("src/assets/icons/dash-circle.svg") 12 12 , not-allowed !important;
+  cursor: url("src/assets/icons/dash-circle.svg") 12 12, not-allowed !important;
 }
 
 .deleteCursor .deletable {
-    cursor: url("src/assets/icons/dash-circle-fill.svg") 12 12 , not-allowed !important;
+  cursor: url("src/assets/icons/dash-circle-fill.svg") 12 12, not-allowed !important;
 }
 
 .content_container {
@@ -153,11 +161,6 @@ onUnmounted(() => {
   height: fit-content;
 }
 
-#settings-column {
-  overflow-y: auto;
-  overflow-x: clip;
-}
-
 .color_block {
   display: inline-block;
   width: 50px;
@@ -166,12 +169,11 @@ onUnmounted(() => {
 
 
 .highlighted {
-  border-color:  var(--color-highlighted) !important; 
+  border-color: var(--color-highlighted) !important;
 }
 
 .column-container {
-  padding: 0px;
-
+  padding: 0;
 }
 
 /* from https://vuejs.org/guide/built-ins/transition.html#the-transition-component */

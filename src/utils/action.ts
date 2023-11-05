@@ -7,10 +7,14 @@ export interface ActionInterface {
 
 export class Action implements ActionInterface {
 
-    forward() {}
-    undo() {}
+    forward() {
+    }
 
-    constructor(..._) {}
+    undo() {
+    }
+
+    constructor(..._) {
+    }
 
     static createAndPerformAction(...args) {
         // Add action, perform action and return it

@@ -21,15 +21,16 @@ export class KeyCombination {
         this.bound_combinations.forEach(comb => comb.call_if_pressed(event))
     }
 
-    constructor(public key, public modifiers = []) {
+    constructor(public key, public modifiers = [], public active: Boolean = true) {
         this.default = modifiers
     }
+
     is_pressed(event: KeyboardEvent) {
         // Check if key and correct modifiers are pressed
-        return event.key !== '' && this.key.includes(event.key) && this.modifers_pressed(event)
+        return event.key !== '' && this.key.includes(event.key) && this.modifiers_pressed(event)
     }
 
-    private modifers_pressed(event: KeyboardEvent) {
+    private modifiers_pressed(event: KeyboardEvent) {
         // Check if modifiers are pressed
         const pressed_modifiers = Object.values(allModifiers).filter(m => event[m]) // Filter for pressed modifers in of event
         return this.check_same_length(pressed_modifiers) && this.check_all_modifiers_pressed(pressed_modifiers) // Check modifiers align
@@ -45,14 +46,25 @@ export class KeyCombination {
         return pressed_modifiers.length === this.modifiers.length
     }
 
-    bind(fcn: Function) {
+    bind(fcn: Function, target: any = null) {
         KeyCombination.bound_combinations.push(this)
         this._fcn = fcn
+        if (target) {
+            this._fcn = this._fcn.bind(target)
+        }
     }
 
     call_if_pressed(event: KeyboardEvent) {
-        if (this.is_pressed(event)) {
+        if (this.active && this.is_pressed(event)) {
             this._fcn(event)
         }
+    }
+
+    mute() {
+        this.active = false
+    }
+
+    listen() {
+        this.active = true
     }
 }

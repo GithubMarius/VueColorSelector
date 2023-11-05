@@ -8,7 +8,8 @@ function page_coordinates(event: MouseEvent): pointCoordinates {
 }
 
 class Point {
-    constructor (public coords: pointCoordinates = [0,0]) {}
+    constructor(public coords: pointCoordinates = [0, 0]) {
+    }
 
     get style() {
         return pointCoordinatesToStyle(this.coords)
@@ -19,7 +20,7 @@ class Point {
     }
 
     reset() {
-        this.coords = [0,0]
+        this.coords = [0, 0]
     }
 
 }
@@ -27,6 +28,7 @@ class Point {
 interface ListenerCallsInterface {
     [propName: string]: Function
 }
+
 export const selectionTool = {
     ...BaseWithListenerCreation,
     listener_calls: <ListenerCallsInterface>{
@@ -38,6 +40,8 @@ export const selectionTool = {
                 if (!event.shiftKey) {
                     this.trigger_drop_from_selection()
                 }
+            } else if (event.buttons === 2) {
+                this.trigger_drop_from_selection()
             }
         },
         mousemove(this: typeof selectionTool, event: MouseEvent) {
@@ -50,9 +54,7 @@ export const selectionTool = {
             }
         },
         mouseup(this: typeof selectionTool, _: MouseEvent) {
-            this.trigger_to_selection()
-            this.trigger_drop_selecting()
-            this.reset()
+            this.finish_selection()
         },
         mouseenter(this: typeof selectionTool, event: MouseEvent) {
             // TODO: ADD
@@ -61,12 +63,12 @@ export const selectionTool = {
             // TODO: ADD
         }
     },
-    selectables: reactive(<HTMLElement[]> []),
+    selectables: reactive(<HTMLElement[]>[]),
     visible: false,
     start: reactive(new Point()),
     end: reactive(new Point()),
 
-    get style(){
+    get style() {
         return {
             display: (this.visible) ? 'block' : 'none',
             left: this.left + 'px',
@@ -82,13 +84,19 @@ export const selectionTool = {
         return Math.min(this.start.coords[1], this.end.coords[1])
     },
     get width(): number {
-        return Math.abs(this.end.coords[0]-this.start.coords[0])
+        return Math.abs(this.end.coords[0] - this.start.coords[0])
     },
     get height(): number {
-        return Math.abs(this.end.coords[1]-this.start.coords[1])
+        return Math.abs(this.end.coords[1] - this.start.coords[1])
     },
     get diameter_squared(): number {
-        return this.width**2 + this.height**2
+        return this.width ** 2 + this.height ** 2
+    },
+
+    finish_selection() {
+        this.trigger_to_selection()
+        this.trigger_drop_selecting()
+        this.reset()
     },
 
     check_visibility() {
@@ -116,7 +124,7 @@ export const selectionTool = {
 
     get_visible_elements_of_class(css_class: string): HTMLElement[] {
         // Find all html elements with css_class that are currently visible
-        const collection: HTMLCollectionOf<HTMLElement> = <HTMLCollectionOf<HTMLElement>> document.getElementsByClassName(css_class)
+        const collection: HTMLCollectionOf<HTMLElement> = <HTMLCollectionOf<HTMLElement>>document.getElementsByClassName(css_class)
         return [...Object.values(collection)].filter((element: HTMLElement) => element.childElementCount > 0 && element.checkVisibility())
     },
 
@@ -173,5 +181,3 @@ export const selectionTool = {
         return selectable.firstElementChild.getBoundingClientRect()
     }
 }
-selectionTool.create_listeners()
-selectionTool.listen()

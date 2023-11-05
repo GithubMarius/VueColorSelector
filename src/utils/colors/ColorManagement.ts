@@ -1,6 +1,5 @@
-import { ColorArray, ColorAlphaArray, RGBtoHSL } from '@/utils/colors/helpers'
-import { oklch, hsl } from '@/../node_modules/culori'
-import { useSettingsStore } from '@/stores/settings'
+import {ColorAlphaArray, ColorArray, RGBtoHSL} from '@/utils/colors/helpers'
+import {hsl, oklch} from '@/../node_modules/culori'
 
 export interface ColorDataInterface {
     RGBA: ColorAlphaArray
@@ -22,20 +21,21 @@ export class Color implements ColorDataInterface {
         public group: ColorGroup,
         public hovered: Boolean = false,
         public show_details: Boolean = false,
-        public selected: Boolean=false,
+        public selected: Boolean = false,
         public selectingCircle: Boolean = false,
         public selectingBlock: Boolean = false,
         public selectingColorViewer: Boolean = false) {
-            this.group.add_color(this)
-        }
-    get groupname () {
+        this.group.add_color(this)
+    }
+
+    get groupname() {
         return this.group.name
     }
 
     get highlighted() {
         return this.selecting || this.selected || this.hovered
     }
-    
+
     get selecting() {
         // True if either related circle or block is inside current temporary selection
         return this.selectingCircle || this.selectingBlock || this.selectingColorViewer
@@ -43,7 +43,7 @@ export class Color implements ColorDataInterface {
 
     get RGB(): ColorArray {
         // Get RGB array
-        return <ColorArray>this.RGBA.slice(0,3)
+        return <ColorArray>this.RGBA.slice(0, 3)
     }
 
 
@@ -54,7 +54,7 @@ export class Color implements ColorDataInterface {
 
     get HSLA(): ColorArray {
         // Get HSLA array
-        const HSLA: ColorArray|any = this.HSL
+        const HSLA: ColorArray | any = this.HSL
         HSLA.push(this.RGBA[3])
         return <ColorArray>HSLA
     }
@@ -84,7 +84,7 @@ export class Color implements ColorDataInterface {
 
     get css_rgb(): string {
         // CSS rgb color string
-        return `rgb(${this.RGBA.slice(0,3)})`
+        return `rgb(${this.RGBA.slice(0, 3)})`
     }
 
     get css_xPos(): string {
@@ -124,7 +124,8 @@ export class Color implements ColorDataInterface {
 
 export class ColorGroup {
 
-    constructor(public name: string = '', public colors: Array<Color> = [], public visibility=true, public visibility_colors: Boolean = true) {}
+    constructor(public name: string = '', public colors: Array<Color> = [], public visibility = true, public visibility_colors: Boolean = true) {
+    }
 
     get is_default() {
         // Check if default group (nameless group)
@@ -156,7 +157,7 @@ export class ColorGroup {
 
     toggle_visibilty_colors() {
         // Invert visibility of colors
-        this.visibility_colors = !this.visibility_colors 
+        this.visibility_colors = !this.visibility_colors
     }
 
 }

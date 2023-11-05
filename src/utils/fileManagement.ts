@@ -4,6 +4,7 @@ import {useColorStore} from "@/stores/color"
 import {useHistoryStore} from "@/stores/history"
 import {useCamImageStore} from "@/stores/camimages"
 import {useSettingsStore} from "@/stores/settings"
+import {useToastStore} from "@/stores/toasts";
 
 const export_mime_type = 'application/json'
 
@@ -80,6 +81,9 @@ export function return_download_file() {
 
     document.body.removeChild(link)
     window.URL.revokeObjectURL(url)
+
+    const toastStore = useToastStore()
+    toastStore.push_success('Data exported.')
 }
 
 
@@ -88,6 +92,9 @@ function onDataFileChange(event) {
 
     if (check_data_import_file_type(event.target.files[0])) {
         read_data_file(event.target.files[0])
+
+        const toastStore = useToastStore()
+        toastStore.push_success('Data imported.')
     } else {
         throw (new Error('Wrong file type.'))
     }
@@ -100,6 +107,9 @@ export function onImgFileChange(event) {
         const settingsStore = useSettingsStore()
         settingsStore.url = <string>e.target.result;
         resetStores()
+
+        const toastStore = useToastStore()
+        toastStore.push_success('Image loaded.')
     }
 }
 
