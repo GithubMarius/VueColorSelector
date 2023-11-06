@@ -1,4 +1,4 @@
-import {KeyCombination} from '@/utils/keyboardinput'
+import {customModifiers, KeyCombination, modifiersType} from '@/utils/keyboardinput'
 import {reactive, toRaw} from "vue";
 import {useToastStore} from "@/stores/toasts";
 
@@ -48,6 +48,12 @@ interface ListenerCalls {
 }
 
 export class Listener {
+    /* Usage:
+    Listener(function mouseup(event) {...}, 'someElementID')
+
+    Important: Do not use anonymous function. Function name must me event type.
+    (E.g.: Exemplary listener will be called on 'mouseup' event on element with ID 'someElementID'.)
+    */
 
     static createListeners(obj: any, listener_calls: ListenerCalls) {
         return Object.values(listener_calls).map((fcn: Function) => {
@@ -60,7 +66,7 @@ export class Listener {
     fcn: Function
     name: String
 
-    constructor(fcn: Function, public id: null | string = null, public className: null | string = null) {
+    constructor(fcn: Function, public id: null | string = null) {
         this.fcn = fcn
         this.name = <String>fcn.name
     }
@@ -72,6 +78,8 @@ export class Listener {
 
     listen() {
         // Adding event listeners to document
+        console.log(this.name)
+        console.log(this.fcn)
         this.target.addEventListener(<any>this.name, <any>this.fcn)
     }
 
@@ -87,6 +95,39 @@ export class Listener {
             return document.getElementById(this.id)
         }
     }
+}
+
+
+export class MouseUpListener extends Listener {
+    /* Usage:
+    MouseUpListener(function mouseup(event) {...}, 0,['cmd'], 'someElementID')
+
+    Important: Do not use anonymous function. Function name does not matter.
+    */
+    constructor(public nested_fcn: Function, public button: number =0, public modifiers: modifiersType[] =[], public id: null | string = null) {
+        const mouseup = (event: MouseEvent)=> {
+            if (event.button === this.button && this.check_modifiers(event)) {
+                this.nested_fcn(event)
+            }
+        }
+        super(mouseup, id)
+    }
+
+    check_modifiers(event: MouseEvent): Boolean {
+        return Object.entries(customModifiers).every(([key, modifier]: [modifiersType, string[]]) =>
+            this.check_modifier(event, modifier, this.modifiers.includes(key))
+        )
+    }
+
+    check_modifier(event: MouseEvent, modifier: string[], necessary_boolean_value: boolean) {
+        return (modifier.some(mod => event[mod]) === necessary_boolean_value)
+
+    }
+
+    bind(target: any) {
+        this.nested_fcn = this.nested_fcn.bind(target)
+    }
+
 }
 
 export class KeyboardListener {

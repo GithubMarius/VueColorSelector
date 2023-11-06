@@ -1,10 +1,8 @@
-import {KeyCombination} from '@/utils/keyboardinput'
-import {BaseTool, KeyboardListener, Listener, ToolInterface} from "@/utils/tools/helpers";
+import {customModifiers, KeyCombination} from '@/utils/keyboardinput'
+import {BaseTool, KeyboardListener, Listener, MouseUpListener, ToolInterface} from "@/utils/tools/helpers";
 import {canvas_container_position_from_event, pointCoordinates} from "@/utils/general";
 import {useReferenceStore} from "@/stores/references";
 import {reactive} from "vue";
-import {useHistoryStore} from "@/stores/history";
-import {useColorStore} from "@/stores/color";
 
 
 export const referenceTool = <ToolInterface>{
@@ -26,7 +24,11 @@ export const referenceTool = <ToolInterface>{
             const referenceStore = useReferenceStore()
             referenceStore.deleted_selected_pairs()
             referenceStore.deleted_selected_points()
-        }, new KeyCombination('Delete', []))
+        }, new KeyCombination('Delete', [])),
+        new MouseUpListener(function mouseup(event) {
+            console.log(event.target)
+            console.log((<HTMLElement>event.target).classList.contains('referencePoint'))
+        }, 0,['cmd'])
     ]
 }
 

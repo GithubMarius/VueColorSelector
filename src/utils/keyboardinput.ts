@@ -5,7 +5,8 @@ const allModifiers = {
     meta: 'metaKey'
 }
 
-export const customModifiers = {
+export type modifiersType = 'shift' | 'alt' | 'cmd'
+export const customModifiers: { shift: string[]; alt: string[]; cmd: (string)[] } = {
     shift: [allModifiers.shift],
     alt: [allModifiers.alt],
     cmd: [allModifiers.ctrl, allModifiers.meta]
