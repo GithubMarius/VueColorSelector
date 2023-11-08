@@ -20,18 +20,9 @@ const referenceStore = useReferenceStore()
 watch(
     () => settings.url,
     (newUrl, _) => {
-      console.log(newUrl)
-      console.log(document.getElementById('canvas'))
-      console.log(ctx.value)
       showImage(newUrl)
     })
 
-watch(
-    () => settings.color_mode.value,
-    (_value, _) => {
-      drawImage()
-    }
-)
 
 const width = ref(0)
 const height = ref(0)

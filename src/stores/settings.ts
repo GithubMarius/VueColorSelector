@@ -29,6 +29,8 @@ const keyCombinations = {
     'show_keyboard_shortcuts': new KeyCombinationWithInfo('k', [customModifiers.cmd], 'Show keyboard shortcuts'),
 }
 
+import imgUrl from '@/assets/YemiWallington.jpg'
+
 export const useSettingsStore = defineStore("settings", {
     state: () => {
         return {
@@ -40,7 +42,7 @@ export const useSettingsStore = defineStore("settings", {
             colorsSortBy: new SelectionProperty('Sort colors by', ['Hue', 'Chroma/Saturation', 'Lightness'], 2),
             colorsOrderAscending: new BooleanProperty('Ascending', true),
 
-            url: 'src/assets/YemiWallington.jpg',
+            url: imgUrl,
 
             captureVideo: new BooleanPropertyWithIcons('Capture video', false, ['bi-camera-video', 'bi-camera-video-off'], 'danger'),
 

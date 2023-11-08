@@ -42,10 +42,12 @@ function transition_ended(_) {
       </span>
       <span v-if="settingsStore.captureVideo.value"><button class="btn btn-primary bi bi-camera"
                                                             @click="camImageStore.take_image()"></button></span>
-      <span class="flip">
+      <span class="btn-group">
           <!-- TODO Add props inheritance to AutoForm (e.g. props="{btnColor: 'warning'}" being forwarded to ToggleButton) -->
           <AutoForm v-model="settingsStore.ui.hide_settings_column" :shown_in_group="false"></AutoForm>
-        </span>
+          <AutoForm v-model="settingsStore.ui.split_mode" :shown_in_group="false"></AutoForm>
+          <AutoForm v-model="settingsStore.ui.show_short_cuts" :shown_in_group="false"></AutoForm>
+      </span>
       <span class="btn-group">
           <button v-for="(tool, _) in Object.values(toolsStore.tools)" class="btn"
                   :class="[tool.icon, (tool.state.active) ? 'btn-primary' : 'btn-outline-primary']"
@@ -85,10 +87,5 @@ function transition_ended(_) {
 
 .top-menu span:not(:first-child) {
   margin-left: 10px;
-}
-
-/* Fix flip */
-.flip {
-  transform: rotateY(180deg);
 }
 </style>
