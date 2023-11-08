@@ -17,6 +17,7 @@ export const colorsTool = <ToolInterface>{
     ],
     additional_listeners: [
         new Listener(function mouseup(event: MouseEvent) {
+            console.log('hii')
             // Create color
             if (event.button === 0) {
                 const historyStore = useHistoryStore()
