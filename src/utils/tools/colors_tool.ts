@@ -1,4 +1,4 @@
-import {KeyCombination} from '@/utils/keyboardinput'
+import {KeyCombinationWithInfo} from '@/utils/keyboardinput'
 import {BaseTool, KeyboardListener, Listener, ToolInterface} from "@/utils/tools/helpers";
 import {useHistoryStore} from "@/stores/history";
 import {useColorStore} from "@/stores/color";
@@ -8,7 +8,7 @@ export const colorsTool = <ToolInterface>{
     name: 'Colors Tool',
     icon: 'bi bi-palette',
     use_selection: true,
-    keyboard_shortcut: new KeyCombination('c', []),
+    keyboard_shortcut: new KeyCombinationWithInfo('c', []),
     listener_calls: [
         function mousemove() {
         },
@@ -27,7 +27,7 @@ export const colorsTool = <ToolInterface>{
             const historyStore = useHistoryStore()
             const colorStore = useColorStore()
             historyStore.delete_selected_colors(colorStore.selected_colors)
-        }, new KeyCombination('Delete', []))
+        }, new KeyCombinationWithInfo('Delete', []))
     ],
     selection_changed() {}
 }

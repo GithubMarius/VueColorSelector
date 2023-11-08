@@ -1,4 +1,4 @@
-import {customModifiers, KeyCombination, modifiersType} from '@/utils/keyboardinput'
+import {customModifiers, KeyCombinationWithInfo, modifiersType} from '@/utils/keyboardinput'
 import {reactive, toRaw} from "vue";
 import {useToastStore} from "@/stores/toasts";
 
@@ -11,7 +11,7 @@ export interface ToolInterface {
     name: String
 
     // Keyboard shortcut to activate tool
-    keyboard_shortcut: KeyCombination
+    keyboard_shortcut: KeyCombinationWithInfo
 
     // Icons
     icon: String
@@ -130,7 +130,7 @@ export class MouseUpListener extends Listener {
 
 export class KeyboardListener {
 
-    constructor(public fcn: Function, public combination: KeyCombination) {
+    constructor(public fcn: Function, public combination: KeyCombinationWithInfo) {
         this.mute()
     }
 

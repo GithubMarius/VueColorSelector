@@ -1,4 +1,4 @@
-import {KeyCombination} from '@/utils/keyboardinput'
+import {KeyCombinationWithInfo} from '@/utils/keyboardinput'
 import {BaseTool, KeyboardListener, Listener, MouseUpListener, ToolInterface} from "@/utils/tools/helpers";
 import {canvas_container_position_from_event, pointCoordinates} from "@/utils/general";
 import {useReferenceStore} from "@/stores/references";
@@ -11,7 +11,7 @@ export const referenceTool = <ToolInterface>{
     icon: 'bi-arrows-vertical',
     use_selection: true,
     _dragged_point: null,
-    keyboard_shortcut: new KeyCombination('r', []),
+    keyboard_shortcut: new KeyCombinationWithInfo('r', []),
     listener_calls: [
     ],
     additional_listeners: [
@@ -32,7 +32,7 @@ export const referenceTool = <ToolInterface>{
             const referenceStore = useReferenceStore()
             referenceStore.deleted_selected_pairs()
             referenceStore.deleted_selected_points()
-        }, new KeyCombination('Delete', [])),
+        }, new KeyCombinationWithInfo('Delete', [])),
         new MouseUpListener(function mouseup(event: MouseEvent) {
             console.log(event.target)
             console.log((<HTMLElement>event.target).classList.contains('referencePoint'))

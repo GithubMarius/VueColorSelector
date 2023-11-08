@@ -9,23 +9,24 @@ import {
     RangeProperty,
     SelectionProperty
 } from "@/utils/properties"
-import {customModifiers, KeyCombination} from "@/utils/keyboardinput"
+import {customModifiers, KeyCombinationWithInfo} from "@/utils/keyboardinput"
 
 
 const keyCombinations = {
-    'change_image_opacity': new KeyCombination('-+', [customModifiers.cmd]),
-    'export': new KeyCombination('e', [customModifiers.cmd]),
-    'forward': new KeyCombination('y', [customModifiers.cmd]),
-    'import': new KeyCombination('i', [customModifiers.cmd]),
-    'open_tab': new KeyCombination('0123456789', [customModifiers.alt]),
-    'toggle_cam': new KeyCombination('q', [customModifiers.cmd]),
-    'toggle_color_group': new KeyCombination('0123456789', [customModifiers.cmd]),
-    'toggle_color_mode': new KeyCombination('b', [customModifiers.cmd]),
-    'toggle_preview': new KeyCombination('d', [customModifiers.cmd]),
-    'toggle_split_mode': new KeyCombination('x', [customModifiers.cmd]),
-    'toggle_theme': new KeyCombination('g', [customModifiers.cmd]),
-    'undo': new KeyCombination('z', [customModifiers.cmd]),
-    'open_file': new KeyCombination('o', [customModifiers.cmd])
+    'undo': new KeyCombinationWithInfo('z', [customModifiers.cmd], 'Undo'),
+    'forward': new KeyCombinationWithInfo('y', [customModifiers.cmd], 'Redo'),
+    'change_image_opacity': new KeyCombinationWithInfo('-+', [customModifiers.cmd]),
+    'open_file': new KeyCombinationWithInfo('o', [customModifiers.cmd], 'Open image'),
+    'export': new KeyCombinationWithInfo('e', [customModifiers.cmd], 'Export color points and captured images (if option set)'),
+    'import': new KeyCombinationWithInfo('i', [customModifiers.cmd], 'Import color points and captured images (if option set)'),
+    'open_tab': new KeyCombinationWithInfo('0123456789', [customModifiers.alt], 'Open nth tab'),
+    'toggle_cam': new KeyCombinationWithInfo('q', [customModifiers.cmd], 'Activate camera'),
+    'toggle_color_group': new KeyCombinationWithInfo('0123456789', [customModifiers.cmd], 'Toggle visibility of nth color group'),
+    'toggle_color_mode': new KeyCombinationWithInfo('b', [customModifiers.cmd], 'Toggle color mode'),
+    'toggle_preview': new KeyCombinationWithInfo('d', [customModifiers.cmd], 'Toggle preview mode'),
+    'toggle_split_mode': new KeyCombinationWithInfo('x', [customModifiers.cmd], 'Toggle split screen mode'),
+    'toggle_theme': new KeyCombinationWithInfo('g', [customModifiers.cmd], 'Toggle theme (light/dark)'),
+    'show_keyboard_shortcuts': new KeyCombinationWithInfo('k', [customModifiers.cmd], 'Show keyboard shortcuts'),
 }
 
 export const useSettingsStore = defineStore("settings", {
@@ -44,10 +45,10 @@ export const useSettingsStore = defineStore("settings", {
             captureVideo: new BooleanPropertyWithIcons('Capture video', false, ['bi-camera-video', 'bi-camera-video-off'], 'danger'),
 
             ui: {
-                show_short_cuts: new BooleanProperty('Show shortcuts', false),
+                show_short_cuts: new BooleanPropertyWithIcons('Show shortcuts', false, ['bi-keyboard', 'bi-keyboard'], 'secondary'),
                 light: new BooleanProperty('Light/Dark UI', true),
-                hide_settings_column: new BooleanPropertyWithIcons('Hide side menu', false, ['bi-window', 'bi-window-sidebar'], 'warning'),
-                split_mode: new BooleanProperty('Split mode', false),
+                hide_settings_column: new BooleanPropertyWithIcons('Hide side menu', false, ['bi-window', 'bi-window-sidebar'], 'secondary'),
+                split_mode: new BooleanPropertyWithIcons('Split mode', false, ['bi-window-split', 'bi-window'], 'secondary'),
 
                 color_circle_radius: new RadiusProperty('Color circle radius', 15, 4, 50),
                 reference_circle_radius: new RadiusProperty('Reference circle radius', 8, 2, 50),

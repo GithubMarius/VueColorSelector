@@ -19,7 +19,7 @@ import RectangularSelectionTool from '@/components/RectangularSelection.vue'
 
 // Utils
 import {openDataImportFileDialog, openImgFileDialog, return_download_file} from '@/utils/fileManagement'
-import {KeyCombination} from './utils/keyboardinput'
+import {KeyCombinationWithInfo} from './utils/keyboardinput'
 import Toasts from "@/components/Toasts.vue";
 import {useToolsStore} from "@/stores/tools";
 import KeyboardShortcutsModal from "@/components/KeyboardShortcutsModal.vue";
@@ -64,15 +64,21 @@ settingsStore.keyCombinations.open_file.bind((event) => {
   event.preventDefault()
 })
 
+// Import points (and captured images)
+settingsStore.keyCombinations.import.bind((event: KeyboardEvent) => {
+  openDataImportFileDialog()
+  event.preventDefault()
+})
+
 // Export points (and captured images)
 settingsStore.keyCombinations.export.bind((event: KeyboardEvent) => {
   return_download_file()
   event.preventDefault()
 })
 
-// Import points (and captured images)
-settingsStore.keyCombinations.import.bind((event: KeyboardEvent) => {
-  openDataImportFileDialog()
+// Show keyboard shortcuts
+settingsStore.keyCombinations.show_keyboard_shortcuts.bind((event: KeyboardEvent) => {
+  settingsStore.ui.show_short_cuts.value = true
   event.preventDefault()
 })
 
@@ -109,7 +115,7 @@ settingsStore.keyCombinations.change_image_opacity.bind((event: KeyboardEvent) =
 
 // Keyboard shortcut listener
 function key_listener(event: KeyboardEvent) {
-  KeyCombination.check_bound_combinations(event)
+  KeyCombinationWithInfo.check_bound_combinations(event)
 }
 
 // Add key listener and set theme attribute

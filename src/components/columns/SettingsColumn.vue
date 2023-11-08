@@ -17,6 +17,7 @@ import ColorViewer from '@/components/ColorViewer.vue'
 import {useSettingsStore} from '@/stores/settings'
 import {useToolsStore} from "@/stores/tools";
 import {useReferenceStore} from "@/stores/references";
+import {KeyCombination, KeyCombinationWithInfo} from "../../utils/keyboardinput";
 
 const settingsStore = useSettingsStore()
 
@@ -54,11 +55,6 @@ const referenceStore = useReferenceStore()
 <template>
   <div id="settings-column" class="overflow-auto p-0 min-vh-100 vh-100 mw-20 bg-body-tertiary"
        :class="[!settingsStore.ui.hide_settings_column.value? 'col-4' : 'd-none']">
-    {{ referenceStore.last_activated }}
-    <button type="button" class="btn btn-primary" @click="settingsStore.ui.show_short_cuts.toggle()">
-      Launch demo modal
-      {{settingsStore.ui.show_short_cuts}}
-    </button>
     <div class="row">
       <!-- Color viewer -->
       <ColorViewer></ColorViewer>
