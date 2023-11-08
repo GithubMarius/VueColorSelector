@@ -17,7 +17,6 @@ import ColorViewer from '@/components/ColorViewer.vue'
 import {useSettingsStore} from '@/stores/settings'
 import {useToolsStore} from "@/stores/tools";
 import {useReferenceStore} from "@/stores/references";
-import {KeyCombination, KeyCombinationWithInfo} from "../../utils/keyboardinput";
 
 const settingsStore = useSettingsStore()
 
@@ -25,14 +24,13 @@ const settingsStore = useSettingsStore()
 const tabs = {
   active_tab_id: ref(0),
   tab_buttons: ref(0),
-  list:
-      {
-        'Captured Images': CapturedImagesTab,
-        'Colors': GroupedColorsTab,
-//      'References': ReferenceTab,
+  list: {
+    'Colors': GroupedColorsTab,
+    'Captured Images': CapturedImagesTab,
     'Settings': SettingsTab,
     'Import/Export': ImportExportTab,
     'History': HistoryTab,
+//      'References': ReferenceTab,
   },
   open_tab(index: number) {
     if ([...this.tab_buttons.value.keys()].includes(index)) {

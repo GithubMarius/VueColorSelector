@@ -9,19 +9,19 @@ import {
     RangeProperty,
     SelectionProperty
 } from "@/utils/properties"
-import {customModifiers, KeyCombinationWithInfo} from "@/utils/keyboardinput"
+import {customModifiers, KeyCombinationWithInfo, specialKeys} from "@/utils/keyboardinput"
 
 
 const keyCombinations = {
     'undo': new KeyCombinationWithInfo('z', [customModifiers.cmd], 'Undo'),
     'forward': new KeyCombinationWithInfo('y', [customModifiers.cmd], 'Redo'),
-    'change_image_opacity': new KeyCombinationWithInfo('-+', [customModifiers.cmd]),
+    'change_image_opacity': new KeyCombinationWithInfo(specialKeys.plusMinus, [customModifiers.cmd]),
     'open_file': new KeyCombinationWithInfo('o', [customModifiers.cmd], 'Open image'),
     'export': new KeyCombinationWithInfo('e', [customModifiers.cmd], 'Export color points and captured images (if option set)'),
     'import': new KeyCombinationWithInfo('i', [customModifiers.cmd], 'Import color points and captured images (if option set)'),
-    'open_tab': new KeyCombinationWithInfo('0123456789', [customModifiers.alt], 'Open nth tab'),
+    'open_tab': new KeyCombinationWithInfo(specialKeys.number, [customModifiers.alt], 'Open nth tab'),
     'toggle_cam': new KeyCombinationWithInfo('q', [customModifiers.cmd], 'Activate camera'),
-    'toggle_color_group': new KeyCombinationWithInfo('0123456789', [customModifiers.cmd], 'Toggle visibility of nth color group'),
+    'toggle_color_group': new KeyCombinationWithInfo(specialKeys.number, [customModifiers.cmd], 'Toggle visibility of nth color group (0th: colors without group)'),
     'toggle_color_mode': new KeyCombinationWithInfo('b', [customModifiers.cmd], 'Toggle color mode'),
     'toggle_preview': new KeyCombinationWithInfo('d', [customModifiers.cmd], 'Toggle preview mode'),
     'toggle_split_mode': new KeyCombinationWithInfo('x', [customModifiers.cmd], 'Toggle split screen mode'),
