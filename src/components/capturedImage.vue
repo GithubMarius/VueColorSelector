@@ -25,7 +25,7 @@ onMounted(() => {
 
 <template>
   <!-- <any>settingsStore.ui.split_mode.value -->
-  <Teleport to="#canvas-container" :disabled="<any>settingsStore.ui.split_mode.value" v-if="mounted">
+  <Teleport to="#canvas-container-wrapper" :disabled="<boolean>settingsStore.ui.split_mode.value" v-if="mounted">
     <div class="captured-image-container"
          v-if="camImageStore.activated_image_exists && !settingsStore.captureVideo.value">
       <img :src="camImageStore.active_image.imgUrl" :style="CapturedImageStyle">

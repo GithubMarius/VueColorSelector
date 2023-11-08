@@ -22,6 +22,7 @@ export const useToolsStore = defineStore("tools", {
 
         state.selectionTool.create_listeners()
         state.selectionTool.listen()
+        state.selectionTool.get_store = useToolsStore
         return state
     }
 })

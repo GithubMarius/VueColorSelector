@@ -36,7 +36,9 @@ const styleReal = computed(function (): StyleValue {
 
 <template>
   <SelectableElement v-model:selecting="pair.selecting" v-model:selected="pair.selected" :active="toolsStore.tools.referenceTool.state.active">
-    <hr class="pairline pairline_digital" :class="{'pairline_select': pair.highlighted}" :style="styleDigital">
+    <hr class="pairline pairline_digital" :class="{'pairline_select': pair.highlighted,
+    'pe-none': toolsStore.tools.referenceTool.dragged_point
+    }" :style="styleDigital">
   </SelectableElement>
 </template>
 

@@ -24,6 +24,10 @@ export const useReferenceStore = defineStore("references", {
             this.pairs.push(pair)
         },
         delete_point(point: ReferencePoint) {
+            // Delete pairs that include point and then delete point
+            const pairs = this.pairs.filter((pair: ReferencePair) => pair.contains(point))
+            this.delete_pairs(pairs)
+
             const index = this.points.indexOf(point)
             this.points.splice(index,1)
         },
@@ -33,8 +37,6 @@ export const useReferenceStore = defineStore("references", {
         },
         delete_points(points: ReferencePoint[]) {
             points.forEach((point: ReferencePoint) => {
-                const pairs = this.pairs.filter((pair: ReferencePair) => pair.contains(point))
-                this.delete_pairs(pairs)
                 this.delete_point(point)
             })
         },

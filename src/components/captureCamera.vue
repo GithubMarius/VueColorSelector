@@ -4,13 +4,14 @@ import {useSettingsStore} from '@/stores/settings';
 import {onMounted, ref, watch} from 'vue';
 
 const settingsStore = useSettingsStore()
+const camImageStore = useCamImageStore()
 
 const loadedMetaData = ref(false)
 
 watch(() => settingsStore.captureVideo.value, (_prev, _next) => {
   if (settingsStore.captureVideo.value && !videoRef.value.srcObject) {
     startVideo()
-    if (!settingsStore.ui.hide_settings_column.value) {
+    if (!settingsStore.ui.split_mode.value) {
       settingsStore.ui.opacity.value = 0.5
     }
   } else {
@@ -21,7 +22,7 @@ watch(() => settingsStore.captureVideo.value, (_prev, _next) => {
 const videoRef = ref()
 
 function startVideo() {
-  var All_mediaDevices = navigator.mediaDevices
+  const All_mediaDevices = navigator.mediaDevices
   if (!All_mediaDevices || !All_mediaDevices.getUserMedia) {
     console.log("getUserMedia() not supported.");
     throw new Error('No camera found.')
@@ -31,7 +32,7 @@ function startVideo() {
     video: true
   })
       .then(function (vidStream) {
-        var video = <HTMLVideoElement>videoRef.value;
+        const video = <HTMLVideoElement>videoRef.value;
         if ("srcObject" in video) {
           video.srcObject = vidStream;
         } else {
@@ -51,12 +52,11 @@ function startVideo() {
 function takeImage() {
   // Take image from current video
   const video = videoRef.value
-  var canvas = document.createElement('canvas');
+  const canvas = document.createElement('canvas');
   canvas.height = video.videoHeight;
   canvas.width = video.videoWidth;
-  var ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d');
   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  const camImageStore = useCamImageStore()
   camImageStore.add_image_from_url(canvas.toDataURL())
 }
 
@@ -64,9 +64,9 @@ function stopVideo() {
   const video = videoRef.value
   const stream = video.srcObject;
   if (stream) {
-    const tracks = stream.getTracks();
+    const tracks: MediaStreamTrack[] = stream.getTracks();
 
-    tracks.forEach((track) => {
+    tracks.forEach((track: MediaStreamTrack) => {
       track.stop();
     });
   }
@@ -89,8 +89,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <Teleport to="#canvas-container" :disabled="!settingsStore.ui.hide_settings_column.value" v-if="mounted">
+  <Teleport to="#canvas-container-wrapper" :disabled="<boolean>settingsStore.ui.split_mode.value" v-if="mounted">
     <video ref="videoRef" id="video" :hidden="!settingsStore.captureVideo"></video>
+    <transition name="fade">
+      <div id="flash" v-if="camImageStore.flash"></div>
+    </transition>
   </Teleport>
 </template>
 
@@ -102,5 +105,24 @@ onMounted(() => {
   transform: translate(-50%, -50%);
   max-width: 100%;
   max-height: 100%;
+}
+
+#flash {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+}
+
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from {
+  opacity: 1;
+}
+
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

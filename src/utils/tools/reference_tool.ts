@@ -1,4 +1,4 @@
-import {customModifiers, KeyCombination} from '@/utils/keyboardinput'
+import {KeyCombination} from '@/utils/keyboardinput'
 import {BaseTool, KeyboardListener, Listener, MouseUpListener, ToolInterface} from "@/utils/tools/helpers";
 import {canvas_container_position_from_event, pointCoordinates} from "@/utils/general";
 import {useReferenceStore} from "@/stores/references";
@@ -10,26 +10,45 @@ export const referenceTool = <ToolInterface>{
     name: 'Reference Tool',
     icon: 'bi-arrows-vertical',
     use_selection: true,
+    _dragged_point: null,
     keyboard_shortcut: new KeyCombination('r', []),
-    listener_calls: [],
+    listener_calls: [
+    ],
     additional_listeners: [
         new Listener(function mouseup(event: MouseEvent) {
-           if ((<HTMLElement>event.target)?.id === 'canvas') {
+            this.dragged_point = null
+            if ((<HTMLElement>event.target)?.id === 'canvas') {
                 const point = ReferencePoint.point_from_event(event)
                 const referenceStore = useReferenceStore()
                 referenceStore.add_point(point, event.shiftKey)
-           }
+            }
         }, 'canvas-container'),
+        new Listener(function mousemove(event: MouseEvent) {
+            if (this.dragged_point) {
+                this.dragged_point.update_from_event(event)
+            }
+        }),
         new KeyboardListener(function delete_selected(_: KeyboardEvent) {
             const referenceStore = useReferenceStore()
             referenceStore.deleted_selected_pairs()
             referenceStore.deleted_selected_points()
         }, new KeyCombination('Delete', [])),
-        new MouseUpListener(function mouseup(event) {
+        new MouseUpListener(function mouseup(event: MouseEvent) {
             console.log(event.target)
             console.log((<HTMLElement>event.target).classList.contains('referencePoint'))
-        }, 0,['cmd'])
-    ]
+        }, 0, ['cmd'])
+    ],
+    set dragged_point(point: ReferencePoint) {
+        this.state['dragged_point'] = point
+        if (point) {
+            this.get_store().selectionTool.mute()
+        } else {
+            this.get_store().selectionTool.listen()
+        }
+    },
+    get dragged_point(): ReferencePoint {
+        return this.state.dragged_point
+    }
 }
 
 interface ReferencePointInterface {
@@ -122,6 +141,10 @@ export class ReferencePoint implements ReferencePointInterface {
         // Return angle between both points in rad
         const sub = this.subtract(point)
         return Math.atan2(sub[1], sub[0])
+    }
+
+    update_from_event(event: MouseEvent) {
+        [this.coords[0], this.coords[1]] = canvas_container_position_from_event(event)
     }
 }
 

@@ -24,7 +24,8 @@ const keyCombinations = {
     'toggle_preview': new KeyCombination('d', [customModifiers.cmd]),
     'toggle_split_mode': new KeyCombination('x', [customModifiers.cmd]),
     'toggle_theme': new KeyCombination('g', [customModifiers.cmd]),
-    'undo': new KeyCombination('z', [customModifiers.cmd])
+    'undo': new KeyCombination('z', [customModifiers.cmd]),
+    'open_file': new KeyCombination('o', [customModifiers.cmd])
 }
 
 export const useSettingsStore = defineStore("settings", {
@@ -43,6 +44,7 @@ export const useSettingsStore = defineStore("settings", {
             captureVideo: new BooleanPropertyWithIcons('Capture video', false, ['bi-camera-video', 'bi-camera-video-off'], 'danger'),
 
             ui: {
+                show_short_cuts: new BooleanProperty('Show shortcuts', false),
                 light: new BooleanProperty('Light/Dark UI', true),
                 hide_settings_column: new BooleanPropertyWithIcons('Hide side menu', false, ['bi-window', 'bi-window-sidebar'], 'warning'),
                 split_mode: new BooleanProperty('Split mode', false),

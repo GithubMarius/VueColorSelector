@@ -41,7 +41,7 @@ const tabs = {
 }
 
 // Go to tab
-settingsStore.keyCombinations.open_tab.bind((event) => {
+settingsStore.keyCombinations.open_tab.bind((event: KeyboardEvent) => {
   tabs.open_tab(Number(event.key) - 1)
   event.preventDefault()
 })
@@ -52,9 +52,13 @@ const referenceStore = useReferenceStore()
 </script>
 
 <template>
-  <div id="settings-column" class="overflow-auto p-0 min-vh-100 mw-20 bg-body-tertiary"
+  <div id="settings-column" class="overflow-auto p-0 min-vh-100 vh-100 mw-20 bg-body-tertiary"
        :class="[!settingsStore.ui.hide_settings_column.value? 'col-4' : 'd-none']">
-    {{ referenceStore.points.length }}
+    {{ referenceStore.last_activated }}
+    <button type="button" class="btn btn-primary" @click="settingsStore.ui.show_short_cuts.toggle()">
+      Launch demo modal
+      {{settingsStore.ui.show_short_cuts}}
+    </button>
     <div class="row">
       <!-- Color viewer -->
       <ColorViewer></ColorViewer>

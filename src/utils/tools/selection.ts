@@ -33,7 +33,9 @@ export const selectionTool = {
     ...BaseWithListenerCreation,
     listener_calls: <ListenerCallsInterface>{
         mousedown(this: typeof selectionTool, event: MouseEvent) {
-            if (event.buttons === 1) {
+            if ((<HTMLElement>event?.target)?.tagName == 'INPUT') {
+                this.ignore_current_events = true
+            } else if (event.buttons === 1) {
                 this.start.from_event(event)
                 this.end.from_event(event)
                 this.refresh_selectables()
@@ -45,7 +47,7 @@ export const selectionTool = {
             }
         },
         mousemove(this: typeof selectionTool, event: MouseEvent) {
-            if (event.buttons === 1) {
+            if (event.buttons === 1 && !this.ignore_current_events) {
                 this.end.from_event(event)
                 this.check_visibility()
                 if (this.visible) {
@@ -55,6 +57,7 @@ export const selectionTool = {
         },
         mouseup(this: typeof selectionTool, _: MouseEvent) {
             this.finish_selection()
+            this.ignore_current_events = false
         },
         mouseenter(this: typeof selectionTool, event: MouseEvent) {
             // TODO: ADD
@@ -67,6 +70,7 @@ export const selectionTool = {
     visible: false,
     start: reactive(new Point()),
     end: reactive(new Point()),
+    ignore_current_events: false,
 
     get style() {
         return {
@@ -97,6 +101,7 @@ export const selectionTool = {
         this.trigger_to_selection()
         this.trigger_drop_selecting()
         this.reset()
+        this.get_store()?.active_tool?.selection_changed()
     },
 
     check_visibility() {

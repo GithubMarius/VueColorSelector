@@ -28,6 +28,7 @@ export const colorsTool = <ToolInterface>{
             const colorStore = useColorStore()
             historyStore.delete_selected_colors(colorStore.selected_colors)
         }, new KeyCombination('Delete', []))
-    ]
+    ],
+    selection_changed() {}
 }
  

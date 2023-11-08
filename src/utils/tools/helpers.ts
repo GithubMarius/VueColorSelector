@@ -78,8 +78,6 @@ export class Listener {
 
     listen() {
         // Adding event listeners to document
-        console.log(this.name)
-        console.log(this.fcn)
         this.target.addEventListener(<any>this.name, <any>this.fcn)
     }
 
@@ -171,6 +169,7 @@ export const BaseWithListenerCreation = {
     mute() {
         this.listeners.forEach((listener: Listener | KeyboardListener) => listener.mute())
     },
+    selection_changed() {}
 }
 
 export const BaseTool = {

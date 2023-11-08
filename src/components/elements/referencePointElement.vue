@@ -6,9 +6,11 @@ import {useSettingsStore} from '@/stores/settings';
 import {combine} from '@/utils/general';
 import {ReferencePoint} from "@/utils/tools/reference_tool";
 import {useToolsStore} from "@/stores/tools";
+import {useReferenceStore} from "@/stores/references";
 
 const settings = useSettingsStore()
 const toolsStore = useToolsStore()
+const referenceStore = useReferenceStore()
 
 const props = defineProps({
   point: {
@@ -40,6 +42,8 @@ const styleReal = computed(function (): StyleValue {
 
 <template>
   <SelectableElement v-model:selecting="point.selecting" v-model:selected="point.selected"
+                     @mouseup.ctrl.exact="referenceStore.delete_point(point)"
+                     @mousedown.exact="toolsStore.tools.referenceTool.dragged_point = point"
                      :active="toolsStore.tools.referenceTool.state.active">
     <div class="referencePoint" :style="styleDigital"></div>
   </SelectableElement>

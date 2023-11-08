@@ -35,11 +35,11 @@ const toolsStore = useToolsStore()
 
 <template>
   <SelectableElement :selecting="selecting" @update:selecting="$emit('update:selecting', $event)"
-                     v-model:selected="color.selected"
+                     v-model:selected="color.selected" @update:selected="console.log('hi')"
                      :active="toolsStore.tools.colorsTool.state.active"
-                     @click.ctrl.stop="historyStore.delete_color(color)"
-                     @click.shift.stop="color.selected = !color.selected"
-                     @click.alt.exact="update_show_details_color(color)"
+                     @mouseup.ctrl.capture.stop="historyStore.delete_color(color)"
+                     @mouseup.shift.capture.stop="color.selected = !color.selected"
+                     @mouseup.alt.capture.stop="update_show_details_color(color)"
                      @mouseover="colorStore.color_hover(color)"
                      @mouseleave="colorStore.color_unhover_all()"
                      :data-color-id="colorStore.color_index(color)">

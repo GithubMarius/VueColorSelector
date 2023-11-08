@@ -113,6 +113,14 @@ export function onImgFileChange(event) {
     }
 }
 
+export function openImgFileDialog() {
+    const input = document.createElement("input")
+    input.setAttribute("type", "file")
+    input.setAttribute("accept", "")
+    input.click()
+    input.onchange = onImgFileChange
+}
+
 export function openDataImportFileDialog() {
     const input = document.createElement("input")
     input.setAttribute("type", "file")

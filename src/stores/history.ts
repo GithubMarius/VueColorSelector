@@ -29,6 +29,7 @@ export const useHistoryStore = defineStore('history', {
 
         // Delete color
         delete_color(...args) {
+            console.log('Deleting color')
             return this.perform_action(DeleteColorAction, ...args)
         },
 

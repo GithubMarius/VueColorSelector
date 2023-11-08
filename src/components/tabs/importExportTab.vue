@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import {useSettingsStore} from '@/stores/settings'
-import {onImgFileChange, openDataImportFileDialog, return_download_file} from '@/utils/fileManagement';
+import {
+  openDataImportFileDialog,
+  openImgFileDialog,
+  return_download_file
+} from '@/utils/fileManagement';
 import SwitchButton from '@/components/ui/SwitchButton.vue'
 import formGroup from '@/components/ui/FormGroup.vue'
 
@@ -31,8 +35,8 @@ const settingsStore = useSettingsStore()
     </template>
     <template #content>
       <div class="row m-2">
-        <input type="file" class="form-control" @change="onImgFileChange">
-
+        <button class="btn btn-primary" @click="openImgFileDialog()">Open Image
+        </button>
       </div>
       <div class="row m-2">
         <button class="btn btn-primary" @click="return_download_file">Export

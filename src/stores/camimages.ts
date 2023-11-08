@@ -44,10 +44,29 @@ export const useCamImageStore = defineStore('camImageStore', {
     state: () => {
         return {
             images: [],
-            editing_image: false
+            editing_image: false,
+            capturing_images: false,
+            flash: false
         }
     },
     actions: {
+        take_image() {
+            // Take image from current video
+            const video: HTMLVideoElement = <HTMLVideoElement>document.getElementById('video')
+            if (video) {
+                const canvas = document.createElement('canvas');
+                canvas.height = video.videoHeight;
+                canvas.width = video.videoWidth;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                this.add_image_from_url(canvas.toDataURL())
+                this.flash = true
+                setTimeout(() => {this.flash = false}, 20)
+
+            } else {
+                console.log('Could not take image.')
+            }
+        },
         add_image_from_url(imgUrl) {
             this.images.push(new CapturedImage(imgUrl))
         },

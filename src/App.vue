@@ -18,10 +18,11 @@ import OverlyingMenu from '@/components/OverlyingMenu.vue'
 import RectangularSelectionTool from '@/components/RectangularSelection.vue'
 
 // Utils
-import {openDataImportFileDialog, return_download_file} from '@/utils/fileManagement'
+import {openDataImportFileDialog, openImgFileDialog, return_download_file} from '@/utils/fileManagement'
 import {KeyCombination} from './utils/keyboardinput'
 import Toasts from "@/components/Toasts.vue";
 import {useToolsStore} from "@/stores/tools";
+import KeyboardShortcutsModal from "@/components/KeyboardShortcutsModal.vue";
 
 // Refs
 const rectSelectionRef = ref(null)
@@ -46,37 +47,42 @@ settingsStore.keyCombinations.undo.bind(historyStore.undo)
 settingsStore.keyCombinations.forward.bind(historyStore.forward)
 
 // Toggle theme
-settingsStore.keyCombinations.toggle_theme.bind((event) => {
+settingsStore.keyCombinations.toggle_theme.bind((event: KeyboardEvent) => {
   settingsStore.ui.light.toggle()
   event.preventDefault()
 })
 
 // Toggle group visibility
-settingsStore.keyCombinations.toggle_color_group.bind((event) => {
+settingsStore.keyCombinations.toggle_color_group.bind((event: KeyboardEvent) => {
   groupStore.toggle_group_visibility_by_index(Number(event.key) - 1)
   event.preventDefault()
 })
 
+// Open image
+settingsStore.keyCombinations.open_file.bind((event) => {
+  openImgFileDialog()
+  event.preventDefault()
+})
 
-// Export points
-settingsStore.keyCombinations.export.bind((event) => {
+// Export points (and captured images)
+settingsStore.keyCombinations.export.bind((event: KeyboardEvent) => {
   return_download_file()
   event.preventDefault()
 })
 
-// Import points
-settingsStore.keyCombinations.import.bind((event) => {
+// Import points (and captured images)
+settingsStore.keyCombinations.import.bind((event: KeyboardEvent) => {
   openDataImportFileDialog()
   event.preventDefault()
 })
 
 // Toggle Camera
-settingsStore.keyCombinations.toggle_cam.bind((_) => {
+settingsStore.keyCombinations.toggle_cam.bind(() => {
   settingsStore.captureVideo.toggle()
 })
 
 // Toggle Color Mode
-settingsStore.keyCombinations.toggle_color_mode.bind((_) => {
+settingsStore.keyCombinations.toggle_color_mode.bind(() => {
   settingsStore.color_mode.toggle()
 })
 
@@ -87,7 +93,7 @@ settingsStore.keyCombinations.toggle_preview.bind((event: KeyboardEvent) => {
 })
 
 // Toggle Split Mode
-settingsStore.keyCombinations.toggle_split_mode.bind((_) => {
+settingsStore.keyCombinations.toggle_split_mode.bind(() => {
   settingsStore.ui.split_mode.toggle()
 })
 
@@ -130,10 +136,12 @@ const toolStore = useToolsStore()
       <ContentColumn></ContentColumn>
       <!-- Settings column -->
       <SettingsColumn></SettingsColumn>
-      <!-- Toasts (popups with temporarily displayed information) -->
-      <Toasts></Toasts>
     </div>
+    <!-- Toasts (popups with temporarily displayed information) -->
+    <Toasts></Toasts>
   </RectangularSelectionTool>
+  <!-- Modal -->
+  <KeyboardShortcutsModal/>
 </template>
 
 <style lang="scss">
@@ -151,8 +159,13 @@ const toolStore = useToolsStore()
   cursor: url("src/assets/icons/dash-circle-fill.svg") 12 12, not-allowed !important;
 }
 
-.content_container {
-  max-height: 100%;
+.column-container {
+  max-height: 100vh;
+}
+
+.column-container > div {
+  min-height: 100% !important;
+  overflow: auto;
 }
 
 #canvas-column {
