@@ -1,26 +1,24 @@
+import {useHistoryStore} from "@/stores/history";
+
 export interface ActionInterface {
 
+    test: Function
     forward: Function
     undo: Function
 
 }
 
-export class Action implements ActionInterface {
+export abstract class Action {
 
-    forward() {
+    constructor() {
     }
-
-    undo() {
-    }
-
-    constructor(..._) {
-    }
-
-    static createAndPerformAction(...args) {
-        // Add action, perform action and return it
+    static create<T extends Action, Args extends any[]>(this: {new(...args: Args): T}, ...args: Args)
+    {
         const action = new this(...args)
-        action.forward()
-        return action
+        const historyStore = useHistoryStore()
+        return historyStore.perform_action(action)
     }
 
+    abstract forward(): void
+    abstract undo(): void
 }

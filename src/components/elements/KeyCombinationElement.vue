@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import {KeyCombination, KeyCombinationWithInfo, modifierLabels} from "@/utils/keyboardinput";
+import {get_display_string_for_key_of_combination, KeyCombinationWithInfo, modifierLabels} from "@/utils/keyboardinput";
 
 const props = defineProps({
   'combination': {
-    type: KeyCombination || KeyCombinationWithInfo
+    type: KeyCombinationWithInfo
   },
   'pressedModifiers': {
     type: Array
@@ -28,9 +28,11 @@ const props = defineProps({
     <td>{{ (combination.modifiers.length > 0) ? '+' : '' }}</td>
     <td>
       <span class="btn pe-none text-uppercase"
-          :class="pressedKeys.includes(combination.key) ? 'btn-primary' : 'btn-outline-primary'"> {{ combination.key }} </span>
+          :class="pressedKeys.some((key: string) => combination.check_key(key))? 'btn-primary' : 'btn-outline-primary'"> {{
+          get_display_string_for_key_of_combination(combination.key)
+        }} </span>
     </td>
-    <td>{{ combination.description }}</td>
+    <td>{{ combination?.description }}</td>
   </tr>
 </template>
 

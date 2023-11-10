@@ -9,6 +9,7 @@ import {
 } from "@/actions/coloractions";
 import {Action} from "@/utils/action";
 import {useToastStore} from "@/stores/toasts";
+import {Color, ColorDataInterface} from "@/utils/colors/ColorManagement";
 
 export const useHistoryStore = defineStore('history', {
     state: () => {
@@ -18,41 +19,6 @@ export const useHistoryStore = defineStore('history', {
         }
     },
     actions: {
-        // Add actions here
-
-        // ----------------------->
-
-        // Add color
-        add_color(event) {
-            return this.perform_action(CreateColorAction, event)
-        },
-
-        // Delete color
-        delete_color(...args) {
-            console.log('Deleting color')
-            return this.perform_action(DeleteColorAction, ...args)
-        },
-
-        delete_selected_colors(...args) {
-            return this.perform_action(DeleteMultipleColors, ...args)
-        },
-
-        // Import colors
-        import_colors(...args) {
-            return this.perform_action(ImportColors, ...args)
-        },
-
-        // Add selection to group
-        add_selection_to_group(...args) {
-            return this.perform_action(AddSelectionToGroup, ...args)
-        },
-
-        // Rename group
-        rename_group(...args) {
-            return this.perform_action(RenameGroup, ...args)
-        },
-
-        // ----------------------->
 
         // Store methods
         undo() {
@@ -71,18 +37,23 @@ export const useHistoryStore = defineStore('history', {
                 toastStore.push_success('Redo.', 100)
             }
         },
-        add_action(action) {
+        add_action(action: Action) {
             this.history.splice(0, this.index)
             this.history.unshift(action)
             this.index = 0
         },
-        perform_action(ActionToPerform: typeof Action, ...args) {
+        perform_action(action: Action): {success: boolean, msg: string} {
             try {
-                const action = ActionToPerform.createAndPerformAction(...args)
                 this.add_action(action)
+                action.forward()
                 return {success: true, msg: ''}
             } catch (err) {
-                console.log(`Could not perform action. Received error: ${err}`)
+                if(err.message !== 'ActionNotPossible') {
+                    console.log(`Could not perform action. Received error unusual error: ${err}`)
+                }
+                else {
+                    console.log('Action was not possible.')
+                }
                 return {success: false, msg: err.message}
             }
         },

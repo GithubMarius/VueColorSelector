@@ -103,8 +103,8 @@ onMounted(() => {
 
       <!-- Circles, reference points and reference lines-->
       <ColorCircleElement v-for="(color, index) in colorStore.colors" :key="index" :color="color"></ColorCircleElement>
-      <ReferencePointElement v-for="(refPoint, _) in referenceStore.points" :point="refPoint"></ReferencePointElement>
       <ReferencePairElement v-for="(refPair, _) in referenceStore.pairs" :pair="refPair"></ReferencePairElement>
+      <ReferencePointElement v-for="(refPoint, _) in referenceStore.points" :point="refPoint"></ReferencePointElement>
     </div>
   </div>
 </template>

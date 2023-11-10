@@ -3,6 +3,7 @@ import {BaseTool, KeyboardListener, Listener, MouseUpListener, ToolInterface} fr
 import {canvas_container_position_from_event, pointCoordinates} from "@/utils/general";
 import {useReferenceStore} from "@/stores/references";
 import {reactive} from "vue";
+import {createReferencePointAction} from "@/actions/referenceactions";
 
 
 export const referenceTool = <ToolInterface>{
@@ -15,17 +16,18 @@ export const referenceTool = <ToolInterface>{
     listener_calls: [
     ],
     additional_listeners: [
-        new Listener(function mouseup(event: MouseEvent) {
+        new Listener('mouseup', function mouseup(event: MouseEvent) {
             this.dragged_point = null
             if ((<HTMLElement>event.target)?.id === 'canvas') {
-                const point = ReferencePoint.point_from_event(event)
-                const referenceStore = useReferenceStore()
-                referenceStore.add_point(point, event.shiftKey)
+                createReferencePointAction.create(event)
             }
         }, 'canvas-container'),
-        new Listener(function mousemove(event: MouseEvent) {
+        new Listener('mousemove', function mousemove(event: MouseEvent) {
             if (this.dragged_point) {
+                const referenceStore = useReferenceStore()
+                const relative_coords = referenceStore.get_relative_coordinates_of_selection(this.dragged_point)
                 this.dragged_point.update_from_event(event)
+                referenceStore.set_coordinates_relative_to(this.dragged_point, relative_coords)
             }
         }),
         new KeyboardListener(function delete_selected(_: KeyboardEvent) {
@@ -110,7 +112,7 @@ export class ReferencePoint implements ReferencePointInterface {
         return point1[0] * point2[0] + point1[1] * point2[1]
     }
 
-    constructor(x: number, y: number, public selected: boolean = false, public selecting: boolean = true) {
+    constructor(x: number, y: number, public selected: boolean = false, public selecting: boolean = false) {
         this.coords = reactive([x, y])
     }
 
@@ -144,7 +146,11 @@ export class ReferencePoint implements ReferencePointInterface {
     }
 
     update_from_event(event: MouseEvent) {
-        [this.coords[0], this.coords[1]] = canvas_container_position_from_event(event)
+        this.update_from_coords(canvas_container_position_from_event(event))
+    }
+
+    update_from_coords(coords: pointCoordinates) {
+        [this.coords[0], this.coords[1]] = coords
     }
 }
 

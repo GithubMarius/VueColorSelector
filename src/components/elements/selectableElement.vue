@@ -28,6 +28,11 @@ function update_selected() {
   }
 }
 
+function add_to_selection() {
+  if (props.active) {
+    emit('update:selected', true)
+  }
+}
 function drop_from_selection() {
   if (props.active) {
     emit('update:selected', false)
@@ -37,6 +42,7 @@ function drop_from_selection() {
 
 <template>
 <span class="selectable"
+      @click.left.shift.exact="add_to_selection"
       @selecting="update_selecting"
       @toselection="update_selected"
       @fromselection="drop_from_selection"

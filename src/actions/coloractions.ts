@@ -87,7 +87,7 @@ export class ImportColors extends Action {
     }
 }
 
-export class DeleteColorAction extends Action implements ActionInterface {
+export class DeleteColorAction extends Action {
     // Delete color/undo deletion
 
     index: number

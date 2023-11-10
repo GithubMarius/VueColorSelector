@@ -7,6 +7,7 @@ import {combine} from '@/utils/general';
 import {ReferencePoint} from "@/utils/tools/reference_tool";
 import {useToolsStore} from "@/stores/tools";
 import {useReferenceStore} from "@/stores/references";
+import {createReferencePairAction, deleteReferencePointAction} from "@/actions/referenceactions";
 
 const settings = useSettingsStore()
 const toolsStore = useToolsStore()
@@ -22,7 +23,8 @@ const props = defineProps({
 const styleDigital = computed(function (): StyleValue {
   const styleSize = {
     width: settings.ui.reference_circle_radius.value * 2 + Number(props.point.highlighted) * 5 + 'px',
-    height: settings.ui.reference_circle_radius.value * 2 + Number(props.point.highlighted) * 5 + 'px'
+    height: settings.ui.reference_circle_radius.value * 2 + Number(props.point.highlighted) * 5 + 'px',
+    backgroundColor: (referenceStore.last_activated === props.point) ? 'var(--bs-danger)' : 'var(--bs-primary)'
   }
   const xy = props.point.coords
   return <StyleValue>combine({
@@ -30,19 +32,16 @@ const styleDigital = computed(function (): StyleValue {
     top: xy[1] + 'px'
   }, styleSize)
 })
-
-const styleReal = computed(function (): StyleValue {
-  const xy = props.point.get_scaled()
-  return <StyleValue>combine({
-    left: xy[0] + 'px',
-    top: xy[1] + 'px'
-  }, settings.ui.reference_circle_radius.css_size)
-})
 </script>
 
 <template>
   <SelectableElement v-model:selecting="point.selecting" v-model:selected="point.selected"
-                     @mouseup.ctrl.exact="referenceStore.delete_point(point)"
+                     @mouseup.left.exact="() => {
+                       referenceStore.last_pressed = point
+                       referenceStore.reset_selection()
+                     }"
+                     @mouseup.left.shift.exact="createReferencePairAction.create(point)"
+                     @mouseup.left.ctrl.exact="deleteReferencePointAction.create(point)"
                      @mousedown.exact="toolsStore.tools.referenceTool.dragged_point = point"
                      :active="toolsStore.tools.referenceTool.state.active">
     <div class="referencePoint" :style="styleDigital"></div>

@@ -2,9 +2,9 @@
 import {Color} from '@/utils/colors/ColorManagement';
 import SelectableElement from './SelectableElement.vue';
 import {useColorStore} from '@/stores/color'
-import {useHistoryStore} from '@/stores/history'
 import {useSettingsStore} from '@/stores/settings';
 import {useToolsStore} from "@/stores/tools";
+import {DeleteColorAction} from "@/actions/coloractions";
 
 defineProps({
   color: {
@@ -27,7 +27,6 @@ function update_show_details_color(color: Color) {
 
 }
 
-const historyStore = useHistoryStore()
 const colorStore = useColorStore()
 const toolsStore = useToolsStore()
 
@@ -35,9 +34,9 @@ const toolsStore = useToolsStore()
 
 <template>
   <SelectableElement :selecting="selecting" @update:selecting="$emit('update:selecting', $event)"
-                     v-model:selected="color.selected" @update:selected="console.log('hi')"
+                     v-model:selected="color.selected"
                      :active="toolsStore.tools.colorsTool.state.active"
-                     @mouseup.ctrl.capture.stop="historyStore.delete_color(color)"
+                     @mouseup.ctrl.capture.stop="DeleteColorAction.create(color)"
                      @mouseup.shift.capture.stop="color.selected = !color.selected"
                      @mouseup.alt.capture.stop="update_show_details_color(color)"
                      @mouseover="colorStore.color_hover(color)"

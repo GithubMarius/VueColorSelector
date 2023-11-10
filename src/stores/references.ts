@@ -1,39 +1,55 @@
 import {defineStore} from "pinia"
 import {ReferencePair, ReferencePoint} from "@/utils/tools/reference_tool";
 import {useToastStore} from "@/stores/toasts";
+import {pointCoordinates} from "@/utils/general";
 
 export const useReferenceStore = defineStore("references", {
     state: () => {
         return {
-            last_pressed: null,
+            last_pressed: <null|ReferencePoint>null,
             pairs: [],
             points: []
         }
     },
     actions: {
         add_point(point: ReferencePoint, connect = false) {
-            if (connect) {
-                const other_point = this.last_activated
-                if (other_point) {
-                    this.add_pair(new ReferencePair(point, other_point))
-                }
+            if (connect && this.last_activated) {
+                this.create_pair_with_last_activated(point)
             }
             this.points.push(point)
+            this.last_pressed = point
+        },
+        create_pair_with_last_activated(point: ReferencePoint) {
+            const pair = this.create_pair(this.last_activated, point)
+            this.add_pair(pair)
+            this.last_pressed = point
+            this.reset_selection()
+        },
+        create_pair(start: null|ReferencePoint, end: null|ReferencePoint) {
+            if (start && end && start !== end  && !this.check_if_pair_exists(start, end)) {
+                return new ReferencePair(start, end)
+            }
         },
         add_pair(pair: ReferencePair) {
             this.pairs.push(pair)
         },
         delete_point(point: ReferencePoint) {
-            // Delete pairs that include point and then delete point
+            // Delete pairs that include point, then delete point and reset last_pressed if necessary
             const pairs = this.pairs.filter((pair: ReferencePair) => pair.contains(point))
             this.delete_pairs(pairs)
 
             const index = this.points.indexOf(point)
-            this.points.splice(index,1)
+            this.points.splice(index, 1)
+
+            // Reset last pressed if necessary
+            if (this.last_pressed === point) {
+                this.last_pressed = null
+            }
+            return pairs
         },
         delete_pair(pair: ReferencePair) {
             const index = this.pairs.indexOf(pair)
-            this.pairs.splice(index,1)
+            this.pairs.splice(index, 1)
         },
         delete_points(points: ReferencePoint[]) {
             points.forEach((point: ReferencePoint) => {
@@ -48,10 +64,27 @@ export const useReferenceStore = defineStore("references", {
             this.delete_pairs(pairs)
         },
         deleted_selected_points() {
-            const points = this.points.filter((point: ReferencePoint) => point.selected)
-            this.delete_points(points)
+            this.delete_points(this.selected_points)
+        },
+        get_relative_coordinates_of_selection(target: ReferencePoint) {
+            const points = this.selected_points
+            return points.map((point: ReferencePoint) => point.coords_relative_to(target))
+        },
+        set_coordinates_relative_to(target: ReferencePoint, relative_coords: pointCoordinates[]) {
+            // Set points relative to target (Length of array of relative_coords must be equal to length of currently selected points
+            const target_coords = target.coords
+            this.selected_points.forEach((point: ReferencePoint, index: number) => {
+                const coords: pointCoordinates = ReferencePoint.add(target_coords, relative_coords[index])
+                point.update_from_coords(coords)
+            })
+        },
+        reset_selection() {
+            this.selected_points.forEach((point: ReferencePoint) => point.selected = false)
+            this.selected_pairs.forEach((pair: ReferencePair) => pair.selected = false)
+        },
+        check_if_pair_exists(start: ReferencePoint, end: ReferencePoint) {
+            return this.pairs.some((pair: ReferencePair) => pair.contains(start) && pair.contains(end))
         }
-
     },
     getters: {
         last_activated(state) {
@@ -63,6 +96,12 @@ export const useReferenceStore = defineStore("references", {
                 const toastStore = useToastStore()
                 toastStore.push_info('No reference point to connect to.')
             }
+        },
+        selected_points(state): ReferencePoint[] {
+            return state.points.filter((point: ReferencePoint) => point.selected)
+        },
+        selected_pairs(state): ReferencePair[] {
+            return state.pairs.filter((pair: ReferencePair) => pair.selected)
         }
     }
 })

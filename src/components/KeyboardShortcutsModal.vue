@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {useSettingsStore} from "@/stores/settings";
-import KeyCombinationElement from "@/components/KeyCombinationElement.vue";
+import KeyCombinationElement from "@/components/elements/KeyCombinationElement.vue";
 import {allModifiers, KeyCombinationWithInfo} from "@/utils/keyboardinput";
 import {reactive} from "vue";
 
@@ -77,7 +77,7 @@ function close_window() {
                 </tr>
               </thead>
               <tbody>
-                <KeyCombinationElement v-for="combination in KeyCombinationWithInfo.combinations"
+                <KeyCombinationElement v-for="combination in <KeyCombinationWithInfo[]>KeyCombinationWithInfo.combinations"
                                        :combination="combination"
                                        :pressedModifiers="pressedModifiers"
                                        :pressedKeys="pressedKeys"

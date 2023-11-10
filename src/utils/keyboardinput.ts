@@ -6,6 +6,19 @@ export const allModifiers = {
     meta: 'metaKey'
 }
 
+export const specialKeys = {
+    number: '0123456789',
+    plusMinus: '+-'
+}
+export const specialKeysDisplay = {
+    [specialKeys.number]: '0-9',
+    [specialKeys.plusMinus]: '+/-'
+}
+
+export function get_display_string_for_key_of_combination(key: string): string {
+    return (key in specialKeysDisplay) ? specialKeysDisplay[key] : key
+}
+
 export type modifiersType = 'shift' | 'alt' | 'cmd'
 export const customModifiers: { shift: string[]; alt: string[]; cmd: (string)[] } = {
     shift: [allModifiers.shift],
@@ -36,7 +49,15 @@ export class KeyCombination {
 
     is_pressed(event: KeyboardEvent) {
         // Check if key and correct modifiers are pressed
-        return event.key !== '' && this.key.includes(event.key) && this.modifiers_pressed(event)
+        return this.check_key(event.key) && this.modifiers_pressed(event)
+    }
+
+    check_key(key: string): boolean {
+        if (key !== '') {
+            return Object.values(specialKeys).includes(this.key) ? this.key.includes(key) : this.key === key
+        } else {
+            return false
+        }
     }
 
     modifiers_pressed(event: KeyboardEvent) {
@@ -81,11 +102,10 @@ export class KeyCombination {
         this.active = true
     }
 
-    static get combinations() {
+    static get combinations(): KeyCombination[] {
         // Returns bound combinations
         return KeyCombination.bound_combinations.filter(comb => comb instanceof this)
     }
-
 }
 
 export class KeyCombinationWithInfo extends KeyCombination {

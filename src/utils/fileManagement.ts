@@ -1,10 +1,12 @@
 import {ColorDataInterface} from "@/utils/colors/ColorManagement"
 
 import {useColorStore} from "@/stores/color"
-import {useHistoryStore} from "@/stores/history"
 import {useCamImageStore} from "@/stores/camimages"
 import {useSettingsStore} from "@/stores/settings"
 import {useToastStore} from "@/stores/toasts";
+import {useHistoryStore} from "@/stores/history";
+
+import {ImportColors} from "@/actions/coloractions";
 
 const export_mime_type = 'application/json'
 
@@ -41,8 +43,7 @@ export function read_data_file(file) {
 
 function parse_colors(colorDataArray: ColorDataInterface[]) {
     //colorDataArray.forEach(color => color.RGBA = <any>Object.values(color.RGBA))
-    const historyStore = useHistoryStore()
-    historyStore.import_colors(colorDataArray)
+    ImportColors.create(colorDataArray)
 }
 
 function parse_images(imageUrlDataArray) {

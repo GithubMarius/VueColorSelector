@@ -41,6 +41,8 @@ export interface ToolInterface {
 
     // Get store
     get_store(): any | StoreInterface
+
+    [any: string]: any
 }
 
 interface ListenerCalls {
@@ -57,7 +59,7 @@ export class Listener {
 
     static createListeners(obj: any, listener_calls: ListenerCalls) {
         return Object.values(listener_calls).map((fcn: Function) => {
-            const listener = new Listener(fcn)
+            const listener = new Listener(fcn.name, fcn)
             listener.bind(obj)
             return listener
         })
@@ -66,9 +68,9 @@ export class Listener {
     fcn: Function
     name: String
 
-    constructor(fcn: Function, public id: null | string = null) {
+    constructor(event_name: string, fcn: Function, public id: null | string = null) {
         this.fcn = fcn
-        this.name = <String>fcn.name
+        this.name = event_name
     }
 
     bind(target: any) {
@@ -103,12 +105,12 @@ export class MouseUpListener extends Listener {
     Important: Do not use anonymous function. Function name does not matter.
     */
     constructor(public nested_fcn: Function, public button: number =0, public modifiers: modifiersType[] =[], public id: null | string = null) {
-        const mouseup = (event: MouseEvent)=> {
+        const mouseup = (event: MouseEvent) =>{
             if (event.button === this.button && this.check_modifiers(event)) {
                 this.nested_fcn(event)
             }
         }
-        super(mouseup, id)
+        super('mouseup', mouseup, id)
     }
 
     check_modifiers(event: MouseEvent): Boolean {
