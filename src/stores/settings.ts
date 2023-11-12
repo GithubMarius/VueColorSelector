@@ -10,9 +10,10 @@ import {
     SelectionProperty
 } from "@/utils/properties"
 import {customModifiers, KeyCombinationWithInfo, specialKeys} from "@/utils/keyboardinput"
+import {Component, nextTick} from "vue";
 
 
-const keyCombinations = {
+export const keyCombinations = {
     'undo': new KeyCombinationWithInfo('z', [customModifiers.cmd], 'Undo'),
     'forward': new KeyCombinationWithInfo('y', [customModifiers.cmd], 'Redo'),
     'change_image_opacity': new KeyCombinationWithInfo(specialKeys.plusMinus, [customModifiers.cmd]),
@@ -36,7 +37,7 @@ export const useSettingsStore = defineStore("settings", {
             keyCombinations: keyCombinations,
 
             chrOrSat: new RangeProperty('Chroma/Saturation', 0.5, 0, 1, 0.01),
-            color_mode: new BooleanProperty('Color/BW mode', true),
+            color_mode: new BooleanPropertyWithIcons('Color/BW mode', true, ['bi-palette', 'bi-circle-half'], 'secondary'),
             colorspace: new SelectionProperty('Color space', ['okhcl', 'hsl']),
             colorsSortBy: new SelectionProperty('Sort colors by', ['Hue', 'Chroma/Saturation', 'Lightness'], 2),
             colorsOrderAscending: new BooleanProperty('Ascending', true),
@@ -46,12 +47,15 @@ export const useSettingsStore = defineStore("settings", {
             captureVideo: new BooleanPropertyWithIcons('Capture video', false, ['bi-camera-video', 'bi-camera-video-off'], 'danger'),
 
             ui: {
+                currentModal: null,
+                modalVisible: true,
+
                 show_short_cuts: new BooleanPropertyWithIcons('Show shortcuts', false, ['bi-keyboard', 'bi-keyboard'], 'secondary'),
                 light: new BooleanProperty('Light/Dark UI', true),
-                hide_settings_column: new BooleanPropertyWithIcons('Hide side menu', false, ['bi-window', 'bi-window-sidebar'], 'secondary'),
+                hide_settings_column: new BooleanPropertyWithIcons('Hide side menu', false, ['bi-person-video', 'bi-person-video2'], 'secondary'),
                 split_mode: new BooleanPropertyWithIcons('Split mode', false, ['bi-window-split', 'bi-window'], 'secondary'),
 
-                color_circle_radius: new RadiusProperty('Color circle radius', 15, 4, 50),
+                color_circle_radius: new RadiusProperty('Color circle radius', 30, 4, 80),
                 reference_circle_radius: new RadiusProperty('Reference circle radius', 8, 2, 50),
 
                 scale: new RangeProperty('Scale', 0.5, 0, 5, 0.01),
@@ -61,8 +65,8 @@ export const useSettingsStore = defineStore("settings", {
             },
 
             exportSettings: {
-                export_images: new BooleanProperty('Export captured images', true),
-                import_images: new BooleanProperty('Import captured images', true)
+                export_images: new BooleanPropertyWithSwitch('Export captured images', true),
+                import_images: new BooleanPropertyWithSwitch('Import captured images', true)
             },
             // Development
             // TODO: Check if used
@@ -70,6 +74,13 @@ export const useSettingsStore = defineStore("settings", {
         }
     },
     actions: {
+        // Modal
+        setModal(component: Component) {
+            this.ui.modalVisible = true
+            this.ui.currentModal = component
+        },
+
+        // Colors
         set_chrOrSat(color: Color) {
             this.chrOrSat.value = this.get_chrOrSatOfColor(color)
         },
@@ -104,8 +115,12 @@ export const useSettingsStore = defineStore("settings", {
 
     },
     getters: {
-        theme() {
-            return (this.ui.light.value) ? 'light' : 'dark'
+        modal(state) {
+            return state.ui.currentModal
+        },
+        theme(state) {
+            return (state.ui.light.value) ? 'light' : 'dark'
         }
-    }
-});
+    },
+    //persist: true,
+})

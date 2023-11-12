@@ -4,7 +4,6 @@
         "isolatedModules": true,
         "paths": {
             "@/*": ["./src/*"],
-            "@assets/*": ["./src/assets/*"]
         },
         "vetur.validation.script": false,
         "allowJs": true,

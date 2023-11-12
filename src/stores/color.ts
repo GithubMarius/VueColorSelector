@@ -105,7 +105,7 @@ export const useColorStore = defineStore('color', {
         selected_color_ids() {
             return [...this.colors.keys()].filter(index => this.colors[index].selected)
         }
-    },
+    }
 })
 
 export const useGroupStore = defineStore('group', {
@@ -175,5 +175,4 @@ export const useGroupStore = defineStore('group', {
             return this.groups.map(group => group.name)
         }
     }
-
 })

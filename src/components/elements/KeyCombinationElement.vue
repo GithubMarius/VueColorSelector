@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {get_display_string_for_key_of_combination, KeyCombinationWithInfo, modifierLabels} from "@/utils/keyboardinput";
+import {get_display_string_for_key_of_combination, KeyCombinationWithInfo} from "@/utils/keyboardinput";
 
-const props = defineProps({
+defineProps({
   'combination': {
     type: KeyCombinationWithInfo
   },
@@ -18,10 +18,10 @@ const props = defineProps({
 <template>
   <tr>
     <td>
-      <template v-for="modifier in combination.modifiers">
+      <template v-for="(modifier, index) in combination.modifiers">
         <span class="btn pe-none text-uppercase"
           :class="pressedModifiers.some(mod => modifier.includes(mod)) ? 'btn-primary' : 'btn-outline-primary'">
-            {{ modifierLabels[JSON.stringify(modifier)]}}
+            {{ combination.modifiers_as_strings[index] }}
         </span>
       </template>
     </td>

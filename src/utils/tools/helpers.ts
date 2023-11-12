@@ -177,10 +177,11 @@ export const BaseWithListenerCreation = {
 export const BaseTool = {
     ...BaseWithListenerCreation,
 
-    activate(this: typeof BaseWithListenerCreation | typeof BaseTool) {
+    activate(this: typeof BaseTool) {
         const store = this.get_store()
         if (toRaw(store.activeTool) !== this) {
             store.activeTool?.deactivate()
+            this.on_activation()
             store.activeTool = this
             if (this.use_selection) {
                 store.selectionTool.state.active = true
@@ -193,13 +194,16 @@ export const BaseTool = {
             toastStore.push_info(this.name)
         }
     },
-    deactivate(this: typeof BaseWithListenerCreation | typeof BaseTool) {
+    deactivate(this: typeof BaseTool) {
         const store = this.get_store()
         store.selectionTool.state.active = false
         store.selectionTool.trigger_drop_from_selection()
         store.activeTool = null
+        this.on_deactivation()
         this.state.active = false
         this.mute()
     },
-    get_store: null
+    get_store: null,
+    on_activation() {},
+    on_deactivation() {}
 }

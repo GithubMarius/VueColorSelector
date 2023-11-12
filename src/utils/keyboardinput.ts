@@ -32,6 +32,20 @@ export const modifierLabels = {
     [JSON.stringify(customModifiers.cmd)]: 'Ctrl'
 }
 
+export function get_pressed_modifiers(event: KeyboardEvent | MouseEvent) {
+    return Object.values(allModifiers).filter(m => event[m]) // Filter for pressed modifiers in of event
+}
+
+export function check_modifiers_pressed(event: KeyboardEvent | MouseEvent, necessary_modifiers: modifiersType[]) {
+    const pressed_modifiers = get_pressed_modifiers(event)
+    return check_pressed_vs_necessary_modifiers(pressed_modifiers, necessary_modifiers)
+}
+
+export function check_pressed_vs_necessary_modifiers(pressed_modifiers: string[], necessary_modifiers: modifiersType[]): boolean {
+    return (pressed_modifiers.length === necessary_modifiers.length) &&
+        pressed_modifiers.every(m => necessary_modifiers.some(ms => customModifiers[ms].includes(m)))
+}
+
 export class KeyCombination {
     default: Array<Array<string>>
 
@@ -45,6 +59,10 @@ export class KeyCombination {
 
     constructor(public key: string, public modifiers = [], public active: Boolean = true) {
         this.default = modifiers
+    }
+
+    get modifiers_as_strings() {
+        return this.modifiers.map((modifier: modifiersType) => modifierLabels[JSON.stringify(modifier)])
     }
 
     is_pressed(event: KeyboardEvent) {
@@ -62,7 +80,7 @@ export class KeyCombination {
 
     modifiers_pressed(event: KeyboardEvent) {
         // Check if modifiers are pressed
-        const pressed_modifiers = this.get_pressed_modifiers(event)
+        const pressed_modifiers = get_pressed_modifiers(event)
         return this.check_same_length(pressed_modifiers) && this.check_all_modifiers_pressed(pressed_modifiers) // Check modifiers align
     }
 
@@ -71,9 +89,7 @@ export class KeyCombination {
         return pressed_modifiers.every(m => this.modifiers.some(ms => ms.includes(m)))
     }
 
-    get_pressed_modifiers(event: KeyboardEvent) {
-        return Object.values(allModifiers).filter(m => event[m]) // Filter for pressed modifiers in of event
-    }
+
 
     private check_same_length(pressed_modifiers: string[]) {
         // Check if the number of pressed modifiers is correct
@@ -90,7 +106,7 @@ export class KeyCombination {
 
     call_if_pressed(event: KeyboardEvent) {
         if (this.active && this.is_pressed(event)) {
-            this._fcn(event)
+            this.trigger(event)
         }
     }
 
@@ -100,6 +116,10 @@ export class KeyCombination {
 
     listen() {
         this.active = true
+    }
+
+    trigger(event: KeyboardEvent) {
+        this._fcn(event)
     }
 
     static get combinations(): KeyCombination[] {

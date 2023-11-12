@@ -1,8 +1,26 @@
 <script setup lang="ts">
 import {computed, useAttrs} from "vue";
+import {mouseStatesComposable} from "@/composables/mouse";
 
-const props = defineProps(['selecting', 'selected', 'active'])
-const emit = defineEmits(['update:selecting', 'update:selected'])
+const props = defineProps({
+  selecting: {},
+  selected: {},
+  active: {},
+  shiftIcon: {
+    default: 'url(src/assets/icons/plus-slash-minus.svg) 8 8, cell',
+    type: String
+  },
+  altIcon: {
+    default: 'default',
+    type: String
+  },
+  cmdIcon: {
+    default: 'url(src/assets/icons/eraser.svg) 4 14, cell',
+    type: String
+  },
+})
+
+const emit = defineEmits(['update:selecting', 'update:selected', 'delete', 'clicked', 'altClicked'])
 defineOptions({
   inheritAttrs: false,
 })
@@ -28,9 +46,9 @@ function update_selected() {
   }
 }
 
-function add_to_selection() {
+function toggle_selected() {
   if (props.active) {
-    emit('update:selected', true)
+    emit('update:selected', !props.selected)
   }
 }
 function drop_from_selection() {
@@ -38,11 +56,22 @@ function drop_from_selection() {
     emit('update:selected', false)
   }
 }
+
+const { shift, alt, cmd } = mouseStatesComposable()
 </script>
 
 <template>
 <span class="selectable"
-      @click.left.shift.exact="add_to_selection"
+      :class="{
+        'selectable-active': active,
+        'selectable-shift': shift && active,
+        'selectable-alt': alt && active,
+        'selectable-cmd': cmd && active,
+      }"
+      @mouseup.left.capture.exact="emit('clicked', $event)"
+      @mouseup.left.alt.capture.exact.stop="emit('altClicked')"
+      @mouseup.ctrl.left.capture.exact.stop="emit('delete', $event)"
+      @mouseup.left.shift.capture.exact.stop="toggle_selected"
       @selecting="update_selecting"
       @toselection="update_selected"
       @fromselection="drop_from_selection"
@@ -51,3 +80,18 @@ function drop_from_selection() {
 <slot></slot>
 </span>
 </template>
+
+<style>
+.selectable-active {
+  cursor: pointer;
+}
+.selectable-shift {
+  cursor: v-bind(shiftIcon);
+}
+.selectable-alt {
+  cursor: v-bind(altIcon);
+}
+.selectable-cmd {
+  cursor: v-bind(cmdIcon);
+}
+</style>

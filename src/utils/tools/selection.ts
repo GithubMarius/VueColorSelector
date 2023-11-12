@@ -50,12 +50,12 @@ export const selectionTool = {
             if (event.buttons === 1 && !this.ignore_current_events) {
                 this.end.from_event(event)
                 this.check_visibility()
-                if (this.visible) {
+                if (this.state.visible) {
                     this.trigger_selecting()
                 }
             }
         },
-        mouseup(this: typeof selectionTool, _: MouseEvent) {
+        mouseup(this: typeof selectionTool, event: MouseEvent) {
             this.finish_selection()
             this.ignore_current_events = false
         },
@@ -67,14 +67,16 @@ export const selectionTool = {
         }
     },
     selectables: reactive(<HTMLElement[]>[]),
-    visible: false,
+    state: reactive({
+        visible: false
+    }),
     start: reactive(new Point()),
     end: reactive(new Point()),
     ignore_current_events: false,
 
     get style() {
         return {
-            display: (this.visible) ? 'block' : 'none',
+            display: (this.state.visible) ? 'block' : 'none',
             left: this.left + 'px',
             top: this.top + 'px',
             width: this.width + 'px',
@@ -106,13 +108,13 @@ export const selectionTool = {
 
     check_visibility() {
         // Make visible if not visible yet and diameter squared bigger than limit
-        if (!this.visible && this.diameter_squared > 900) {
-            this.visible = true
+        if (!this.state.visible && this.diameter_squared > 900) {
+            this.state.visible = true
         }
     },
     reset() {
         // Reset visibility and coordinates
-        this.visible = false
+        this.state.visible = false
         this.start.reset()
         this.end.reset()
     },

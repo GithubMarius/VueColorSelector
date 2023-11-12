@@ -1,5 +1,6 @@
 import {createApp} from "vue";
 import {createPinia} from "pinia";
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
 import App from "@/App.vue";
 
@@ -10,6 +11,7 @@ import CardContainer from '@/components/ui/CardContainer.vue'
 // ToastStore
 import {useToastStore} from "@/stores/toasts";
 import {useSettingsStore} from "@/stores/settings";
+import {create} from "domain";
 
 
 const app = createApp(App)
@@ -20,7 +22,10 @@ app.component('FormGroup', FormGroup)
 app.component('CardContainer', CardContainer)
 
 // Install the store instance as a plugin
-app.use(createPinia())
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
+
+app.use(pinia)
 
 // Add global error handling (pushing errors as toasts)
 

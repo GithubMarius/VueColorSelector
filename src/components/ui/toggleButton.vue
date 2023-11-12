@@ -8,12 +8,22 @@ import {computed} from 'vue'
 const props = defineProps({
   modelValue: {},
   icons: undefined,
+  icon: {
+    type: String
+  },
   labels: undefined,
+  label: {
+    type: String
+  },
   btnColor: {
     type: String,
     default: 'primary'
   },
   outlineOnly: {
+    type: Boolean,
+    default: false
+  },
+  filledOnly: {
     type: Boolean,
     default: false
   }
@@ -22,12 +32,14 @@ const props = defineProps({
 defineEmits(['update:modelValue'])
 
 function btn_style() {
-  return ((!props.modelValue || props.outlineOnly) ? 'btn-outline-' : 'btn-') + props.btnColor
+  return ((!props.modelValue || props.outlineOnly) && !props.filledOnly ? 'btn-outline-' : 'btn-') + props.btnColor
 }
 
+const resolvedIcons = props.icon ? [props.icon, props.icon] : props.icons
+
 const css_classes = computed(() => {
-  if (props.icons) {
-    return 'bi ' + (props.modelValue ? props.icons[0] + ' ' + btn_style() : props.icons[1] + ' ' + btn_style())
+  if (resolvedIcons) {
+    return 'bi ' + (props.modelValue ? resolvedIcons[0] + ' ' + btn_style() : resolvedIcons[1] + ' ' + btn_style())
   } else {
     return btn_style()
   }
@@ -37,6 +49,8 @@ const css_classes = computed(() => {
 const label = computed(() => {
   if (props.labels) {
     return props.modelValue ? props.labels[0] : props.labels[1]
+  } else if (props.label) {
+    return props.label
   }
 })
 </script>

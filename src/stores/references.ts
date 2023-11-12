@@ -19,6 +19,9 @@ export const useReferenceStore = defineStore("references", {
             this.points.push(point)
             this.last_pressed = point
         },
+        add_points(points: ReferencePoint[]) {
+          points.forEach((point: ReferencePoint) => this.add_point(point))
+        },
         create_pair_with_last_activated(point: ReferencePoint) {
             const pair = this.create_pair(this.last_activated, point)
             this.add_pair(pair)
@@ -33,9 +36,12 @@ export const useReferenceStore = defineStore("references", {
         add_pair(pair: ReferencePair) {
             this.pairs.push(pair)
         },
+        add_pairs(pairs: ReferencePair[]) {
+            pairs.forEach((point: ReferencePair) => this.add_pair(point))
+        },
         delete_point(point: ReferencePoint) {
             // Delete pairs that include point, then delete point and reset last_pressed if necessary
-            const pairs = this.pairs.filter((pair: ReferencePair) => pair.contains(point))
+            const pairs = this.get_pairs_of_point(point)
             this.delete_pairs(pairs)
 
             const index = this.points.indexOf(point)
@@ -48,8 +54,10 @@ export const useReferenceStore = defineStore("references", {
             return pairs
         },
         delete_pair(pair: ReferencePair) {
-            const index = this.pairs.indexOf(pair)
-            this.pairs.splice(index, 1)
+            if(this.pairs.includes(pair)) {
+                const index = this.pairs.indexOf(pair)
+                this.pairs.splice(index, 1)
+            }
         },
         delete_points(points: ReferencePoint[]) {
             points.forEach((point: ReferencePoint) => {
@@ -84,6 +92,9 @@ export const useReferenceStore = defineStore("references", {
         },
         check_if_pair_exists(start: ReferencePoint, end: ReferencePoint) {
             return this.pairs.some((pair: ReferencePair) => pair.contains(start) && pair.contains(end))
+        },
+        get_pairs_of_point(point: ReferencePoint): ReferencePair[] {
+            return this.pairs.filter((pair: ReferencePair) => pair.contains(point))
         }
     },
     getters: {

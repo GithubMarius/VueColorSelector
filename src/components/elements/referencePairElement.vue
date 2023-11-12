@@ -3,6 +3,7 @@ import {computed, ref, StyleValue} from 'vue';
 import SelectableElement from '@/components/elements/SelectableElement.vue';
 import {ReferencePair} from "@/utils/tools/reference_tool";
 import {useToolsStore} from "@/stores/tools";
+import {deleteReferencePairAction} from "@/actions/referenceactions";
 
 const toolsStore = useToolsStore()
 
@@ -35,7 +36,9 @@ const styleReal = computed(function (): StyleValue {
 </script>
 
 <template>
-  <SelectableElement v-model:selecting="pair.selecting" v-model:selected="pair.selected" :active="toolsStore.tools.referenceTool.state.active">
+  <SelectableElement v-model:selecting="pair.selecting" v-model:selected="pair.selected" :active="toolsStore.tools.referenceTool.state.active"
+                     @delete="deleteReferencePairAction.create(pair)"
+  >
     <hr class="pairline pairline_digital" :class="{'pairline_select': pair.highlighted,
     'pe-none': toolsStore.tools.referenceTool.dragged_point
     }" :style="styleDigital">

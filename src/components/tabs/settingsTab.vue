@@ -35,6 +35,15 @@ const settingsStore = useSettingsStore()
       <AutoForm v-model="settingsStore.ui.scale"></AutoForm>
     </template>
   </CardContainer>
+  <CardContainer>
+    <template #header>
+      Export/Import Settings
+    </template>
+    <template #content>
+      <AutoForm v-model="settingsStore.exportSettings.export_images"></AutoForm>
+      <AutoForm v-model="settingsStore.exportSettings.import_images"></AutoForm>
+    </template>
+  </CardContainer>
 
 
 </template>

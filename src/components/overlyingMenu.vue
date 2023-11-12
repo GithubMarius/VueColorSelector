@@ -4,21 +4,23 @@ import {useSettingsStore} from '@/stores/settings';
 import AutoForm from '@/components/ui/AutoForm.vue';
 import {useToolsStore} from "@/stores/tools";
 import {useColorStore} from "@/stores/color";
-import {ref} from "vue";
-import {useHistoryStore} from "@/stores/history";
+import {ref, watch} from "vue";
 import {useCamImageStore} from "@/stores/camimages";
+import {AddSelectionToGroup} from "@/actions/coloractions";
+import FileMenu from "@/components/FileMenu.vue";
+import ToggleButton from "@/components/ui/ToggleButton.vue";
+import KeyboardShortcutsModal from "@/components/modals/KeyboardShortcutsModal.vue";
 
 const settingsStore = useSettingsStore()
 const toolsStore = useToolsStore()
 const colorStore = useColorStore()
-const historyStore = useHistoryStore()
 const camImageStore = useCamImageStore()
 
 const group_name_input = ref()
 
 function check_input(event: any) {
   if (event.key === 'Enter' && event.target.value !== '') {
-    historyStore.add_selection_to_group(event.target.value)
+    AddSelectionToGroup.create(event.target.value)
     colorStore.drop_selection()
   } else if (event.key === 'Escape') {
     colorStore.drop_selection()
@@ -28,39 +30,42 @@ function check_input(event: any) {
   event.stopPropagation()
 }
 
-function transition_ended(_) {
-  group_name_input.value.focus()
+function focus_input() {
+  group_name_input.value?.focus()
 }
+
+watch(() => colorStore.selected_colors.length, focus_input)
 
 </script>
 
 <template>
-  <div class="position-absolute top-menu pe-none bg-body-tertiary rounded m-2 bg-opacity-75 border">
-    <span>
+  <div class="position-absolute top-menu pe-none">
       <span>
-        <AutoForm v-model="settingsStore.captureVideo" :shown_in_group="false"></AutoForm>
-      </span>
-      <span v-if="settingsStore.captureVideo.value"><button class="btn btn-primary bi bi-camera"
-                                                            @click="camImageStore.take_image()"></button></span>
-      <span class="btn-group">
-          <!-- TODO Add props inheritance to AutoForm (e.g. props="{btnColor: 'warning'}" being forwarded to ToggleButton) -->
-          <AutoForm v-model="settingsStore.ui.hide_settings_column" :shown_in_group="false"></AutoForm>
-          <AutoForm v-model="settingsStore.ui.split_mode" :shown_in_group="false"></AutoForm>
-          <AutoForm v-model="settingsStore.ui.show_short_cuts" :shown_in_group="false"></AutoForm>
-      </span>
-      <span class="btn-group">
+        <FileMenu/>
+        <AutoForm v-model="settingsStore.captureVideo" :shown_in_group="false" :filled-only="true"></AutoForm>
+        <span v-if="settingsStore.captureVideo.value">
+          <button class="btn btn-primary bi bi-camera" @click="camImageStore.take_image()" />
+        </span>
+        <span class="autoform-group btn-group">
+            <AutoForm v-model="settingsStore.ui.split_mode" :shown_in_group="false" :filled-only="true"></AutoForm>
+            <AutoForm v-model="settingsStore.ui.hide_settings_column" :shown_in_group="false" :filled-only="true"></AutoForm>
+            <AutoForm v-model="settingsStore.color_mode" :shown_in_group="false" :filled-only="true"></AutoForm>
+            <ToggleButton :icons="['bi-keyboard', 'bi-keyboard']" @click="settingsStore.setModal(KeyboardShortcutsModal)" :filled-only="true" btn-color="secondary"/>
+
+        </span>
+        <span class="btn-group">
           <button v-for="(tool, _) in Object.values(toolsStore.tools)" class="btn"
-                  :class="[tool.icon, (tool.state.active) ? 'btn-primary' : 'btn-outline-primary']"
-                  @click="tool.activate()"></button>
+                    :class="[tool.icon, (tool.state.active) ? 'btn-primary' : 'btn-outline-primary']"
+                    @click="tool.activate()"></button>
+        </span>
       </span>
-      <transition @after-enter="transition_ended">
-        <span v-if="colorStore.selected_colors.length > 0" @mouseup.capture.stop>
+      <transition @after-enter="focus_input">
+        <span v-if="colorStore.selected_colors.length > 0">
           <input ref="group_name_input" class="pe-auto form-control" placeholder="GROUPNAME"
                  @mousedown.stop @mousemove.stop @keydown="check_input"
-          >
+                 @mouseup.capture.stop>
         </span>
       </transition>
-    </span>
 
     <!-- TODO ADD NEW TOOL -->
     <!--       <span class="btn-group" role="group" aria-label="ToolToogles" v-if="!settingsStore.ui.hide_settings_column.value">
@@ -80,12 +85,34 @@ function transition_ended(_) {
   width: fit-content;
 }
 
-.top-menu span {
+.top-menu > span {
   display: inline-flex;
+}
+
+.top-menu > span > * {
   pointer-events: all;
+}
+
+.top-menu > span > span > span {
+  box-shadow: 0 0 5px 0 var(--bs-secondary);
 }
 
 .top-menu span:not(:first-child) {
   margin-left: 10px;
+}
+
+.top-menu > * {
+  display: block;
+  width: fit-content;
+}
+</style>
+
+<style>
+.top-menu > span > *:not(:first-child) {
+  margin-left: 10px;
+}
+
+.autoform-group > label:nth-of-type(2) {
+  transform: rotateY(180deg);
 }
 </style>

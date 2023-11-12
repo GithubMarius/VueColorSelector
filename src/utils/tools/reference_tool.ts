@@ -3,7 +3,12 @@ import {BaseTool, KeyboardListener, Listener, MouseUpListener, ToolInterface} fr
 import {canvas_container_position_from_event, pointCoordinates} from "@/utils/general";
 import {useReferenceStore} from "@/stores/references";
 import {reactive} from "vue";
-import {createReferencePointAction} from "@/actions/referenceactions";
+import {
+    createReferencePointAction,
+    deleteSelectReferencePairsAndPointsAction,
+    moveMultipleReferencePointsAction
+} from "@/actions/referenceactions";
+import {useHistoryStore} from "@/stores/history";
 
 
 export const referenceTool = <ToolInterface>{
@@ -13,12 +18,14 @@ export const referenceTool = <ToolInterface>{
     use_selection: true,
     _dragged_point: null,
     keyboard_shortcut: new KeyCombinationWithInfo('r', []),
-    listener_calls: [
-    ],
+    dragged_points: [],
+    coords_before_dragging: null,
+    listener_calls: [],
+
     additional_listeners: [
         new Listener('mouseup', function mouseup(event: MouseEvent) {
             this.dragged_point = null
-            if ((<HTMLElement>event.target)?.id === 'canvas') {
+            if (!this.get_store().selectionTool.state.visible && (<HTMLElement>event.target)?.id === 'canvas' && event.button === 0) {
                 createReferencePointAction.create(event)
             }
         }, 'canvas-container'),
@@ -31,22 +38,30 @@ export const referenceTool = <ToolInterface>{
             }
         }),
         new KeyboardListener(function delete_selected(_: KeyboardEvent) {
-            const referenceStore = useReferenceStore()
-            referenceStore.deleted_selected_pairs()
-            referenceStore.deleted_selected_points()
+            deleteSelectReferencePairsAndPointsAction.create()
         }, new KeyCombinationWithInfo('Delete', [])),
-        new MouseUpListener(function mouseup(event: MouseEvent) {
-            console.log(event.target)
-            console.log((<HTMLElement>event.target).classList.contains('referencePoint'))
-        }, 0, ['cmd'])
     ],
     set dragged_point(point: ReferencePoint) {
-        this.state['dragged_point'] = point
+        const historyStore = useHistoryStore()
         if (point) {
+            historyStore.pause()
             this.get_store().selectionTool.mute()
+            const referenceStore = useReferenceStore()
+            this.state['dragged_points'] = referenceStore.selected_points
+            if (!this.state['dragged_points'].includes(point)) {
+                this.state['dragged_points'].push(point)
+            }
+            this.state['coords_before_dragging'] = this.state['dragged_points'].map((point: ReferencePoint) => [...point.coords])
         } else {
-            this.get_store().selectionTool.listen()
+            historyStore.continue()
+            if (this.state['dragged_points']) {
+                this.get_store().selectionTool.listen()
+                moveMultipleReferencePointsAction.create(this.state['dragged_points'], this.state['coords_before_dragging'])
+                this.state['dragged_points'] = null
+                this.state['coords_before_dragging'] = null
+            }
         }
+        this.state['dragged_point'] = point
     },
     get dragged_point(): ReferencePoint {
         return this.state.dragged_point

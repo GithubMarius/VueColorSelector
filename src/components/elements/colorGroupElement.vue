@@ -3,13 +3,12 @@ import {ColorGroup} from '@/utils/colors/ColorManagement';
 import ColorBlockElement from '@/components/elements/ColorBlockElement.vue'
 import ToggleButton from '@/components/ui/ToggleButton.vue'
 import {useColorStore} from '@/stores/color'
-import {useHistoryStore} from '@/stores/history';
 
 import {computed, nextTick, ref} from 'vue'
 import {useSettingsStore} from '@/stores/settings';
+import {RenameGroup} from "@/actions/coloractions";
 
 const colorStore = useColorStore()
-const historyStore = useHistoryStore()
 const settingsStore = useSettingsStore()
 
 const props = defineProps({
@@ -33,7 +32,7 @@ function activate_name_editing() {
 
 function submit_name() {
   const name = group_name_input_ref.value.value
-  const actionFeedback = historyStore.rename_group(props.group.name, name)
+  const actionFeedback = RenameGroup.create(props.group.name, name)
   if (actionFeedback.success) {
     reset()
   } else {

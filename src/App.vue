@@ -2,12 +2,13 @@
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
 // Vue
-import {onMounted, onUnmounted, ref, watch} from 'vue'
+import {markRaw, onMounted, onUnmounted, ref, toRaw, watch} from 'vue'
 
 // Stores
 import {useGroupStore} from '@/stores/color'
 import {useHistoryStore} from '@/stores/history'
 import {useSettingsStore} from '@/stores/settings'
+import {useToolsStore} from "@/stores/tools"
 
 // Columns
 import ContentColumn from './components/columns/ContentColumn.vue'
@@ -20,9 +21,10 @@ import RectangularSelectionTool from '@/components/RectangularSelection.vue'
 // Utils
 import {openDataImportFileDialog, openImgFileDialog, return_download_file} from '@/utils/fileManagement'
 import {KeyCombinationWithInfo} from './utils/keyboardinput'
-import Toasts from "@/components/Toasts.vue";
-import {useToolsStore} from "@/stores/tools";
-import KeyboardShortcutsModal from "@/components/KeyboardShortcutsModal.vue";
+import Toasts from "@/components/Toasts.vue"
+
+// Modals
+import KeyboardShortcutsModal from "@/components/modals/KeyboardShortcutsModal.vue"
 
 // Refs
 const rectSelectionRef = ref(null)
@@ -38,7 +40,6 @@ const groupStore = useGroupStore()
 watch(() => settingsStore.ui.light.value, () => {
   document.documentElement.setAttribute('data-bs-theme', settingsStore.theme)
 })
-
 
 // Key Bindings
 
@@ -78,7 +79,7 @@ settingsStore.keyCombinations.export.bind((event: KeyboardEvent) => {
 
 // Show keyboard shortcuts
 settingsStore.keyCombinations.show_keyboard_shortcuts.bind((event: KeyboardEvent) => {
-  settingsStore.ui.show_short_cuts.value = true
+  settingsStore.setModal(KeyboardShortcutsModal)
   event.preventDefault()
 })
 
@@ -147,7 +148,8 @@ const toolStore = useToolsStore()
     <Toasts></Toasts>
   </RectangularSelectionTool>
   <!-- Modal -->
-  <KeyboardShortcutsModal/>
+  <component :is="toRaw(settingsStore.modal)" v-model:visible="settingsStore.ui.modalVisible"
+             v-if="toRaw(settingsStore.modal) && settingsStore.ui.modalVisible"></component>
 </template>
 
 <style lang="scss">
@@ -156,14 +158,10 @@ const toolStore = useToolsStore()
 :root {
   --color-highlighted: rgb(14, 137, 231);
 }
-
-.deleteCursor {
-  cursor: url("src/assets/icons/dash-circle.svg") 12 12, not-allowed !important;
+.pipetteCursor {
+  cursor: url(src/assets/icons/eyedropper.svg) 0 16, pointer;
 }
 
-.deleteCursor .deletable {
-  cursor: url("src/assets/icons/dash-circle-fill.svg") 12 12, not-allowed !important;
-}
 
 .column-container {
   max-height: 100vh;

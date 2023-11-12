@@ -25,7 +25,7 @@ class CreateColorBaseAction extends Action {
 
     toString() {
         // Return string representation
-        return `Added color point. (Index: ${this.index})`
+        return `Added color point.`
     }
 
 }
@@ -55,7 +55,7 @@ export class CreateColorAction extends CreateColorBaseAction {
 
     toString() {
         // Return string representation
-        return `Added color point. (Index: ${this.index})`
+        return `Added color point.`
     }
 
 }
@@ -83,7 +83,7 @@ export class ImportColors extends Action {
     }
 
     toString() {
-        return `Import ${this.actions.length} color points.`
+        return `Imported ${this.actions.length} color points.`
     }
 }
 
@@ -119,7 +119,7 @@ export class DeleteColorAction extends Action {
     }
 
     toString() {
-        return `Deleted color point. Index: ${this.index})`
+        return `Deleted color point.`
     }
 
 }
@@ -149,7 +149,7 @@ export class DeleteMultipleColors extends Action {
     }
 
     toString() {
-        return `Delete selected points.`
+        return `Deleted selected points.`
     }
 
 }
@@ -181,9 +181,8 @@ export class AddSelectionToGroup extends Action {
         const colors = this.indices.map(index => colorStore.colors[index])
         colorStore.move_colors_to_groups_by_names(this.previous_groups, colors)
     }
-
     toString() {
-        return `Moving colors to group "${this.new_group_name}."`
+        return `Moved colors to group "${this.new_group_name}."`
     }
 
 }

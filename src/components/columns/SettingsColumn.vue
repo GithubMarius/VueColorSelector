@@ -4,9 +4,7 @@ import {ref} from 'vue';
 // Tabs
 import GroupedColorsTab from '@/components/tabs/GroupedColorsTab.vue'
 import HistoryTab from '@/components/tabs/HistoryTab.vue'
-import ImportExportTab from '@/components/tabs/ImportExportTab.vue'
 
-// import ReferenceTab from '@/components/tabs/ReferencesTab.vue'
 import SettingsTab from '@/components/tabs/SettingsTab.vue'
 import CapturedImagesTab from '@/components/tabs/CapturedImagesTab.vue'
 
@@ -15,8 +13,8 @@ import ColorViewer from '@/components/ColorViewer.vue'
 
 // Stores
 import {useSettingsStore} from '@/stores/settings'
-import {useToolsStore} from "@/stores/tools";
-import {useReferenceStore} from "@/stores/references";
+import {useToolsStore} from '@/stores/tools'
+import {useReferenceStore} from "@/stores/references"
 
 const settingsStore = useSettingsStore()
 
@@ -28,7 +26,6 @@ const tabs = {
     'Colors': GroupedColorsTab,
     'Captured Images': CapturedImagesTab,
     'Settings': SettingsTab,
-    'Import/Export': ImportExportTab,
     'History': HistoryTab,
 //      'References': ReferenceTab,
   },
@@ -52,7 +49,7 @@ const referenceStore = useReferenceStore()
 
 <template>
   <div id="settings-column" class="overflow-auto p-0 min-vh-100 vh-100 mw-20 bg-body-tertiary"
-       :class="[!settingsStore.ui.hide_settings_column.value? 'col-4' : 'd-none']">
+       :class="[!settingsStore.ui.hide_settings_column.value? 'col-4 custom-shadow' : 'd-none']">
     <div class="row">
       <!-- Color viewer -->
       <ColorViewer></ColorViewer>
@@ -79,6 +76,7 @@ const referenceStore = useReferenceStore()
 <style scoped>
 #settings-column {
   height: fit-content;
+  box-shadow: 0 0 20px 5px var(--bs-secondary);
 }
 
 </style>

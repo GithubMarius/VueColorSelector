@@ -15,14 +15,14 @@ export const useHistoryStore = defineStore('history', {
     state: () => {
         return {
             history: <Array<Action>>[],
+            pauseUndoRedo: false,
             index: 0
         }
     },
     actions: {
-
         // Store methods
         undo() {
-            if (this.undo_possible) {
+            if (this.undo_possible && !this.pauseUndoRedo) {
                 this.history[this.index].undo()
                 this.index++
                 const toastStore = useToastStore()
@@ -30,7 +30,7 @@ export const useHistoryStore = defineStore('history', {
             }
         },
         forward() {
-            if (this.forward_possible) {
+            if (this.forward_possible && !this.pauseUndoRedo) {
                 this.index--
                 this.history[this.index].forward()
                 const toastStore = useToastStore()
@@ -57,7 +57,14 @@ export const useHistoryStore = defineStore('history', {
                 return {success: false, msg: err.message}
             }
         },
+        pause() {
+            this.pauseUndoRedo = true
+        },
+        continue() {
+            this.pauseUndoRedo = false
+        },
         reset() {
+            this.pauseUndoRedo = false
             this.history.length = 0
         }
     },

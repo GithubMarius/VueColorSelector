@@ -19,12 +19,12 @@ defineEmits([
 
 const settingsStore = useSettingsStore()
 
-function update_show_details_color(color: Color) {
+function update_show_details_color(event: MouseEvent, color: Color) {
   colorStore.update_show_details(color)
   if (color.show_details) {
     settingsStore.set_chrOrSat(color)
   }
-
+  event.stopPropagation()
 }
 
 const colorStore = useColorStore()
@@ -36,9 +36,8 @@ const toolsStore = useToolsStore()
   <SelectableElement :selecting="selecting" @update:selecting="$emit('update:selecting', $event)"
                      v-model:selected="color.selected"
                      :active="toolsStore.tools.colorsTool.state.active"
-                     @mouseup.ctrl.capture.stop="DeleteColorAction.create(color)"
-                     @mouseup.shift.capture.stop="color.selected = !color.selected"
-                     @mouseup.alt.capture.stop="update_show_details_color(color)"
+                     @delete="DeleteColorAction.create(color)"
+                     @clicked="update_show_details_color($event, color)"
                      @mouseover="colorStore.color_hover(color)"
                      @mouseleave="colorStore.color_unhover_all()"
                      :data-color-id="colorStore.color_index(color)">

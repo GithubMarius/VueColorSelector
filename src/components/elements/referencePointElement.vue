@@ -36,13 +36,12 @@ const styleDigital = computed(function (): StyleValue {
 
 <template>
   <SelectableElement v-model:selecting="point.selecting" v-model:selected="point.selected"
-                     @mouseup.left.exact="() => {
+                     @mousedown.left.exact="() => {
+                       toolsStore.tools.referenceTool.dragged_point = point
                        referenceStore.last_pressed = point
-                       referenceStore.reset_selection()
                      }"
-                     @mouseup.left.shift.exact="createReferencePairAction.create(point)"
-                     @mouseup.left.ctrl.exact="deleteReferencePointAction.create(point)"
-                     @mousedown.exact="toolsStore.tools.referenceTool.dragged_point = point"
+                     @altClicked="createReferencePairAction.create(point)"
+                     @delete="deleteReferencePointAction.create(point)"
                      :active="toolsStore.tools.referenceTool.state.active">
     <div class="referencePoint" :style="styleDigital"></div>
   </SelectableElement>
